@@ -1,0 +1,9 @@
+CREATE TABLE public.users (
+  user_id BIGSERIAL PRIMARY KEY,
+  email VARCHAR(150) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  avatar_url TEXT,
+  full_name VARCHAR(60),
+  role INTEGER NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
