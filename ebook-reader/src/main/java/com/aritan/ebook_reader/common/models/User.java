@@ -1,5 +1,6 @@
-package com.aritan.ebook_reader.features.user;
+package com.aritan.ebook_reader.common.models;
 
+import com.aritan.ebook_reader.common.validation.ValidRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,14 +10,16 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", schema = "public")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,10 +38,20 @@ public class User {
     @Column(name = "full_name", length = 60)
     private String fullName;
 
-    @Column(name = "role", nullable = false)
-    private Integer role;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+
+    private Set<Role> roles = new HashSet<>();
 
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
     private Date createdAt;
+
+    public User(String fullName, String email, String password) {
+        this.fullName = fullName;
+        this.email = email;
+        this.passwordHash = password;
+    }
 }

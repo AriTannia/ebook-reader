@@ -2,19 +2,20 @@ package com.aritan.ebook_reader.features.user;
 
 import com.aritan.ebook_reader.common.constants.UserMessages;
 import com.aritan.ebook_reader.common.models.EBResponse;
+import com.aritan.ebook_reader.common.models.User;
 import com.aritan.ebook_reader.features.user.dtos.UserRequest;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api")
 public class UserController {
-    private IUserService userService;
+    private final IUserService userService;
 
     @GetMapping("/public/users")
     public ResponseEntity<EBResponse<List<User>>> getAllUsers() {

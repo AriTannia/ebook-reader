@@ -44,6 +44,30 @@ public class EBResponse<T> {
         return response;
     }
 
+    public static <T> EBResponse<T> Unauthorized(Integer codeNumber, String message){
+        EBResponse<T> response = new EBResponse<>(EBResponseCode.Unauthorized);
+        response.setCodeNumber(codeNumber);
+        response.setMessage(message);
+
+        return response;
+    }
+
+    public static <T> EBResponse<T> NotFound(Integer codeNumber, String message){
+        EBResponse<T> response = new EBResponse<>(EBResponseCode.NotFound);
+        response.setCodeNumber(codeNumber);
+        response.setMessage(message);
+
+        return response;
+    }
+
+    public static <T> EBResponse<T> Forbidden(Integer codeNumber, String message){
+        EBResponse<T> response = new EBResponse<>(EBResponseCode.Forbidden);
+        response.setCodeNumber(codeNumber);
+        response.setMessage(message);
+
+        return response;
+    }
+
     public static String GetDefaultMessage(EBResponseCode codeStatus){
         return switch (codeStatus) {
             case EBResponseCode.Success -> "Success.";

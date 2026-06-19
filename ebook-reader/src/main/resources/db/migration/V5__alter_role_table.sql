@@ -1,0 +1,1 @@
+ALTER TABLE public.roles RENAME COLUMN id TO role_id;

@@ -1,5 +1,6 @@
 package com.aritan.ebook_reader.features.user;
 
+import com.aritan.ebook_reader.common.models.User;
 import com.aritan.ebook_reader.features.user.dtos.UserRequest;
 
 import java.util.List;

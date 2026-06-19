@@ -1,0 +1,3 @@
+TRUNCATE TABLE public.roles RESTART IDENTITY CASCADE;
+
+INSERT INTO public.roles (name) VALUES ('ADMIN'),('USER');
