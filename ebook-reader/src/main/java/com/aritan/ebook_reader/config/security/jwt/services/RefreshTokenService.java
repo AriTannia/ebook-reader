@@ -1,5 +1,7 @@
 package com.aritan.ebook_reader.config.security.jwt.services;
 
+import com.aritan.ebook_reader.common.constants.AuthMessages;
+import com.aritan.ebook_reader.common.constants.UserMessages;
 import com.aritan.ebook_reader.common.exception.TokenRefreshException;
 import com.aritan.ebook_reader.common.models.RefreshToken;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRefreshTokenRepository;
@@ -41,7 +43,7 @@ public class RefreshTokenService implements IRefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if(token.getExpiryDate().compareTo(Instant.now()) < 0){
             refreshTokenRepository.delete(token);
-            throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
+            throw new TokenRefreshException(token.getToken(), AuthMessages.REFRESH_TOKEN_EXPIRED);
         }
 
         return token;

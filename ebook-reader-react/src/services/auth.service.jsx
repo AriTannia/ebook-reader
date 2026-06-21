@@ -1,21 +1,19 @@
-import axios from "axios";
+import api from "./api";
 
-axios.defaults.withCredentials = true;
-
-const API_URL = "/api/auth/";
+const API_URL = "/auth/";
 
 export const register = (username, email, password) => {
-  return axios.post(API_URL + "signup", {
+  return api.post(API_URL + "signup", {
     username,
     email,
     password,
   });
 };
 
-export const login = (username, password) => {
-  return axios
+export const login = (email, password) => {
+  return api
     .post(API_URL + "signin", {
-      username,
+      email,
       password,
     })
     .then((response) => {
@@ -23,6 +21,10 @@ export const login = (username, password) => {
     });
 };
 
+export const refreshToken = () => {
+  return api.post(API_URL + "refresh-token");
+}
+
 export const logout = () => {
-    return axios.post(API_URL + "signout");
+    return api.post(API_URL + "signout");
 }

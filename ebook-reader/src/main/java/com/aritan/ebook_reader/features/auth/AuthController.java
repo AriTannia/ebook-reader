@@ -42,7 +42,7 @@ public class AuthController {
                 .body(EBResponse.Success(null, "Signout successful!"));
     }
 
-    @PostMapping("/refreshtoken")
+    @PostMapping("/refresh-token")
     public ResponseEntity<EBResponse<?>> refreshToken(HttpServletRequest request){
         var result = authService.refreshToken(request);
         return ResponseEntity.ok()

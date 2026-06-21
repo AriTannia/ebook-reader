@@ -12,27 +12,103 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [formdData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [serverError, setServerError] = useState({
+    fullName: false,
+    email: false,
+    password: false,
+  });
   
   const { message } = useSelector((state) => state.message);
+
+  const validateForm = (username, email, password) => {
+    const errors = {};
+    if(!username){
+      errors.username = "Username is required.";
+    } else if(username.length < 3){
+      errors.username = "Username must be at least 3 characters.";
+    }
+
+    if(!email){
+      errors.email = "Email is required.";
+    } else if(!email.includes("@")){
+      errors.email = "Please enter a valid email address.";
+    }
+
+    if(!password){
+      errors.password = "Password is required.";
+    } else if(password.length < 6){
+      errors.password = "Password must be at least 6 characters.";
+    }
+
+    return errors;
+  };
+
+  const validateField = (name, value) => {
+    const errors = validateForm(
+      name === "username" ? value : formdData.username,
+      name === "email" ? value : formdData.email,
+      name === "password" ? value : formdData.password
+    );
+
+    return errors[name] ? { [name]: errors[name] } : {};
+  };
+
+    const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formdData,
+      [name]: value
+    });
+    const newErrors = validateField(name, value);
+    setFieldErrors((prev) => ({
+      ...prev,
+      [name]: newErrors[name]
+    }));
+
+    setServerError((prev) => ({
+      ...prev,
+      [name]: false,
+    }));
+  };
 
   const handleRegister = (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    dispatch(register({ username, email, password }))
+    const allErrors = {
+      ...validateField("username", formdData.username),
+      ...validateField("email", formdData.email),
+      ...validateField("password", formdData.password),
+    };
+
+    if(Object.keys(allErrors).length > 0){
+      setFieldErrors(allErrors);
+      setLoading(false);
+      return;
+    }
+
+    setServerError({ username: false, email: false, password: false });
+
+    dispatch(register({ username: formdData.username, email: formdData.email, password: formdData.password }))
       .unwrap()
       .then(() => {
         navigate("/login");
       })
-      .catch(() => {
+      .catch((errorMessage) => {
         setLoading(false);
-        setError(message || "Registration failed. Please try again.");
+        setError(errorMessage || "Registration failed. Please try again.");
+        setServerError({ username: true, email: true, password: true });
       });
   };
 
@@ -60,13 +136,16 @@ const Register = () => {
               id="name"
               label="Full name"
               type="text"
-              name="name"
+              name="username"
               required
               autoComplete="name"
               placeholder="Jane Doe"
               minLength={3}
               maxLength={20}
-              onChange={(e) => setUsername(e.target.value)}
+              value={formdData.username}
+              onChange={handleInputChange}
+              error={fieldErrors.username}
+              isInvalid={serverError.username}
               icon={<User className="h-4 w-4" />}
             />
             <InputField
@@ -77,7 +156,10 @@ const Register = () => {
               required
               autoComplete="email"
               placeholder="you@example.com"
-              onChange={(e) => setEmail(e.target.value)}
+              value={formdData.email}
+              onChange={handleInputChange}
+              error={fieldErrors.email}
+              isInvalid={serverError.email}
               icon={<Mail className="h-4 w-4" />}
             />
             <InputField
@@ -89,7 +171,10 @@ const Register = () => {
               minLength={6}
               autoComplete="new-password"
               placeholder="At least 6 characters"
-              onChange={(e) => setPassword(e.target.value)}
+              value={formdData.password}
+              onChange={handleInputChange}
+              error={fieldErrors.password}
+              isInvalid={serverError.password}
               minLength={6}
               maxLength={40}
               icon={<Lock className="h-4 w-4" />}

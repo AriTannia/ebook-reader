@@ -19,7 +19,7 @@ public class UserService implements IUserService{
     public List<User> getAllUsers() {
         List<User> users = userRepository.findAll();
         if(users.isEmpty()){
-            throw new ResourceNotFoundException(UserMessages.NOT_FOUND);
+            throw new ResourceNotFoundException(UserMessages.NO_DATA_FOUND);
         }
 
         return users;
@@ -39,6 +39,6 @@ public class UserService implements IUserService{
     @Override
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(UserMessages.NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(UserMessages.NO_DATA_FOUND));
     }
 }

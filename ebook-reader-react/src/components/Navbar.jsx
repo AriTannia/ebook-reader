@@ -1,11 +1,13 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BookOpen, User, LogOut } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../reducers/auth";
 
 export default function Navbar() {
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.auth.user);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     setDropdownOpen(false);
-    dispatch({ type: "LOGOUT" });
+    dispatch(logout());
     navigate("/");
   };
 
@@ -34,6 +36,18 @@ export default function Navbar() {
         .slice(0, 2)
         .toUpperCase()
     : "";
+
+    useEffect(() => {
+      console.log(
+        "Trạng thái đăng nhập thay đổi! isLoggedIn =",
+        isLoggedIn,
+        "User =",
+        currentUser,
+      );
+    }, [isLoggedIn, currentUser]);
+
+    const hasUser =
+      isLoggedIn && currentUser && Object.keys(currentUser).length > 0;
 
   return (
     <header className="sticky top-0 z-20 border-b border-border/70 bg-background/80 backdrop-blur-md">
@@ -54,7 +68,7 @@ export default function Navbar() {
 
         {/* Far right */}
         <div className="flex items-center">
-          {currentUser ? (
+          {hasUser ? (
             /* ── Authenticated: avatar + hover dropdown ── */
             <div
               className="relative"

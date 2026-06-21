@@ -9,7 +9,7 @@ import Home from "./pages/Home";
 import BoardUser from "./pages/BoardUser";
 import BoardAdmin from "./pages/BoardAdmin";
 
-import { logout } from "./reducers/auth";
+import { logout, refreshToken } from "./reducers/auth";
 import { clearMessage } from "./reducers/message";
 
 const App = () => {
@@ -25,13 +25,17 @@ const App = () => {
     }
   }, [dispatch, location]);
 
+  useEffect(() => {
+    dispatch(refreshToken());
+  }, [dispatch]); 
+
   const logOut = useCallback(() => {
     dispatch(logout());
   }, [dispatch]);
 
   useEffect(() => {
     if(currentUser){
-      setShowAdminBoard(currentUser.Routes.includes("ROLE_ADMIN"));
+      setShowAdminBoard(currentUser.roles.includes("ROLE_ADMIN"));
     } else {
       setShowAdminBoard(false);
     }

@@ -41,7 +41,7 @@ public class UserDetailsImpl implements UserDetails {
 
         return new UserDetailsImpl(
                 user.getUserId(),
-                user.getEmail(),
+                user.getFullName(),
                 user.getEmail(),
                 user.getPasswordHash(),
                 authorityList);

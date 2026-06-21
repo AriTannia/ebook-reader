@@ -36,6 +36,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    // Unauthorized
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<EBResponse<Object>> handleAuthenticationException(AuthenticationException ex) {
+        EBResponse<Object> response = EBResponse.Unauthorized(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<EBResponse<Object>> handleGenericException(Exception e){
         EBResponse<Object> response = new EBResponse<>(EBResponseCode.Error);

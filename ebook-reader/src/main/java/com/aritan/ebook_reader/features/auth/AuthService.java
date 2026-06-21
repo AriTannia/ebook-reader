@@ -1,6 +1,9 @@
 package com.aritan.ebook_reader.features.auth;
 
+import com.aritan.ebook_reader.common.constants.AuthMessages;
+import com.aritan.ebook_reader.common.constants.UserMessages;
 import com.aritan.ebook_reader.common.enums.ERole;
+import com.aritan.ebook_reader.common.exception.AuthenticationException;
 import com.aritan.ebook_reader.common.exception.DataDuplicateException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.RefreshToken;
@@ -16,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,38 +43,43 @@ public class AuthService implements IAuthService{
     private final JwtUtils jwtUtils;
     @Override
     public UserAuthenticationResponse authenticateUser(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        // Generate Jwt
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            // Generate Jwt
+            ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
 
-        // Generate RefreshToken
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-        ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
+            // Generate RefreshToken
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+            ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
 
-        UserJwtHeaderResponse userJwtHeaderResponse = new UserJwtHeaderResponse(jwtCookie, jwtRefreshCookie);
-        UserInfoResponse userInfoResponse = new UserInfoResponse(userDetails.getId(),
-                userDetails.getEmail(),
-                roles);
+            UserJwtHeaderResponse userJwtHeaderResponse = new UserJwtHeaderResponse(jwtCookie, jwtRefreshCookie);
+            UserInfoResponse userInfoResponse = new UserInfoResponse(userDetails.getId(),
+                    userDetails.getEmail(),
+                    userDetails.getUsername(),
+                    roles);
 
-        return new UserAuthenticationResponse(
-                userJwtHeaderResponse,
-                userInfoResponse
-        );
+            return new UserAuthenticationResponse(
+                    userJwtHeaderResponse,
+                    userInfoResponse
+            );
+        } catch (BadCredentialsException e){
+            throw new AuthenticationException(AuthMessages.INVALID_CREDENTIALS);
+        }
     }
 
     @Override
     public User registerUser(SignupRequest request) {
         if(userRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new DataDuplicateException("Error: Email is already in use!");
+            throw new DataDuplicateException(UserMessages.EMAIL_IN_USE);
         }
 
         // Create new user's account
@@ -82,14 +91,14 @@ public class AuthService implements IAuthService{
 
         if (strRoles == null) {
             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new ResourceNotFoundException("Error: Role is not found."));
+                    .orElseThrow(() -> new ResourceNotFoundException(UserMessages.ROLE_NOT_FOUND));
             roles.add(userRole);
         } else {
             strRoles.forEach(strRole -> {
                 ERole eRole = ERole.getOrDefault(strRole);
 
                 Role existedRole = roleRepository.findByName(eRole)
-                        .orElseThrow(() -> new ResourceNotFoundException("Error: Role is not found."));
+                        .orElseThrow(() -> new ResourceNotFoundException(UserMessages.ROLE_NOT_FOUND));
                 roles.add(existedRole);
             });
         }
@@ -121,8 +130,8 @@ public class AuthService implements IAuthService{
                     .map(refreshTokenService::verifyExpiration)
                     .map(RefreshToken::getUser)
                     .map(jwtUtils::generateJwtCookie)
-                    .orElseThrow(() -> new ResourceNotFoundException("Refresh token is not in database!"));
+                    .orElseThrow(() -> new ResourceNotFoundException(AuthMessages.REFRESH_TOKEN_NOT_FOUND));
         }
-        throw new ResourceNotFoundException("Refresh Token is empty!");
+        throw new ResourceNotFoundException(AuthMessages.REFRESH_TOKEN_EMPTY);
     }
 }

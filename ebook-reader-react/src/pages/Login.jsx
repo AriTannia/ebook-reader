@@ -12,13 +12,67 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [formdData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [serverError, setServerError] = useState({
+    email: false,
+    password: false,
+  });
 
   const { isLoggedIn } = useSelector((state) => state.auth);
   const { message } = useSelector((state) => state.message);
+
+  const validateForm = (email, password) => {
+    const errors = {};
+
+    if(!email){
+      errors.email = "Email is required.";
+    } else if(!email.includes("@")){
+      errors.email = "Please enter a valid email address.";
+    }
+
+    if(!password){
+      errors.password = "Password is required.";
+    } else if(password.length < 6){
+      errors.password = "Password must be at least 6 characters.";
+    }
+
+    return errors;
+  };
+
+  const validateField = (name, value) => {
+    const errors = validateForm(
+      name === "email" ? value : formdData.email,
+      name === "password" ? value : formdData.password
+    );
+
+    return errors[name] ? { [name]: errors[name] } : {};
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formdData,
+      [name]: value
+    });
+    const newErrors = validateField(name, value);
+    setFieldErrors((prev) => ({
+      ...prev,
+      [name]: newErrors[name]
+    }));
+    
+    setServerError((prev) => ({
+      ...prev,
+      [name]: false,
+    }));
+  };
 
   if(isLoggedIn) {
     return <Navigate to="/" />;
@@ -29,14 +83,28 @@ const Login = () => {
         setError("");
         setLoading(true);
 
-        dispatch(login({ email, password }))
+        const allErrors = {
+          ...validateField("email", formdData.email),
+          ...validateField("password", formdData.password),
+        }
+
+        if(Object.keys(allErrors).length > 0){
+          setFieldErrors(allErrors);
+          setLoading(false);
+          return;
+        }
+
+        setServerError({ email: false, password: false });
+
+        dispatch(login({ email: formdData.email, password: formdData.password }))
         .unwrap()
         .then(() => {
             navigate("/");
         })
-        .catch(() => {
+        .catch((errorMessage) => {
             setLoading(false);
-            setError(message || "Login failed. Please try again.");
+            setError(errorMessage || "Login failed. Please try again.");
+            setServerError({ email: true, password: true });
         });
     };
 
@@ -59,7 +127,7 @@ const Login = () => {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-5" noValidate={false}>
+          <form onSubmit={handleLogin} className="flex flex-col gap-5" noValidate>
             <InputField
               id="email"
               label="Email address"
@@ -68,7 +136,10 @@ const Login = () => {
               required
               autoComplete="email"
               placeholder="you@example.com"
-              onChange={(e) => setEmail(e.target.value)}
+              value={formdData.email}
+              onChange={handleInputChange}
+              error={fieldErrors.email}
+              isInvalid={serverError.email}
               icon={<Mail className="h-4 w-4" />}
             />
             <div className="flex flex-col gap-1.5">
@@ -81,7 +152,10 @@ const Login = () => {
                 minLength={6}
                 autoComplete="current-password"
                 placeholder="Enter your password"
-                onChange={(e) => setPassword(e.target.value)}
+                value={formdData.password}
+                onChange={handleInputChange}
+                error={fieldErrors.password}
+                isInvalid={serverError.password}
                 icon={<Lock className="h-4 w-4" />}
               />
               <div className="flex justify-end">

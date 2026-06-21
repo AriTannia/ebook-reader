@@ -1,5 +1,6 @@
 package com.aritan.ebook_reader.config.security.jwt.services;
 
+import com.aritan.ebook_reader.common.constants.UserMessages;
 import com.aritan.ebook_reader.common.models.User;
 import com.aritan.ebook_reader.features.user.IUserRepository;
 import jakarta.transaction.Transactional;
@@ -18,7 +19,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException(UserMessages.notFoundWithEmail(username)));
 
         return UserDetailsImpl.build(user);
     }
