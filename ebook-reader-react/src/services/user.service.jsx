@@ -1,15 +1,11 @@
-import axios from 'axios';
+import api from "./api";
 
-const API_URL = '/api/users/';
+const API_URL = "/public/users/";
 
-export const getPublicContent = () => {
-  return axios.get(API_URL + 'all');
+export const getUserProfile = (userId) => {
+  return api.get(API_URL + userId);
 };
 
-export const getUserBoard = () => {
-  return axios.get(API_URL + 'user');
-};
-
-export const getAdminBoard = () => {
-  return axios.get(API_URL + 'admin');
+export const updateUserProfile = (userId, updatedData) => {
+  return api.put(API_URL + userId, updatedData);
 };

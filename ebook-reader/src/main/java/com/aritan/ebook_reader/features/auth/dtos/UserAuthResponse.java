@@ -5,11 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserAuthenticationResponse {
-    private UserJwtHeaderResponse userJwtHeaderResponse;
-    private UserAuthResponse userAuthResponse;
+public class UserAuthResponse {
+    private Long id;
+    private String email;
+    private String username;
+    private List<String> roles;
 }

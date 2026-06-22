@@ -24,7 +24,7 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, result.getUserJwtHeaderResponse().getJwtCookie().toString())
                 .header(HttpHeaders.SET_COOKIE, result.getUserJwtHeaderResponse().getJwtRefreshCookie().toString())
-                .body(EBResponse.Success(result.getUserInfoResponse(), "Signin successful!"));
+                .body(EBResponse.Success(result.getUserAuthResponse(), "Signin successful!"));
     }
 
     @PostMapping("/signup")

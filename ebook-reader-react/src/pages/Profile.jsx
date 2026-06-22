@@ -1,13 +1,22 @@
-import React from 'react';
+import { React, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { ArrowRight, Library } from "lucide-react"
 import Navbar from "../components/Navbar"
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { user } from '../reducers/user';
 
 const Profile = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user: currentUser } = useSelector((state) => state.auth);
+  const { selectedUser, loading } = useSelector((state) => state.user); 
+
+  useEffect(() => {
+    if (currentUser) {
+      dispatch(fetchUserProfile(currentUser.id));
+    }
+  }, [dispatch, currentUser]);
 
   if (!currentUser) {
     return (
@@ -49,7 +58,7 @@ const Profile = () => {
               {currentUser.avatarUrl ? (
                 <img
                   src={currentUser.avatarUrl}
-                  alt={currentUser.username}
+                  alt={currentUser.fullName}
                   className="h-20 w-20 rounded-full object-cover shadow-md ring-4 ring-primary/15"
                 />
               ) : (
@@ -59,7 +68,7 @@ const Profile = () => {
               )}
 
               <h1 className="mt-5 text-balance text-xl font-semibold tracking-tight text-foreground">
-                {currentUser.username}&apos;s Profile
+                {currentUser.fullName}&apos;s Profile
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
                 {currentUser.email}

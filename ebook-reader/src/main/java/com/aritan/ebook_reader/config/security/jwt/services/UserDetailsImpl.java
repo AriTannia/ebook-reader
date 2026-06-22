@@ -21,13 +21,15 @@ public class UserDetailsImpl implements UserDetails {
     private Long id;
     private String email;
     private String username;
+    private String fullName;
     @JsonIgnore
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
-    public UserDetailsImpl(Long id,  String username,String email, String password,
+    public UserDetailsImpl(Long id, String fullName, String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id  = id;
-        this.username = username;
+        this.username = email;
+        this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.authorities = authorities;

@@ -29,7 +29,7 @@ export default function Navbar() {
 
   // Derive initials for the avatar placeholder
   const initials = currentUser
-    ? currentUser.username
+    ? currentUser.fullName
         .split(" ")
         .map((n) => n[0])
         .join("")
@@ -85,7 +85,7 @@ export default function Navbar() {
                 {currentUser.avatarUrl ? (
                   <img
                     src={currentUser.avatarUrl}
-                    alt={currentUser.username}
+                    alt={currentUser.fullName}
                     className="h-full w-full rounded-full object-cover"
                   />
                 ) : (

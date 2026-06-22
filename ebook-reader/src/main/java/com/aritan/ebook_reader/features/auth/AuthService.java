@@ -15,6 +15,7 @@ import com.aritan.ebook_reader.config.security.jwt.services.interfaces.IRefreshT
 import com.aritan.ebook_reader.config.security.jwt.utilities.JwtUtils;
 import com.aritan.ebook_reader.features.auth.dtos.*;
 import com.aritan.ebook_reader.features.user.IUserRepository;
+import com.aritan.ebook_reader.features.auth.dtos.UserAuthResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -62,14 +63,14 @@ public class AuthService implements IAuthService{
             ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
 
             UserJwtHeaderResponse userJwtHeaderResponse = new UserJwtHeaderResponse(jwtCookie, jwtRefreshCookie);
-            UserInfoResponse userInfoResponse = new UserInfoResponse(userDetails.getId(),
+            UserAuthResponse userAuthResponse = new UserAuthResponse(userDetails.getId(),
                     userDetails.getEmail(),
                     userDetails.getUsername(),
                     roles);
 
             return new UserAuthenticationResponse(
                     userJwtHeaderResponse,
-                    userInfoResponse
+                    userAuthResponse
             );
         } catch (BadCredentialsException e){
             throw new AuthenticationException(AuthMessages.INVALID_CREDENTIALS);

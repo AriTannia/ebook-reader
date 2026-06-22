@@ -9,6 +9,7 @@ public  final class UserMessages {
     public static final String DATA_CREATED_SUCCESSFULLY = "Data created successfully";
     public static final String EMAIL_IN_USE = "Email is already in use!";
     public static final String ROLE_NOT_FOUND = "Role is not found.";
+    public static final String DATA_UPDATED_SUCCESSFULLY = "Data updated successfully!";
     public static final String INVALID_ROLE_FORMAT = "Định dạng quyền (Role) không hợp lệ hoặc không tồn tại!";
 
     // Validation Input

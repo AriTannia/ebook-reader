@@ -1,4 +1,4 @@
-package com.aritan.ebook_reader.features.auth.dtos;
+package com.aritan.ebook_reader.features.user.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,9 +11,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInfoResponse {
+public class UserResponse {
     private Long id;
     private String email;
-    private String username;
+    private String fullName;
+    private String avatarUrl;
     private List<String> roles;
 }
