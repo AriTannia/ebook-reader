@@ -10,6 +10,6 @@ public class FileHelper {
 
         String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
 
-        return randomUUID().toString() + extension;
+        return randomUUID() + extension;
     }
 }

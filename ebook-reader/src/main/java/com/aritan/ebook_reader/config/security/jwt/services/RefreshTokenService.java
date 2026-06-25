@@ -1,7 +1,6 @@
 package com.aritan.ebook_reader.config.security.jwt.services;
 
-import com.aritan.ebook_reader.common.constants.AuthMessages;
-import com.aritan.ebook_reader.common.constants.UserMessages;
+import com.aritan.ebook_reader.common.constants.messages.AuthMessage;
 import com.aritan.ebook_reader.common.exception.TokenRefreshException;
 import com.aritan.ebook_reader.common.models.RefreshToken;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRefreshTokenRepository;
@@ -31,7 +30,7 @@ public class RefreshTokenService implements IRefreshTokenService {
     public RefreshToken createRefreshToken(Long userId) {
         RefreshToken refreshToken = new RefreshToken();
 
-        refreshToken.setUser(userRepository.findById(userId).get());
+        refreshToken.setUser(userRepository.getReferenceById(userId));
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         refreshToken.setToken(UUID.randomUUID().toString());
 
@@ -43,7 +42,7 @@ public class RefreshTokenService implements IRefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if(token.getExpiryDate().compareTo(Instant.now()) < 0){
             refreshTokenRepository.delete(token);
-            throw new TokenRefreshException(token.getToken(), AuthMessages.REFRESH_TOKEN_EXPIRED);
+            throw new TokenRefreshException(token.getToken(), AuthMessage.REFRESH_TOKEN_EXPIRED);
         }
 
         return token;
@@ -51,6 +50,6 @@ public class RefreshTokenService implements IRefreshTokenService {
 
     @Override
     public void deleteByUserId(Long userId) {
-        refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
+        refreshTokenRepository.deleteByUser(userRepository.getReferenceById(userId));
     }
 }

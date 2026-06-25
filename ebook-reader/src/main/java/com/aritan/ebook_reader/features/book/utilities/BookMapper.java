@@ -1,0 +1,85 @@
+package com.aritan.ebook_reader.features.book.utilities;
+
+import com.aritan.ebook_reader.common.enums.BookStatus;
+import com.aritan.ebook_reader.common.models.Book;
+import com.aritan.ebook_reader.common.models.BookFormat;
+import com.aritan.ebook_reader.common.models.Author;
+import com.aritan.ebook_reader.common.models.Category;
+import com.aritan.ebook_reader.common.models.Publisher;
+import com.aritan.ebook_reader.features.author.utilities.AuthorMapper;
+import com.aritan.ebook_reader.features.book.dtos.*;
+import com.aritan.ebook_reader.features.category.utilities.CategoryMapper;
+import com.aritan.ebook_reader.features.publisher.utilities.PublisherMapper;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Mapper(
+    componentModel = "spring",
+    uses = {
+            AuthorMapper.class,
+            CategoryMapper.class,
+            PublisherMapper.class
+    }
+)
+public interface BookMapper {
+    BookResponse toBookResponse(Book book);
+    BookDetailsResponse toDetailsResponse(Book book);
+
+    @Mapping(target = "bookId", ignore = true)
+    @Mapping(target = "status", constant = BookStatus.ACTIVE_VALUE)
+    @Mapping(target = "authors", ignore = true)
+    @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "publisher", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    Book toBook(BookCreateRequest createRequest);
+
+    @Mapping(target = "authors", ignore = true)
+    @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "publisher", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    void updateBook(
+            BookUpdateRequest request,
+            @MappingTarget Book book
+    );
+
+    BookFormatResponse toFormatResponse(BookFormat bookFormat);
+
+    @Mapping(target = "bookFormatId", ignore = true)
+    @Mapping(target = "book", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    BookFormat toBookFormat(BookFormatCreateRequest createRequest);
+
+    @Mapping(target = "bookFormatId", ignore = true)
+    @Mapping(target = "book", ignore = true)
+    @Mapping(target = "formatType", ignore = true)
+    @Mapping(target = "mimeType", ignore = true)
+    @Mapping(target = "fileSize", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    void updateBookFormat(
+            BookFormatUpdateRequest request,
+            @MappingTarget BookFormat bookFormat
+    );
+
+    default Set<Long> mapAuthorsToIds(Set<Author> authors) {
+        if (authors == null) return null;
+        return authors.stream()
+                .map(Author::getAuthorId)
+                .collect(Collectors.toSet());
+    }
+
+    default Set<Long> mapCategoriesToIds(Set<Category> categories) {
+        if (categories == null) return null;
+        return categories.stream()
+                .map(Category::getCategoryId)
+                .collect(Collectors.toSet());
+    }
+
+    default Long mapPublisherToId(Publisher publisher) {
+        if (publisher == null) return null;
+        return publisher.getPublisherId();
+    }
+}

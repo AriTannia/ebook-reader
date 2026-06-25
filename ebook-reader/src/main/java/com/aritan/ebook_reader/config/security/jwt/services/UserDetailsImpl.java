@@ -1,9 +1,12 @@
 package com.aritan.ebook_reader.config.security.jwt.services;
 
 import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.features.auth.AuthService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +27,8 @@ public class UserDetailsImpl implements UserDetails {
     private String fullName;
     @JsonIgnore
     private String password;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserDetailsImpl.class);
     private Collection<? extends GrantedAuthority> authorities;
     public UserDetailsImpl(Long id, String fullName, String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
@@ -37,9 +42,13 @@ public class UserDetailsImpl implements UserDetails {
 
     // Factory Method
     public static UserDetailsImpl build(User user){
+        long start = System.currentTimeMillis();
+
         List<GrantedAuthority> authorityList = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
+
+        logger.info("Load Role time: {} ms", System.currentTimeMillis() - start);
 
         return new UserDetailsImpl(
                 user.getUserId(),

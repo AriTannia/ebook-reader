@@ -1,0 +1,26 @@
+package com.aritan.ebook_reader.features.book.dtos;
+
+import com.aritan.ebook_reader.common.enums.BookStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class BookCreateRequest {
+    private String title;
+    private String description;
+    private BigDecimal price;
+    private String coverImageUrl;
+    private String language;
+    private LocalDate publishedDate;
+    private List<Long> authorIds;
+    private List<Long> categoryIds;
+    private Long publisherId;
+}

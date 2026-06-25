@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.common.validation;
 
-import com.aritan.ebook_reader.common.constants.UserMessages;
+import com.aritan.ebook_reader.common.constants.messages.UserMessage;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = RoleValidator.class)
 @Documented
 public @interface ValidRole {
-    String message() default UserMessages.INVALID_ROLE_FORMAT;
+    String message() default UserMessage.INVALID_ROLE_FORMAT;
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

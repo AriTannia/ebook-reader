@@ -1,8 +1,10 @@
 package com.aritan.ebook_reader.common.models;
 
 import com.aritan.ebook_reader.common.enums.EBResponseCode;
+import com.sun.net.httpserver.Authenticator;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -20,6 +22,15 @@ public class EBResponse<T> {
 
     public static <T> EBResponse<T> Success(T data, String message){
         EBResponse<T> response = new EBResponse<>(EBResponseCode.Success);
+        response.setMessage(message);
+        response.setCodeNumber(HttpStatus.FOUND.value());
+        response.setData(data);
+
+        return response;
+    }
+
+    public static <T> EBResponse<Page<T>> Success(Page<T> data, String message){
+        EBResponse<Page<T>> response = new EBResponse<>(EBResponseCode.Success);
         response.setMessage(message);
         response.setCodeNumber(HttpStatus.FOUND.value());
         response.setData(data);

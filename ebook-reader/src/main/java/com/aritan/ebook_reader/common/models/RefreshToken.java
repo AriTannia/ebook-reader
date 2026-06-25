@@ -1,5 +1,7 @@
 package com.aritan.ebook_reader.common.models;
 
+import com.aritan.ebook_reader.common.constants.tables.RefreshTokenTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.UserTableConstants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +11,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Entity
-@Table(name = "refresh_token", schema = "public")
+@Table(name = RefreshTokenTableConstants.TABLE_NAME, schema = RefreshTokenTableConstants.SCHEMA)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,16 +19,19 @@ import java.time.Instant;
 public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "refresh_token_id", nullable = false)
+    @Column(name = RefreshTokenTableConstants.REFRESH_TOKEN_ID, nullable = false)
     private Long refreshTokenId;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+    @JoinColumn(
+            name = RefreshTokenTableConstants.USER_ID,
+            referencedColumnName = UserTableConstants.USER_ID,
+            nullable = false)
     private User user;
 
-    @Column(name = "token", nullable = false, unique = true, columnDefinition = "TEXT")
+    @Column(name = RefreshTokenTableConstants.TOKEN, nullable = false, unique = true, columnDefinition = "TEXT")
     private String token;
 
-    @Column(name = "expiry_date", nullable = false)
+    @Column(name = RefreshTokenTableConstants.EXPIRY_DATE, nullable = false)
     private Instant expiryDate;
 }

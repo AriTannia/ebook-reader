@@ -1,9 +1,9 @@
-package com.aritan.ebook_reader.common.constants;
+package com.aritan.ebook_reader.common.constants.messages;
 
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public  final class UserMessages {
+public  final class UserMessage {
     public static final String DATA_SUCCESS = "Data retrieved successfully";
     public static final String NO_DATA_FOUND =  "No data found";
     public static final String DATA_CREATED_SUCCESSFULLY = "Data created successfully";
@@ -11,6 +11,8 @@ public  final class UserMessages {
     public static final String ROLE_NOT_FOUND = "Role is not found.";
     public static final String DATA_UPDATED_SUCCESSFULLY = "Data updated successfully!";
     public static final String INVALID_ROLE_FORMAT = "Định dạng quyền (Role) không hợp lệ hoặc không tồn tại!";
+    public static final String USER_NOT_FOUND_WITH_EMAIL =
+            "User not found with email: %s";
 
     // Validation Input
     public static final String FULL_NAME_EMPTY = "Full name cannot be empty!";
@@ -19,8 +21,5 @@ public  final class UserMessages {
     public static final String EMAIL_INVALID = "Invalid email format!";
     public static final String PASSWORD_EMPTY = "Password cannot be empty!";
     public static final String PASSWORD_SIZE = "Password must be between 6 and 40 characters long!";
-
-    public static String notFoundWithEmail(String username) {
-        return "User Not Found with email: " + username;
-    }
+    public static final String DATA_DELETED_SUCCESSFULLY = "Data deleted successfully!";
 }

@@ -1,19 +1,13 @@
 package com.aritan.ebook_reader.features.file;
 
-import com.aritan.ebook_reader.common.enums.AccessType;
+import com.aritan.ebook_reader.common.constants.messages.FileMessage;
 import com.aritan.ebook_reader.common.exception.UnsupportedOperationException;
-import com.aritan.ebook_reader.features.file.utilities.FileHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.http.SdkHttpMethod;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -21,7 +15,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
-import java.io.InputStream;
 import java.time.Duration;
 
 @Service
@@ -50,14 +43,10 @@ public class FileService implements IFileService {
         return presignedGetObjectRequest.url().toString();
     }
 
-    private String generatePutPresignedUrl(String filePath, AccessType accessType){
+    private String generatePutPresignedUrl(String filePath){
         PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(filePath);
-
-        if(accessType == AccessType.PUBLIC){
-            putObjectRequestBuilder.acl(ObjectCannedACL.PUBLIC_READ);
-        }
 
         PutObjectRequest putObjectRequest = putObjectRequestBuilder.build();
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
@@ -70,43 +59,15 @@ public class FileService implements IFileService {
     }
 
     @Override
-    public String generatePresignedUrl(String filePath, SdkHttpMethod method, AccessType accessType) {
+    public String generatePresignedUrl(String filePath, SdkHttpMethod method) {
         if(method == SdkHttpMethod.GET){
             return generateGetPresignedUrl(filePath);
         } else if(method == SdkHttpMethod.PUT){
-            return generatePutPresignedUrl(filePath, accessType);
+            return generatePutPresignedUrl(filePath);
         } else{
-            throw new UnsupportedOperationException("Unsupported HTTP method for presigned URL generation: " + method);
+            throw new UnsupportedOperationException(
+                    String.format(FileMessage.UNSUPPORTED_HTTP_METHOD, method)
+            );
         }
-    }
-
-    @Override
-    public String uploadMultipartFile(MultipartFile file, AccessType accessType) {
-        String fileName = FileHelper.buildFileName(file.getOriginalFilename());
-        try(InputStream inputStream = file.getInputStream()){
-            PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName);
-
-            if(accessType == AccessType.PUBLIC){
-                putObjectRequestBuilder.acl(ObjectCannedACL.PUBLIC_READ);
-            }
-
-            PutObjectRequest putObjectRequest = putObjectRequestBuilder.build();
-            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, file.getSize()));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to upload file: " + e.getMessage(), e);
-        }
-        return fileName;
-    }
-
-    @Override
-    public ResponseInputStream<GetObjectResponse> downloadFile(String fileName) {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(fileName)
-                .build();
-
-        return s3Client.getObject(getObjectRequest);
     }
 }

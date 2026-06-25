@@ -1,5 +1,7 @@
 package com.aritan.ebook_reader.common.models;
 
+import com.aritan.ebook_reader.common.constants.tables.RoleTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.UserTableConstants;
 import com.aritan.ebook_reader.common.validation.ValidRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "users", schema = "public")
+@Table(name = UserTableConstants.TABLE_NAME, schema = UserTableConstants.SCHEMA)
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
@@ -23,30 +25,30 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id", updatable = false, nullable = false)
+    @Column(name = UserTableConstants.USER_ID, updatable = false, nullable = false)
     private Long userId;
 
-    @Column(name = "email", nullable = false, unique = true, length = 150)
+    @Column(name = UserTableConstants.EMAIL, nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = UserTableConstants.PASSWORD_HASH, nullable = false)
     private String passwordHash;
 
-    @Column(name = "avatar_url", columnDefinition = "TEXT")
+    @Column(name = UserTableConstants.AVATAR_URL, columnDefinition = "TEXT")
     private String avatarUrl;
 
-    @Column(name = "full_name", length = 60)
+    @Column(name = UserTableConstants.FULL_NAME, length = 60)
     private String fullName;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(name = UserTableConstants.USER_ROLES_TABLE,
+            joinColumns = @JoinColumn(name = UserTableConstants.USER_ID),
+            inverseJoinColumns = @JoinColumn(name = RoleTableConstants.ROLE_ID))
 
     private Set<Role> roles = new HashSet<>();
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false, nullable = false)
+    @Column(name = UserTableConstants.CREATED_AT, updatable = false, nullable = false)
     private Date createdAt;
 
     public User(String fullName, String email, String password) {

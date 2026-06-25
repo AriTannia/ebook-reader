@@ -1,0 +1,18 @@
+package com.aritan.ebook_reader.common.constants.messages;
+
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+public class AuthMessage {
+    // Success
+    public static final String SIGN_IN_SUCCESSFUL = "Sign in successful!";
+    public static final String SIGN_UP_SUCCESSFUL = "Sign up successful!";
+    public static final String SIGN_OUT_SUCCESSFUL = "Sign out successful!";
+    public static final String TOKEN_REFRESHED_SUCCESSFULLY = "Token refreshed successfully!";
+
+    // Error
+    public static final String INVALID_CREDENTIALS = "Invalid email or password!";
+    public static final String REFRESH_TOKEN_NOT_FOUND = "Refresh token is not in database!";
+    public static final String REFRESH_TOKEN_EMPTY = "Refresh Token is empty!";
+    public static final String REFRESH_TOKEN_EXPIRED = "Refresh token was expired. Please make a new signin request";
+}

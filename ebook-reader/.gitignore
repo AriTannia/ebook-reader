@@ -18,6 +18,7 @@ target/
 *.iws
 *.iml
 *.ipr
+ebook-reader/src/main/resources/flyway.conf
 
 ### NetBeans ###
 /nbproject/private/
