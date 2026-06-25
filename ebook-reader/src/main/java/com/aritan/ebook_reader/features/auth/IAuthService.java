@@ -14,4 +14,5 @@ public interface IAuthService {
     UserJwtHeaderResponse signOutUser();
 
     ResponseCookie refreshToken(HttpServletRequest request);
+    User getCurrentUser();
 }

@@ -2,6 +2,7 @@ package com.aritan.ebook_reader.features.user.utilities;
 
 import com.aritan.ebook_reader.common.models.Role;
 import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.features.review.dtos.ReviewUserResponse;
 import com.aritan.ebook_reader.features.user.dtos.UserCreateRequest;
 import com.aritan.ebook_reader.features.user.dtos.UserResponse;
 import com.aritan.ebook_reader.features.user.dtos.UserUpdateRequest;
@@ -34,6 +35,8 @@ public interface UserMapper {
     void toEntity(
             UserUpdateRequest updateRequest,
             @MappingTarget User user);
+
+    ReviewUserResponse toReviewUserResponse(User user);
 
     default List<String> map(Set<Role> roles) {
         if (roles == null) {

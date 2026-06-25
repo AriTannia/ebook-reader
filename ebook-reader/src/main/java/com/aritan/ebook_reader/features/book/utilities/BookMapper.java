@@ -10,6 +10,7 @@ import com.aritan.ebook_reader.features.author.utilities.AuthorMapper;
 import com.aritan.ebook_reader.features.book.dtos.*;
 import com.aritan.ebook_reader.features.category.utilities.CategoryMapper;
 import com.aritan.ebook_reader.features.publisher.utilities.PublisherMapper;
+import com.aritan.ebook_reader.features.tag.utilities.TagMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -22,7 +23,8 @@ import java.util.stream.Collectors;
     uses = {
             AuthorMapper.class,
             CategoryMapper.class,
-            PublisherMapper.class
+            PublisherMapper.class,
+            TagMapper.class
     }
 )
 public interface BookMapper {
@@ -34,11 +36,13 @@ public interface BookMapper {
     @Mapping(target = "authors", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "publisher", ignore = true)
+    @Mapping(target = "tags", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     Book toBook(BookCreateRequest createRequest);
 
     @Mapping(target = "authors", ignore = true)
     @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "tags", ignore = true)
     @Mapping(target = "publisher", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateBook(

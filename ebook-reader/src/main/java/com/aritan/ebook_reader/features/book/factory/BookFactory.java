@@ -3,11 +3,9 @@ package com.aritan.ebook_reader.features.book.factory;
 import com.aritan.ebook_reader.common.constants.messages.AuthorMessage;
 import com.aritan.ebook_reader.common.constants.messages.CategoryMessage;
 import com.aritan.ebook_reader.common.constants.messages.PublisherMessage;
+import com.aritan.ebook_reader.common.constants.messages.TagMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.Author;
-import com.aritan.ebook_reader.common.models.Book;
-import com.aritan.ebook_reader.common.models.Category;
-import com.aritan.ebook_reader.common.models.Publisher;
+import com.aritan.ebook_reader.common.models.*;
 import com.aritan.ebook_reader.features.book.dtos.BookCreateRequest;
 import com.aritan.ebook_reader.features.book.dtos.BookReferenceContext;
 import com.aritan.ebook_reader.features.book.utilities.BookMapper;
@@ -29,10 +27,12 @@ public class BookFactory {
 
         Set<Author> authors = resolveAuthors(createRequest, context);
         Set<Category> categories = resolveCategories(createRequest, context);
+        Set<Tag> tags = resolverTags(createRequest, context);
         Publisher publisher = resolvePublisher(createRequest, context);
 
         book.setAuthors(authors);
         book.setCategories(categories);
+        book.setTags(tags);
         book.setPublisher(publisher);
 
         return book;
@@ -74,6 +74,24 @@ public class BookFactory {
                     }
 
                     return category;
+                })
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Tag> resolverTags(
+            BookCreateRequest request,
+            BookReferenceContext context
+    ){
+        return request.getTagIds()
+                .stream()
+                .map(id -> {
+                    Tag tag = context.tags().get(id);
+                    if (tag == null) {
+                        throw new ResourceNotFoundException(
+                                TagMessage.TAG_NOT_FOUND
+                        );
+                    }
+                    return tag;
                 })
                 .collect(Collectors.toSet());
     }

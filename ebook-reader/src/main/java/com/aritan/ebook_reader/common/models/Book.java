@@ -3,6 +3,7 @@ package com.aritan.ebook_reader.common.models;
 import com.aritan.ebook_reader.common.constants.tables.AuthorTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.BookTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.CategoryTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.TagTableConstants;
 import com.aritan.ebook_reader.common.enums.BookStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -64,6 +65,14 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = CategoryTableConstants.CATEGORY_ID)
     )
     private Set<Category> categories = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = BookTableConstants.BOOK_TAGS_TABLE,
+            joinColumns = @JoinColumn(name = BookTableConstants.BOOK_ID),
+            inverseJoinColumns = @JoinColumn(name = TagTableConstants.TAG_ID)
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = BookTableConstants.PUBLISHER_ID)

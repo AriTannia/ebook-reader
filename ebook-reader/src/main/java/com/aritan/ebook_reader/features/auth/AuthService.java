@@ -142,4 +142,15 @@ public class AuthService implements IAuthService{
         }
         throw new ResourceNotFoundException(AuthMessage.REFRESH_TOKEN_EMPTY);
     }
+
+    @Override
+    public User getCurrentUser(){
+        Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!Objects.equals(principle.toString(), "anonymousUser")){
+            Long userId = ((UserDetailsImpl) principle).getId();
+            return userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
+        }
+        throw new ResourceNotFoundException(UserMessage.NO_DATA_FOUND);
+    }
 }

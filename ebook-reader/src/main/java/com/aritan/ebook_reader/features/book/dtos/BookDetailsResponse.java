@@ -1,12 +1,7 @@
 package com.aritan.ebook_reader.features.book.dtos;
 
 import com.aritan.ebook_reader.common.enums.BookStatus;
-import com.aritan.ebook_reader.features.author.dtos.AuthorBookResponse;
-import com.aritan.ebook_reader.features.author.dtos.AuthorResponse;
-import com.aritan.ebook_reader.features.category.dtos.CategoryBookResponse;
-import com.aritan.ebook_reader.features.category.dtos.CategoryResponse;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherResponse;
-import com.aritan.ebook_reader.features.publisher.utilities.PublisherMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,8 +22,9 @@ public class BookDetailsResponse {
     private String language;
     private LocalDate publishedDate;
     private BookStatus status;
-    private Set<AuthorBookResponse> authors;
-    private Set<CategoryBookResponse> categories;
+    private Set<BookAuthorResponse> authors;
+    private Set<BookCategoryResponse> categories;
+    private Set<BookTagResponse> tags;
     private PublisherResponse publisher;
 
 }

@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,5 +23,6 @@ public class BookCreateRequest {
     private LocalDate publishedDate;
     private List<Long> authorIds;
     private List<Long> categoryIds;
+    private List<UUID> tagIds;
     private Long publisherId;
 }

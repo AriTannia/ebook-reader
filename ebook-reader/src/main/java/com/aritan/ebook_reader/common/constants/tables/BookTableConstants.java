@@ -23,4 +23,5 @@ public class BookTableConstants {
     // Join tables
     public static final String BOOK_AUTHORS_TABLE = "book_authors";
     public static final String BOOK_CATEGORIES_TABLE = "book_categories";
+    public static final String BOOK_TAGS_TABLE = "book_tags";
 }
