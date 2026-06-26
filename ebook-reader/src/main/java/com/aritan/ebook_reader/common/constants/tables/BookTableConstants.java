@@ -17,6 +17,10 @@ public class BookTableConstants {
     public static final String LANGUAGE = "language";
     public static final String PUBLISHED_DATE = "published_date";
     public static final String STATUS = "status";
+    public static final String BADGE = "badge";
+    public static final String AVERAGE_RATING = "average_rating";
+    public static final String REVIEW_COUNT = "review_count";
+    public static final String SOLD_COPIES = "sold_copies";
     public static final String PUBLISHER_ID = "publisher_id";
     public static final String CREATED_AT = "created_at";
 

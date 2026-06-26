@@ -1,8 +1,13 @@
 package com.aritan.ebook_reader.features.book.utilities;
 
+import com.aritan.ebook_reader.common.constants.rules.BookBadgeRules;
+import com.aritan.ebook_reader.common.enums.BookBadge;
 import com.aritan.ebook_reader.common.enums.BookStatus;
 import com.aritan.ebook_reader.common.models.Book;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class BookSpecification {
     public static Specification<Book> hasAuthor(Long authorId) {
@@ -74,6 +79,40 @@ public class BookSpecification {
                             pattern
                     )
             );
+        };
+    }
+
+    public static Specification<Book> hasBadge(BookBadge badge) {
+        return (root, query, cb) -> {
+
+            if (badge == null) {
+                return null;
+            }
+
+            return switch (badge) {
+
+                case NEW -> cb.greaterThanOrEqualTo(
+                        root.get("publishedDate"),
+                        LocalDate.now()
+                                .minusDays(BookBadgeRules.NEW_DAYS)
+                );
+
+                case HOT -> cb.and(
+                        cb.greaterThanOrEqualTo(
+                                root.get("averageRating"),
+                                BookBadgeRules.HOT_RATING
+                        ),
+                        cb.greaterThanOrEqualTo(
+                                root.get("reviewCount"),
+                                BookBadgeRules.HOT_REVIEW_COUNT
+                        )
+                );
+
+                case BESTSELLER -> cb.greaterThanOrEqualTo(
+                        root.get("soldCopies"),
+                        BookBadgeRules.BESTSELLER_SOLD
+                );
+            };
         };
     }
 }
