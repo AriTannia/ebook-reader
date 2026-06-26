@@ -4,6 +4,7 @@ import com.aritan.ebook_reader.common.constants.tables.AuthorTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.BookTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.CategoryTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.TagTableConstants;
+import com.aritan.ebook_reader.common.enums.BookBadge;
 import com.aritan.ebook_reader.common.enums.BookStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -48,7 +49,21 @@ public class Book {
     private LocalDate publishedDate;
 
     @Enumerated(EnumType.STRING)
-    private BookStatus status;
+    @Column(name = BookTableConstants.STATUS, nullable = false, length = 20)
+    private BookStatus status = BookStatus.ACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = BookTableConstants.BADGE, nullable = false, length = 20)
+    private BookBadge badge;
+
+    @Column(name = BookTableConstants.AVERAGE_RATING, precision = 2, scale = 1)
+    private BigDecimal averageRating = BigDecimal.ZERO;
+
+    @Column(name = BookTableConstants.REVIEW_COUNT, nullable = false)
+    private Long reviewCount = 0L;
+
+    @Column(name = BookTableConstants.SOLD_COPIES, nullable = false)
+    private Long soldCopies = 0L;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

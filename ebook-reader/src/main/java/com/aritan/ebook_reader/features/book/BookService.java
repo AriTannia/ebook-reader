@@ -4,6 +4,7 @@ import com.aritan.ebook_reader.common.constants.messages.AuthorMessage;
 import com.aritan.ebook_reader.common.constants.messages.BookMessage;
 import com.aritan.ebook_reader.common.constants.messages.CategoryMessage;
 import com.aritan.ebook_reader.common.constants.messages.PublisherMessage;
+import com.aritan.ebook_reader.common.enums.BookBadge;
 import com.aritan.ebook_reader.common.enums.BookStatus;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.Author;
@@ -42,13 +43,17 @@ public class BookService implements IBookService{
     private final BookMapper bookMapper;
 
     @Override
-    public Page<BookResponse> getPagedBooks(BookFilterRequest request, Pageable pageable) {
+    public Page<BookResponse> getPagedBooks(
+            BookFilterRequest request,
+            Pageable pageable,
+            BookBadge badge) {
         Specification<Book> spec = Specification
                 .where(BookSpecification.hasAuthor(request.getAuthorId()))
                 .and(BookSpecification.hasCategory(request.getCategoryId()))
                 .and(BookSpecification.hasStatus(BookStatus.ACTIVE))
                 .and(BookSpecification.hasPublisher(request.getPublisherId()))
-                .and(BookSpecification.hasKeyword(request.getKeyword()));
+                .and(BookSpecification.hasKeyword(request.getKeyword()))
+                .and(BookSpecification.hasBadge(badge));
 
         Page<Book> books = bookRepository.findAll(spec, pageable);
 

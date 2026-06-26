@@ -37,6 +37,10 @@ public interface BookMapper {
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "publisher", ignore = true)
     @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "badge", ignore = true)
+    @Mapping(target = "averageRating", ignore = true)
+    @Mapping(target = "reviewCount", ignore = true)
+    @Mapping(target = "soldCopies", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     Book toBook(BookCreateRequest createRequest);
 
