@@ -1,6 +1,6 @@
 import api from "./api";
 
-const API_URL = "/auth/";
+const API_URL = "/v1/auth/";
 
 export const register = (username, email, password) => {
   return api.post(API_URL + "signup", {

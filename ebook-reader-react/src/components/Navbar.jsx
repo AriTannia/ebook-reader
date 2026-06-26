@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, User, LogOut } from "lucide-react";
+import { BookOpen, User, LogOut, Search, ShoppingCart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../reducers/auth";
 
@@ -9,6 +9,7 @@ export default function Navbar() {
   const currentUser = useSelector((state) => state.auth.user);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
 
@@ -25,6 +26,26 @@ export default function Navbar() {
     setDropdownOpen(false);
     dispatch(logout());
     navigate("/");
+  };
+
+  const handleLibraryClick = () => {
+    if (isLoggedIn) {
+      navigate("/library");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim() !== "") {
+      navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
   };
 
   // Derive initials for the avatar placeholder
@@ -53,21 +74,74 @@ export default function Navbar() {
     <header className="sticky top-0 z-20 border-b border-border/70 bg-background/80 backdrop-blur-md">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         {/* Branding — far left */}
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-foreground transition-opacity hover:opacity-80"
-          aria-label="Ebook-store home"
-        >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-            <BookOpen className="h-5 w-5" strokeWidth={2.2} />
-          </span>
-          <span className="text-lg font-semibold tracking-tight">
-            Ebook<span className="text-primary">-store</span>
-          </span>
-        </Link>
+        <div className="flex items-center gap-3 shrink-0">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-foreground transition-opacity hover:opacity-80"
+            aria-label="Ebook-store home"
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+              <BookOpen className="h-5 w-5" strokeWidth={2.2} />
+            </span>
+            <span className="text-lg font-semibold tracking-tight">
+              Ebook<span className="text-primary">-store</span>
+            </span>
+          </Link>
+
+          {/* Search bar */}
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex items-center bg-card rounded-lg border border-input shadow-sm transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 w-64"
+          >
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search books, authors, categories..."
+              className="flex-1 bg-transparent px-4 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
+              aria-label="Search books"
+            />
+            <button
+              type="submit"
+              className="mr-2 flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+              aria-label="Search"
+            >
+              <Search className="h-4 w-4" />
+            </button>
+          </form>
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Right section: Cart + Library + Avatar */}
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            className="p-2 text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="Shopping cart"
+            title="Shopping cart"
+          >
+            <ShoppingCart className="h-5 w-5" />
+          </button>
+          {currentUser ? (
+            <Link
+              to="/library"
+              className="px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground"
+            >
+              Library
+            </Link>
+          ) : (
+            <button
+              onClick={handleLibraryClick}
+              className="px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground"
+            >
+              Library
+            </button>
+          )}
+        </div>
 
         {/* Far right */}
-        <div className="flex items-center">
+        <div className="flex items-center shrink-0 ml-2">
           {hasUser ? (
             /* ── Authenticated: avatar + hover dropdown ── */
             <div

@@ -1,6 +1,6 @@
 import api from "./api";
 
-const API_URL = "/public/users/";
+const API_URL = "/v1/users/";
 
 export const getUserProfile = (userId) => {
   return api.get(API_URL + userId);
