@@ -16,20 +16,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FileController {
     private final IFileService fileService;
-
-    @GetMapping("{filename}")
+    @PostMapping("/avatar/pre-signed-url")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<String> getUrl(@PathVariable String filename) {
-        String url = fileService.generatePresignedUrl(filename, SdkHttpMethod.GET);
-        return ResponseEntity.ok(url);
-    }
-
-    @PostMapping("/pre-signed-url")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<Map<String, Object>>> generateUrl(
+    public ResponseEntity<EBResponse<Map<String, Object>>> generateResignedAvatarUrl(
             @RequestParam(name = "filename", required = false, defaultValue = "") String filename) {
-        filename = FileHelper.buildFileName(filename);
-        String url = fileService.generatePresignedUrl(filename, SdkHttpMethod.PUT);
+        filename = FileHelper.buildAvatarFileName(filename);
+        String url = fileService.generatePresignedUrl(filename);
 
         return ResponseEntity.ok(
                 EBResponse.Success(

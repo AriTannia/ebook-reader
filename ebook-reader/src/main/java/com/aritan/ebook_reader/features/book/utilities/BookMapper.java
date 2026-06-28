@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.book.utilities;
 
-import com.aritan.ebook_reader.common.enums.BookStatus;
+import com.aritan.ebook_reader.common.enums.book.BookStatus;
 import com.aritan.ebook_reader.common.models.Book;
 import com.aritan.ebook_reader.common.models.BookFormat;
 import com.aritan.ebook_reader.common.models.Author;
@@ -48,6 +48,10 @@ public interface BookMapper {
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "publisher", ignore = true)
+    @Mapping(target = "badge", ignore = true)
+    @Mapping(target = "averageRating", ignore = true)
+    @Mapping(target = "reviewCount", ignore = true)
+    @Mapping(target = "soldCopies", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateBook(
             BookUpdateRequest request,
@@ -71,6 +75,17 @@ public interface BookMapper {
             BookFormatUpdateRequest request,
             @MappingTarget BookFormat bookFormat
     );
+
+    @Mapping(target = "authorNames", source = "authors")
+    BookSumaryResponse toSummaryResponse(Book book);
+
+    default String toAuthorNames(Set<Author> authors){
+        if(authors == null) return null;
+
+        return authors.stream()
+                .map(Author::getAuthorName)
+                .collect(Collectors.joining(", "));
+    }
 
     default Set<Long> mapAuthorsToIds(Set<Author> authors) {
         if (authors == null) return null;

@@ -5,9 +5,13 @@ import com.aritan.ebook_reader.common.exception.*;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -27,15 +31,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
-
-    // Invalid
-    @ExceptionHandler(DataInvalidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<EBResponse<Object>> handleInvalidException(DataInvalidException ex) {
-        EBResponse<Object> response = EBResponse.Error(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
     // Unauthorized
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -45,12 +40,31 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<EBResponse<Object>> handleGenericException(Exception e){
+    public ResponseEntity<EBResponse<Object>> handleGenericException(Exception e) {
         EBResponse<Object> response = new EBResponse<>(EBResponseCode.Error);
         response.setCodeNumber(HttpStatus.INTERNAL_SERVER_ERROR.value());
         e.printStackTrace();
         response.setMessage(e.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<EBResponse<Object>> handleInvalidException(Exception e){
+        EBResponse<Object> response = EBResponse.Error(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<EBResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        EBResponse<Map<String, String>> response = new EBResponse<>(EBResponseCode.Error);
+        response.setCodeNumber(HttpStatus.BAD_REQUEST.value());
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+        response.setData(errors);
+        response.setMessage(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
     }
 }

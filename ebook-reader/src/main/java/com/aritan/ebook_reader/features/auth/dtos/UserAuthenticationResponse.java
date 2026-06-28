@@ -1,5 +1,6 @@
 package com.aritan.ebook_reader.features.auth.dtos;
 
+import com.aritan.ebook_reader.features.user.dtos.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,5 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserAuthenticationResponse {
     private UserJwtHeaderResponse userJwtHeaderResponse;
-    private UserAuthResponse userAuthResponse;
+    private UserResponse userResponse;
 }

@@ -2,8 +2,13 @@ import api from "./api";
 
 const API_URL = "/v1/books/";
 
-export const getAllBooks = () => {
-  return api.get(API_URL);
+export const getAllBooks = (filters = {}, badge) => {
+  return api.get(API_URL, {
+    params: {
+      ...filters,
+      badge
+    },
+  });
 };
 
 export const getBookDetails = (bookId) => {

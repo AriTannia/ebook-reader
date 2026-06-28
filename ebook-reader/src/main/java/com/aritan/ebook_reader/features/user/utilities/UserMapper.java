@@ -5,7 +5,7 @@ import com.aritan.ebook_reader.common.models.User;
 import com.aritan.ebook_reader.features.review.dtos.ReviewUserResponse;
 import com.aritan.ebook_reader.features.user.dtos.UserCreateRequest;
 import com.aritan.ebook_reader.features.user.dtos.UserResponse;
-import com.aritan.ebook_reader.features.user.dtos.UserUpdateRequest;
+import com.aritan.ebook_reader.features.user.dtos.UserUpdateProfileRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -13,7 +13,6 @@ import org.mapstruct.MappingTarget;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -29,11 +28,12 @@ public interface UserMapper {
             @MappingTarget User user);
 
     @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "avatarUrl", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
     @Mapping(target = "roles", ignore = true)
     void toEntity(
-            UserUpdateRequest updateRequest,
+            UserUpdateProfileRequest profileUpdatedRequest,
             @MappingTarget User user);
 
     ReviewUserResponse toReviewUserResponse(User user);

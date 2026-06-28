@@ -7,7 +7,6 @@ import App from './App.jsx'
 import {BrowserRouter} from "react-router-dom";
 import axios from "axios";
 
-axios.defaults.withCredentials = true;
 axios.interceptors.request.use(
   (config) => {
     return config;

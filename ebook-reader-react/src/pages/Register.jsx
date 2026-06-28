@@ -13,11 +13,11 @@ const Register = () => {
   const navigate = useNavigate();
 
   const [formdData, setFormData] = useState({
-    username: '',
+    fullName: '',
     email: '',
     password: ''
   });
-  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -30,12 +30,12 @@ const Register = () => {
   
   const { message } = useSelector((state) => state.message);
 
-  const validateForm = (username, email, password) => {
+  const validateForm = (fullName, email, password) => {
     const errors = {};
-    if(!username){
-      errors.username = "Username is required.";
-    } else if(username.length < 3){
-      errors.username = "Username must be at least 3 characters.";
+    if(!fullName){
+      errors.fullName = "Full name is required.";
+    } else if(fullName.length < 3){
+      errors.fullName = "Full name must be at least 3 characters.";
     }
 
     if(!email){
@@ -55,7 +55,7 @@ const Register = () => {
 
   const validateField = (name, value) => {
     const errors = validateForm(
-      name === "username" ? value : formdData.username,
+      name === "fullName" ? value : formdData.fullName,
       name === "email" ? value : formdData.email,
       name === "password" ? value : formdData.password
     );
@@ -87,7 +87,7 @@ const Register = () => {
     setLoading(true);
 
     const allErrors = {
-      ...validateField("username", formdData.username),
+      ...validateField("fullName", formdData.fullName),
       ...validateField("email", formdData.email),
       ...validateField("password", formdData.password),
     };
@@ -98,9 +98,9 @@ const Register = () => {
       return;
     }
 
-    setServerError({ username: false, email: false, password: false });
+    setServerError({ fullName: false, email: false, password: false });
 
-    dispatch(register({ username: formdData.username, email: formdData.email, password: formdData.password }))
+    dispatch(register({ fullName: formdData.fullName, email: formdData.email, password: formdData.password }))
       .unwrap()
       .then(() => {
         navigate("/login");
@@ -108,7 +108,7 @@ const Register = () => {
       .catch((errorMessage) => {
         setLoading(false);
         setError(errorMessage || "Registration failed. Please try again.");
-        setServerError({ username: true, email: true, password: true });
+        setServerError({ fullName: true, email: true, password: true });
       });
   };
 
@@ -136,16 +136,16 @@ const Register = () => {
               id="name"
               label="Full name"
               type="text"
-              name="username"
+              name="fullName"
               required
               autoComplete="name"
               placeholder="Jane Doe"
               minLength={3}
               maxLength={20}
-              value={formdData.username}
+              value={formdData.fullName}
               onChange={handleInputChange}
-              error={fieldErrors.username}
-              isInvalid={serverError.username}
+              error={fieldErrors.fullName}
+              isInvalid={serverError.fullName}
               icon={<User className="h-4 w-4" />}
             />
             <InputField
@@ -183,7 +183,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="mt-1 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-1 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -203,7 +203,7 @@ const Register = () => {
             Already have an account?{" "}
             <Link
               to="/login"
-              className="font-medium text-primary transition-opacity hover:opacity-80"
+              className="font-medium text-primary transition-opacity hover:opacity-80 cursor-pointer"
             >
               Sign In
             </Link>

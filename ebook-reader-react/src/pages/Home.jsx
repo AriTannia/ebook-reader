@@ -5,7 +5,6 @@ import Navbar from "../components/Navbar"
 const Home = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col items-center justify-center px-6 text-center">
         <span className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
           <BookOpen className="h-7 w-7" strokeWidth={2.2} />

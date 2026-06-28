@@ -51,7 +51,7 @@ public class JwtUtils {
     }
 
     public ResponseCookie generateRefreshJwtCookie(String refreshToken){
-        return generateCookie(jwtRefreshCookie, refreshToken, "/api/auth/refresh-token");
+        return generateCookie(jwtRefreshCookie, refreshToken, "/api/v1/auth/refresh-token");
     }
     //endregion
 
@@ -73,7 +73,7 @@ public class JwtUtils {
 
     public ResponseCookie getCleanJwtRefreshCookie(){
         return ResponseCookie.from(jwtRefreshCookie, null)
-                .path("/api/auth/refresh-token").build();
+                .path("/api/v1/auth/refresh-token").build();
     }
     //endregion
 

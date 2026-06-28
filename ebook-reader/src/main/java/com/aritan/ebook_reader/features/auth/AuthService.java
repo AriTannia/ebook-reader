@@ -5,17 +5,20 @@ import com.aritan.ebook_reader.common.constants.messages.UserMessage;
 import com.aritan.ebook_reader.common.enums.ERole;
 import com.aritan.ebook_reader.common.exception.AuthenticationException;
 import com.aritan.ebook_reader.common.exception.DataDuplicateException;
+import com.aritan.ebook_reader.common.exception.InvalidRequestException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.RefreshToken;
 import com.aritan.ebook_reader.common.models.Role;
 import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
 import com.aritan.ebook_reader.config.security.jwt.services.UserDetailsImpl;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRoleRepository;
 import com.aritan.ebook_reader.config.security.jwt.services.interfaces.IRefreshTokenService;
 import com.aritan.ebook_reader.config.security.jwt.utilities.JwtUtils;
 import com.aritan.ebook_reader.features.auth.dtos.*;
 import com.aritan.ebook_reader.features.user.IUserRepository;
-import com.aritan.ebook_reader.features.auth.dtos.UserAuthResponse;
+import com.aritan.ebook_reader.features.user.IUserService;
+import com.aritan.ebook_reader.features.user.dtos.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -25,13 +28,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,10 +41,12 @@ import java.util.Set;
 public class AuthService implements IAuthService{
     private final IRefreshTokenService refreshTokenService;
     private final IUserRepository userRepository;
+    private final IUserService userService;
     private final IRoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final StorageUrlExtension storageUrlExtension;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     @Override
@@ -53,39 +56,30 @@ public class AuthService implements IAuthService{
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-            logger.info("Authentication time: {} ms", System.currentTimeMillis() - start);
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             // Generate Jwt
             ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .toList();
-
             // Generate RefreshToken
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
             ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
 
             UserJwtHeaderResponse userJwtHeaderResponse = new UserJwtHeaderResponse(jwtCookie, jwtRefreshCookie);
-            UserAuthResponse userAuthResponse = new UserAuthResponse(userDetails.getId(),
-                    userDetails.getEmail(),
-                    userDetails.getUsername(),
-                    roles);
 
-            return new UserAuthenticationResponse(
-                    userJwtHeaderResponse,
-                    userAuthResponse
-            );
+            // Get User Info
+            UserResponse userResponse = userService.getUserById(userDetails.getId());
+
+            return new UserAuthenticationResponse(userJwtHeaderResponse, userResponse);
+
         } catch (BadCredentialsException e){
             throw new AuthenticationException(AuthMessage.INVALID_CREDENTIALS);
         }
     }
 
     @Override
-    public User registerUser(SignupRequest request) {
+    public UserResponse registerUser(SignupRequest request) {
         if(userRepository.findByEmail(request.getEmail()).isPresent()){
             throw new DataDuplicateException(UserMessage.EMAIL_IN_USE);
         }
@@ -112,7 +106,9 @@ public class AuthService implements IAuthService{
         }
 
         user.setRoles(roles);
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        return userService.getUserById(user.getUserId());
     }
 
     @Override
@@ -152,5 +148,26 @@ public class AuthService implements IAuthService{
                     .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
         }
         throw new ResourceNotFoundException(UserMessage.NO_DATA_FOUND);
+    }
+
+    @Override
+    public UserResponse getCurrentUserFromCookie(HttpServletRequest request){
+        String accessToken = jwtUtils.getJwtFromCookies(request);
+
+        if(accessToken == null || accessToken.isEmpty()) {
+            throw new InvalidRequestException(
+                    AuthMessage.ACCESS_TOKEN_INVALID);
+        }
+
+        if(!jwtUtils.validateJwtToken(accessToken)) {
+            throw new AuthenticationException(
+                    AuthMessage.ACCESS_TOKEN_INVALID);
+        }
+
+        String email = jwtUtils.getUserNameFromJwtToken(accessToken);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
+
+        return userService.getUserById(user.getUserId());
     }
 }

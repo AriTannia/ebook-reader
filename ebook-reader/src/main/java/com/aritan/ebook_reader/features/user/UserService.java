@@ -5,12 +5,15 @@ import com.aritan.ebook_reader.common.enums.ERole;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.Role;
 import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRoleRepository;
-import com.aritan.ebook_reader.features.user.dtos.UserCreateRequest;
-import com.aritan.ebook_reader.features.user.dtos.UserResponse;
-import com.aritan.ebook_reader.features.user.dtos.UserUpdateRequest;
+import com.aritan.ebook_reader.features.user.dtos.*;
 import com.aritan.ebook_reader.features.user.utilities.UserMapper;
+import com.aritan.ebook_reader.features.user.utilities.UserSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,22 +23,26 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements IUserService{
+public class UserService implements IUserService {
     private final IUserRepository userRepository;
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final StorageUrlExtension storageUrlExtension;
 
     @Override
-    public List<UserResponse> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        if(users.isEmpty()){
-            throw new ResourceNotFoundException(UserMessage.NO_DATA_FOUND);
-        }
+    public Page<UserResponse> getAllUsers(UserFilterRequest request, Pageable pageable) {
+        Specification<User> spec = Specification
+                .where(UserSpecification.hasKeyword(request.getKeyword()));
 
-        return users.stream()
-                .map(userMapper::toUserResponse)
-                .toList();
+        Page<User> users = userRepository.findAll(spec, pageable);
+
+        return users.map(user -> {
+            UserResponse response = userMapper.toUserResponse(user);
+            response.setAvatarUrl(storageUrlExtension.getPublicUrl(user.getAvatarUrl()));
+
+            return response;
+        });
     }
 
     @Override
@@ -61,23 +68,18 @@ public class UserService implements IUserService{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
 
-        return userMapper.toUserResponse(user);
+        UserResponse userResponse = userMapper.toUserResponse(user);
+        userResponse.setAvatarUrl(storageUrlExtension.getPublicUrl(user.getAvatarUrl()));
+
+        return userResponse;
     }
 
     @Override
-    public UserResponse updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
+    public UserResponse updateUserProfile(Long userId, UserUpdateProfileRequest profileUpdatedRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
 
-        userMapper.toEntity(userUpdateRequest, user);
-
-        Set<Role> roles = userUpdateRequest.getRoles().stream()
-                .map(roleName -> roleRepository.findByName(ERole.valueOf(roleName))
-                        .orElseThrow(() -> new ResourceNotFoundException(UserMessage.ROLE_NOT_FOUND)))
-                .collect(Collectors.toSet());
-
-        user.setRoles(roles);
-        user.setPasswordHash(passwordEncoder.encode(userUpdateRequest.getPassword()));
+        userMapper.toEntity(profileUpdatedRequest, user);
 
         userRepository.save(user);
 
@@ -90,5 +92,19 @@ public class UserService implements IUserService{
                 .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
 
         userRepository.delete(user);
+    }
+
+    @Override
+    public UserResponse updateUserAvatar(
+            Long userId,
+            UserUpdateAvatarRequest updateAvatarRequest) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
+
+        user.setAvatarUrl(updateAvatarRequest.getAvatarUrl());
+        userRepository.save(user);
+
+        return userMapper.toUserResponse(user);
     }
 }

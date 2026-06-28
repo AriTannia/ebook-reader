@@ -23,27 +23,9 @@ public class FileService implements IFileService {
     @Value("${ebook-reader.app.s3.bucketName}")
     private String bucketName;
 
-    private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
-    private String generateGetPresignedUrl(String filePath) {
-
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(filePath)
-                .build();
-
-        // Expiration Time
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(60))
-                .getObjectRequest(getObjectRequest)
-                .build();
-
-        PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(presignRequest);
-        return presignedGetObjectRequest.url().toString();
-    }
-
-    private String generatePutPresignedUrl(String filePath){
+    public String generatePresignedUrl(String filePath){
         PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(filePath);
@@ -56,18 +38,5 @@ public class FileService implements IFileService {
 
         PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner.presignPutObject(presignRequest);
         return presignedPutObjectRequest.url().toString();
-    }
-
-    @Override
-    public String generatePresignedUrl(String filePath, SdkHttpMethod method) {
-        if(method == SdkHttpMethod.GET){
-            return generateGetPresignedUrl(filePath);
-        } else if(method == SdkHttpMethod.PUT){
-            return generatePutPresignedUrl(filePath);
-        } else{
-            throw new UnsupportedOperationException(
-                    String.format(FileMessage.UNSUPPORTED_HTTP_METHOD, method)
-            );
-        }
     }
 }

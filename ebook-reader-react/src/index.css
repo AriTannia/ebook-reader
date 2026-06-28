@@ -1,10 +1,24 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 * {
   border-color: var(--border);
 }
 
-@theme {
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Hide scrollbar while keeping functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@theme  {
  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
 
@@ -103,5 +117,49 @@ body {
 
   .animate-dropdown-fade {
     animation: dropdown-fade 0.18s ease-out both;
+  }
+
+  @keyframes modal-backdrop-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes modal-content-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-modal-backdrop-in {
+    animation: modal-backdrop-in 0.3s ease-out both;
+  }
+
+  .animate-modal-content-in {
+    animation: modal-content-in 0.3s ease-out both;
+  }
+
+  @keyframes drag-over-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .animate-drag-over-pulse {
+    animation: drag-over-pulse 0.6s ease-in-out;
   }
 }

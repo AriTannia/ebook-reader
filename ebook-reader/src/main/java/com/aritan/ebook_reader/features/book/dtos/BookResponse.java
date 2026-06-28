@@ -1,12 +1,13 @@
 package com.aritan.ebook_reader.features.book.dtos;
 
-import com.aritan.ebook_reader.common.enums.BookBadge;
+import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,5 +22,6 @@ public class BookResponse {
     private Long reviewCount;
     private Long soldCopies;
     private String language;
+    private Set<BookAuthorResponse> authors;
     private LocalDate publishedDate;
 }

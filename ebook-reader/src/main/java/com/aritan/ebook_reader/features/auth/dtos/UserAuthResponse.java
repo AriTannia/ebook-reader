@@ -14,6 +14,7 @@ import java.util.List;
 public class UserAuthResponse {
     private Long id;
     private String email;
-    private String username;
+    private String userName;
+    private String fullName;
     private List<String> roles;
 }

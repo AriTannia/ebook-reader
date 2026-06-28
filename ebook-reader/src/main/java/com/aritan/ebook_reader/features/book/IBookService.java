@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.book;
 
-import com.aritan.ebook_reader.common.enums.BookBadge;
+import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.features.book.dtos.*;
 
 import org.springframework.data.domain.Page;

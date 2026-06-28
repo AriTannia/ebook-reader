@@ -65,6 +65,6 @@ public class Review {
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = ReviewTableConstants.UPDATED_AT, updatable = false, nullable = false)
+    @Column(name = ReviewTableConstants.UPDATED_AT, nullable = false)
     private LocalDateTime updatedAt;
 }

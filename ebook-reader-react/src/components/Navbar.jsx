@@ -12,6 +12,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
+  const [imgError, setImgError] = useState(false);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -49,14 +50,17 @@ export default function Navbar() {
   };
 
   // Derive initials for the avatar placeholder
-  const initials = currentUser
-    ? currentUser.fullName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "";
+  const initials = currentUser?.fullName
+  ? currentUser.fullName
+      .trim()
+      .split(/\s+/)
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase()
+  : "";
+
+  console.log("AVT: " + initials);
 
     useEffect(() => {
       console.log(
@@ -117,7 +121,7 @@ export default function Navbar() {
         {/* Right section: Cart + Library + Avatar */}
         <div className="flex items-center gap-1 shrink-0">
           <button
-            className="p-2 text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground"
+            className="p-2 text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
             aria-label="Shopping cart"
             title="Shopping cart"
           >
@@ -126,14 +130,14 @@ export default function Navbar() {
           {currentUser ? (
             <Link
               to="/library"
-              className="px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground"
+              className="px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
             >
               Library
             </Link>
           ) : (
             <button
               onClick={handleLibraryClick}
-              className="px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground"
+              className="px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
             >
               Library
             </button>
@@ -160,6 +164,7 @@ export default function Navbar() {
                   <img
                     src={currentUser.avatarUrl}
                     alt={currentUser.fullName}
+                    onError={() => setImgError(true)}
                     className="h-full w-full rounded-full object-cover"
                   />
                 ) : (
@@ -186,7 +191,7 @@ export default function Navbar() {
                   <button
                     role="menuitem"
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer"
                   >
                     <LogOut className="h-4 w-4 shrink-0 text-muted-foreground" />
                     Log Out
@@ -198,7 +203,7 @@ export default function Navbar() {
             /* ── Guest: prominent Sign In button ── */
             <Link
               to="/login"
-              className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:shadow-lg hover:opacity-95 active:scale-[0.97]"
+              className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:shadow-lg hover:opacity-95 active:scale-[0.97] cursor-pointer"
             >
               Sign In
             </Link>

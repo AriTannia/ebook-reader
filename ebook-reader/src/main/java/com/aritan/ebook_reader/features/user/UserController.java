@@ -2,16 +2,14 @@ package com.aritan.ebook_reader.features.user;
 
 import com.aritan.ebook_reader.common.constants.messages.UserMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
-import com.aritan.ebook_reader.common.models.User;
-import com.aritan.ebook_reader.features.user.dtos.UserCreateRequest;
-import com.aritan.ebook_reader.features.user.dtos.UserResponse;
-import com.aritan.ebook_reader.features.user.dtos.UserUpdateRequest;
+import com.aritan.ebook_reader.features.user.dtos.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,8 +18,8 @@ public class UserController {
     private final IUserService userService;
 
     @GetMapping
-    public ResponseEntity<EBResponse<List<UserResponse>>> getAllUsers() {
-        var result = userService.getAllUsers();
+    public ResponseEntity<EBResponse<Page<UserResponse>>> getAllUsers(UserFilterRequest request, Pageable pageable) {
+        var result = userService.getAllUsers(request, pageable);
         return ResponseEntity.ok(EBResponse.Success(result, UserMessage.DATA_SUCCESS));
     }
 
@@ -39,10 +37,21 @@ public class UserController {
         return ResponseEntity.ok(EBResponse.Created(result, UserMessage.DATA_CREATED_SUCCESSFULLY));
     }
 
-    @PutMapping("{userId}")
+    @PutMapping("{userId}/profile")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<UserResponse>> updateUser(@PathVariable Long userId, @RequestBody UserUpdateRequest userUpdateRequest){
-        var result = userService.updateUser(userId, userUpdateRequest);
+    public ResponseEntity<EBResponse<UserResponse>> updateUserProfile(
+            @PathVariable Long userId,
+            @Valid @RequestBody UserUpdateProfileRequest profileUpdatedRequest){
+        var result = userService.updateUserProfile(userId, profileUpdatedRequest);
+        return ResponseEntity.ok(EBResponse.Success(result, UserMessage.DATA_UPDATED_SUCCESSFULLY));
+    }
+
+    @PutMapping("{userId}/avatar")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<UserResponse>> updateUserAvatar(
+            @PathVariable Long userId,
+            @RequestBody UserUpdateAvatarRequest updateAvatarRequest){
+        var result = userService.updateUserAvatar(userId, updateAvatarRequest);
         return ResponseEntity.ok(EBResponse.Success(result, UserMessage.DATA_UPDATED_SUCCESSFULLY));
     }
 

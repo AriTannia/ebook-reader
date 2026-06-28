@@ -1,7 +1,7 @@
 package com.aritan.ebook_reader.features.book;
 
 import com.aritan.ebook_reader.common.constants.messages.BookMessage;
-import com.aritan.ebook_reader.common.enums.BookBadge;
+import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.features.book.dtos.*;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,9 @@ public class BookController {
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EBResponse<Page<BookResponse>>> getAllBooks(
-            BookFilterRequest request, Pageable pageable, @RequestParam BookBadge badge){
+            BookFilterRequest request,
+            Pageable pageable,
+            @RequestParam(required = false) BookBadge badge){
         var result = bookService.getPagedBooks(request, pageable, badge);
 
         return ResponseEntity.ok(EBResponse.Success(result, BookMessage.BOOKS_RETRIEVED_SUCCESSFULLY));

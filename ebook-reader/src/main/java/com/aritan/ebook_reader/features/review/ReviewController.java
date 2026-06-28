@@ -58,6 +58,17 @@ public class ReviewController {
                         String.format(ReviewMessage.REVIEW_UPDATED_SUCCESSFULLY, reviewId)));
     }
 
+    @PutMapping("/books/{bookId}/reviews/{reviewId}/helpful")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<ReviewResponse>> updateReviewHelpful(
+            @PathVariable Long bookId,
+            @PathVariable UUID reviewId){
+        var result = reviewService.updateReviewHelpful(bookId, reviewId);
+        return ResponseEntity.ok(
+                EBResponse.Success(result,
+                        String.format(ReviewMessage.REVIEW_UPDATED_SUCCESSFULLY, reviewId)));
+    }
+
     @DeleteMapping("/books/{bookId}/reviews/{reviewId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<?>> deleteReview(

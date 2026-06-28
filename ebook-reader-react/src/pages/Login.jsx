@@ -116,7 +116,7 @@ const Login = () => {
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               Welcome back
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground cursor-pointer">
               Sign in to continue to your library
             </p>
           </div>
@@ -161,7 +161,7 @@ const Login = () => {
               <div className="flex justify-end">
                 <a
                   href="#"
-                  className="text-xs font-medium text-primary transition-opacity hover:opacity-80"
+                  className="text-xs font-medium text-primary transition-opacity hover:opacity-80 cursor-pointer"
                 >
                   Forgot password?
                 </a>
@@ -171,7 +171,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="mt-1 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-1 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -191,7 +191,7 @@ const Login = () => {
             Don&apos;t have an account?{" "}
             <Link
               to="/register"
-              className="font-medium text-primary transition-opacity hover:opacity-80"
+              className="font-medium text-primary transition-opacity hover:opacity-80 cursor-pointer"
             >
               Sign Up
             </Link>

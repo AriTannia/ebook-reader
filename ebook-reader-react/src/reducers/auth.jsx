@@ -18,9 +18,9 @@ const getAuthErrorMessage = (error) => {
 
 export const register = createAsyncThunk(
   'auth/register',
-  async ({ username, email, password }, thunkAPI) => {
+  async ({ fullName, email, password }, thunkAPI) => {
     try {
-      const response = await AuthService.register(username, email, password);
+      const response = await AuthService.register(fullName, email, password);
       return response.data;
     } catch (error) {
       const message = getAuthErrorMessage(error);
@@ -63,11 +63,24 @@ export const logout = createAsyncThunk(
     }
 )
 
+export const getCurrentUser = createAsyncThunk(
+  "auth/me",
+  async (_, thunkAPI) => {
+    try {
+      const response = await AuthService.getCurrentUser();
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
     isLoggedIn: false,
     user: null,
+    loading: true
   },
   extraReducers: (builder) => {
     builder
@@ -95,6 +108,16 @@ const authSlice = createSlice({
       })
       .addCase(refreshToken.rejected, (state) => {
         state.isLoggedIn = false;
+        state.user = null;
+      })
+      .addCase(getCurrentUser.fulfilled, (state, action) => {
+        state.isLoggedIn = true;
+        state.loading = false;
+        state.user = action.payload?.data || action.payload;
+      })
+      .addCase(getCurrentUser.rejected, (state) => {
+        state.isLoggedIn = false;
+        state.loading = false;
         state.user = null;
       });
     },

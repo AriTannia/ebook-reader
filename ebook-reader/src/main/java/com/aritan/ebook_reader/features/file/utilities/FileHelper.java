@@ -1,15 +1,18 @@
 package com.aritan.ebook_reader.features.file.utilities;
 
-import static java.util.UUID.randomUUID;
+import java.util.UUID;
 
 public class FileHelper {
-    public static String buildFileName(String originalFileName){
-        if(originalFileName == null || originalFileName.contains(".")){
-            return randomUUID().toString();
+
+    public static String buildAvatarFileName(String originalFileName) {
+
+        if (originalFileName == null || !originalFileName.contains(".")) {
+            return "avatars/" + UUID.randomUUID();
         }
 
-        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        String extension =
+                originalFileName.substring(originalFileName.lastIndexOf("."));
 
-        return randomUUID() + extension;
+        return "avatars/" + UUID.randomUUID() + extension;
     }
 }

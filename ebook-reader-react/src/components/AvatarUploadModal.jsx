@@ -1,19 +1,19 @@
 import { useState, useRef } from "react";
 import { Upload, X, Check, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateAvatar } from "../reducers/user";
-import { useToast } from "../context/ToastContext";
+import { updateUserAvatar } from "../reducers/user";
+import { uploadFile } from "../reducers/file";
+import toast from "react-hot-toast";
 
-export default function AvatarUploadModal({ onClose }) {
+export default function AvatarUploadModal({ isOpen, onClose }) {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user);
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState("");
   const [isDragging, setIsDragging] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [error, setError] = useState(null);
-  const { addToast } = useToast();
+  const fileInputRef = useRef(null);
 
   const validImageTypes = ["image/jpeg", "image/png", "image/webp"];
   const maxFileSize = 5 * 1024 * 1024; // 5MB
@@ -31,7 +31,7 @@ export default function AvatarUploadModal({ onClose }) {
   const handleFileSelect = (file) => {
     const error = validateFile(file);
     if (error) {
-      addToast({ type: "error", message: error });
+      toast.error(error);
       return;
     }
     setSelectedFile(file);
@@ -40,13 +40,6 @@ export default function AvatarUploadModal({ onClose }) {
       setPreview(reader.result);
     };
     reader.readAsDataURL(file);
-  };
-
-  const handleInputChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleFileSelect(file);
-    }
   };
 
   const handleInputChange = (e) => {
@@ -70,39 +63,56 @@ export default function AvatarUploadModal({ onClose }) {
     setIsDragging(false);
 
     const files = e.dataTransfer.files;
-    if(files?.[0]) {
+    if (files?.[0]) {
       handleFileSelect(files[0]);
     }
   };
 
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setPreview("");
+    setUploadProgress(0);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleSave = async () => {
-    if(!selectedFile || !preview) return;
+    if (!selectedFile || !preview) return;
 
     setIsUploading(true);
+    setUploadProgress(0);
 
-    //Simulate upload progress
-    const uploadSimulation = setInterval(() => {
-      setUploadProgress((prev) => {
-        if(prev >= 100) {
-          clearInterval(uploadSimulation);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
+    try {
+      const uploadResult = await dispatch(
+        uploadFile({
+          file: selectedFile,
+          onProgress: (percent) => setUploadProgress(percent),
+        }),
+      ).unwrap();
 
-    // Simulate a delay for the upload process
-    setTimeout(async () => {
-      clearInterval(uploadSimulation);
+      console.log("Messi: " + uploadResult);
+      console.log("Ri do: "+ uploadResult.filePath);
+
+      await dispatch(
+        updateUserAvatar({
+          userId: currentUser.userId,
+          avatarData: {
+            avatarUrl: uploadResult.filePath,
+          },
+        }),
+      ).unwrap();
+
       setUploadProgress(100);
 
-      // Dispatch the action to update the avatar in the Redux store
-      await dispatch(updateAvatar(preview));
+      toast.success("Avatar updated successfully!");
 
+      handleClose();
+    } catch (error) {
+      toast.error(error || "Failed to update avatar.");
+    } finally {
       setIsUploading(false);
-      addToast({ type: "success", message: "Avatar updated successfully!" });
-      onClose();
-    }, 2000);
+    }
   };
 
   const handleClose = () => {
@@ -111,20 +121,17 @@ export default function AvatarUploadModal({ onClose }) {
     setUploadProgress(0);
     setIsDragging(false);
     setIsUploading(false);
-    onClose();
-  };
 
-  const handleClose = () => {
-    setSelectedFile(null);
-    setPreview("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+
+    onClose();
   };
 
-  if(!isOpen) return null;
+  if (!isOpen) return null;
 
-    return (
+  return (
     <>
       {/* Backdrop */}
       <div
@@ -169,8 +176,8 @@ export default function AvatarUploadModal({ onClose }) {
                   className="font-semibold text-primary underline hover:opacity-80 transition-opacity"
                 >
                   choose a file
-                </button>
-                {" "}from your device.
+                </button>{" "}
+                from your device.
               </p>
               <p className="text-xs text-muted-foreground">
                 JPG, PNG, or WebP • Max 5MB
@@ -226,7 +233,9 @@ export default function AvatarUploadModal({ onClose }) {
             {isUploading && (
               <div className="mb-6">
                 <div className="mb-2 flex items-center justify-between">
-                  <p className="text-xs font-medium text-foreground">Uploading</p>
+                  <p className="text-xs font-medium text-foreground">
+                    Uploading
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     {Math.round(uploadProgress)}%
                   </p>
@@ -245,14 +254,6 @@ export default function AvatarUploadModal({ onClose }) {
         {/* Action Buttons */}
         <div className="flex gap-3">
           <button
-            onClick={handleClose}
-            disabled={isUploading}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100 disabled:opacity-50 transition-all active:scale-[0.98]"
-          >
-            <X className="h-4 w-4" />
-            Cancel
-          </button>
-          <button
             onClick={handleSave}
             disabled={!selectedFile || isUploading}
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all active:scale-[0.98]"
@@ -265,15 +266,20 @@ export default function AvatarUploadModal({ onClose }) {
             ) : (
               <>
                 <Check className="h-4 w-4" />
-                Save Changes
+                Save
               </>
             )}
+          </button>
+          <button
+            onClick={handleClose}
+            disabled={isUploading}
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg border bg-white px-4 py-2.5 text-sm font-medium hover:bg-muted transition-all active:scale-[0.98]"
+          >
+            <X className="h-4 w-4" style={{ color: "#64748b" }} />
+            <span style={{ color: "#64748b" }}>Cancel</span>
           </button>
         </div>
       </div>
     </>
-  )
+  );
 }
-
-
-  

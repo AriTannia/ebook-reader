@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.book.dtos;
 
-import com.aritan.ebook_reader.common.enums.BookStatus;
+import com.aritan.ebook_reader.common.enums.book.BookStatus;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,23 +1,20 @@
 import { useState } from "react"
-import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { Star, ShoppingCart } from "lucide-react"
 import { fetchBookDetails } from "../reducers/book"
 
 export default function BookCard({ book, onAddToCart }) {
-  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [imageError, setImageError] = useState(false)
 
   const handleCardClick = () => {
-    dispatch(fetchBookDetails(book.bookId))
     navigate(`/books/${book.bookId}`)
   }
 
   return (
     <div
       onClick={handleCardClick}
-      className="group flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+      className="group flex flex-col h-full rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
     >
       {/* Book Cover */}
       <div className="relative w-full aspect-3/4 overflow-hidden rounded-lg bg-muted shrink-0">
@@ -38,6 +35,13 @@ export default function BookCard({ book, onAddToCart }) {
             </h3>
           </div>
         )}
+
+        {/* Badge */}
+        {book.badge && (
+          <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2.5 py-1 rounded-full text-xs font-semibold">
+            {book.badge}
+          </div>
+        )}
       </div>
 
       {/* Book Info — flex column with consistent spacing */}
@@ -45,20 +49,21 @@ export default function BookCard({ book, onAddToCart }) {
         <h3 className="font-semibold text-sm text-foreground line-clamp-2 group-hover:text-primary transition-colors">
           {book.title}
         </h3>
-        <p className="text-xs text-muted-foreground">{book.authors?.map(author => author.authorName).join(", ")}</p>
+        <p className="text-xs text-muted-foreground">
+          {book.authors?.map((author) => author.authorName).join(", ")}
+        </p>
 
-        {/* Rating
         <div className="flex items-center gap-1">
           <div className="flex items-center gap-0.5">
             <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
             <span className="text-xs font-medium text-foreground">
-              {book.rating}
+              {book.averageRating.toFixed(1)}
             </span>
           </div>
           <span className="text-xs text-muted-foreground">
-            ({book.reviews.toLocaleString()})
+            ({book.reviewCount.toLocaleString()})
           </span>
-        </div> */}
+        </div>
 
         {/* Price — fixed at bottom, full width */}
         <div className="mt-auto pt-3 w-full">

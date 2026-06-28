@@ -2,9 +2,9 @@ import api from "./api";
 
 const API_URL = "/v1/auth/";
 
-export const register = (username, email, password) => {
+export const register = (fullName, email, password) => {
   return api.post(API_URL + "signup", {
-    username,
+    fullName,
     email,
     password,
   });
@@ -28,3 +28,7 @@ export const refreshToken = () => {
 export const logout = () => {
     return api.post(API_URL + "signout");
 }
+
+export const getCurrentUser = () => {
+  return api.get(API_URL + "me");
+};

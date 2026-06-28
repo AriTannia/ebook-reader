@@ -1,11 +1,10 @@
 package com.aritan.ebook_reader.features.book.utilities;
 
 import com.aritan.ebook_reader.common.constants.rules.BookBadgeRules;
-import com.aritan.ebook_reader.common.enums.BookBadge;
+import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.models.Book;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Component

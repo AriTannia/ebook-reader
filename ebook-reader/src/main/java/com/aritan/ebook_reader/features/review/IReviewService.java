@@ -18,4 +18,6 @@ public interface IReviewService {
     ReviewResponse updateReview(Long bookId, ReviewUpdatedRequest updateRequest, UUID reviewId);
 
     void deleteReview(Long bookId, UUID reviewId);
+
+    ReviewResponse updateReviewHelpful(Long bookId, UUID reviewId);
 }
