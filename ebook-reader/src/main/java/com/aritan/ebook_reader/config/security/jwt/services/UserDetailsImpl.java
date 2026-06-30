@@ -1,7 +1,6 @@
 package com.aritan.ebook_reader.config.security.jwt.services;
 
 import com.aritan.ebook_reader.common.models.User;
-import com.aritan.ebook_reader.features.auth.AuthService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.jspecify.annotations.NonNull;
@@ -30,7 +29,7 @@ public class UserDetailsImpl implements UserDetails {
     private final String password;
 
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsImpl.class);
-    private Collection<? extends GrantedAuthority> authorities;
+    private final Collection<? extends GrantedAuthority> authorities;
     public UserDetailsImpl(Long id, String fullName, String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id  = id;
