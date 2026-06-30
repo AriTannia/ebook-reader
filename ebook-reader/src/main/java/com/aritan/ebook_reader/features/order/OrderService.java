@@ -149,9 +149,7 @@ public class OrderService implements IOrderService {
         for(OrderItem orderItem : order.getItems()){
             Long bookId = orderItem.getBook().getBookId();
 
-            boolean alreadyInCart = cartItemRepository
-                    .findByCart_CartIdAndBook_BookId(cart.getCartId(), bookId)
-                    .isPresent();
+            boolean alreadyInCart = cartItemRepository.existsByCart_CartIdAndBook_BookId(cart.getCartId(), bookId);
 
             if(!alreadyInCart){
                 CartItem cartItem = new CartItem();

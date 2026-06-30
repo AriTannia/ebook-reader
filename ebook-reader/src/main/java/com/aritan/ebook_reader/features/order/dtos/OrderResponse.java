@@ -18,7 +18,7 @@ public class OrderResponse {
     private Long orderId;
     private List<OrderItemResponse> items;
     private OrderStatus status;
-    private BigDecimal TotalAmount;
+    private BigDecimal totalAmount;
     private LocalDateTime createdAt;
     private LocalDateTime paidAt;
 }

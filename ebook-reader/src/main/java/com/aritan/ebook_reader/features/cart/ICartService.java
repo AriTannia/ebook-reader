@@ -6,6 +6,6 @@ import com.aritan.ebook_reader.features.cart.dtos.CartResponse;
 public interface ICartService {
     CartResponse getCartByUserId();
     CartResponse addItemToCart(CartAddItemRequest addItemRequest);
-    void removeItemFromCart(Long cartItemId);
+    CartResponse removeItemFromCart(Long cartItemId);
     void clearCart();
 }

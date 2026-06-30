@@ -55,6 +55,23 @@ export const updateUserAvatar = createAsyncThunk(
   },
 );
 
+export const deleteUser = createAsyncThunk(
+  "user/deleteUser",
+  async (userId, thunkAPI) => {
+    try {
+      await UserService.deleteUser(userId);
+      return userId;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while deleting the user.";
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
+);
+
 const initialState = {
   profile: null,
   isFetching: false,
@@ -101,6 +118,18 @@ const userSlice = createSlice({
         state.profile = action.payload.data;
       })
       .addCase(updateUserAvatar.rejected, (state, action) => {
+        state.isUpdating = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteUser.pending, (state) => {
+        state.isUpdating = true;
+        state.error = null;
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.isUpdating = false;
+        state.profile = null;
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
         state.isUpdating = false;
         state.error = action.payload;
       });

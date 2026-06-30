@@ -8,6 +8,8 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import RootPage from "./pages/RootPage";
 import BookDetails from "./pages/BookDetails";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 
 import { logout, getCurrentUser } from "./reducers/auth";
 import { clearMessage } from "./reducers/message";
@@ -43,6 +45,8 @@ const App = () => {
         <Route exact path="/register" element={<Register />} />
         <Route exact path="/profile" element={<Profile />} />
         <Route exact path="/books/:bookId" element={<BookDetails />} />
+        <Route exact path="/cart" element={<Cart />} />
+        <Route exact path="/checkout/:orderId" element={<Checkout />} />
       </Routes>
     </>
   );

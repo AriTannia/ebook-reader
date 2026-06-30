@@ -37,6 +37,14 @@ export default function Navbar() {
     }
   };
 
+  const handleCartClick = () => {
+    if (isLoggedIn) {
+      navigate("/cart");
+    } else {
+      navigate("/login");
+    }
+  };
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -76,7 +84,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-20 border-b border-border/70 bg-background/80 backdrop-blur-md">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-2">
         {/* Branding — far left */}
         <div className="flex items-center gap-3 shrink-0">
           <Link
@@ -124,6 +132,7 @@ export default function Navbar() {
             className="p-2 text-foreground rounded-lg transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
             aria-label="Shopping cart"
             title="Shopping cart"
+            onClick={handleCartClick}
           >
             <ShoppingCart className="h-5 w-5" />
           </button>

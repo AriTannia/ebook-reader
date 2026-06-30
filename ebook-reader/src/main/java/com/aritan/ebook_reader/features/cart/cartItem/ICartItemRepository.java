@@ -9,7 +9,15 @@ import java.util.Optional;
 
 @Repository
 public interface ICartItemRepository extends JpaRepository<CartItem, Long> {
-    @EntityGraph(attributePaths = {"book"})
+    @EntityGraph(attributePaths = {
+            "book",
+            "book.authors"
+    })
     Optional<CartItem> findByCart_CartIdAndBook_BookId(Long cartId, Long BookId);
+
+    boolean existsByCart_CartIdAndBook_BookId(
+            Long cartId,
+            Long bookId
+    );
     void deleteByCart_CartId(Long cartId);
 }

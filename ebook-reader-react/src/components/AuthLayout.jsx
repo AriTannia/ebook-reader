@@ -25,7 +25,6 @@ export default function AuthLayout({ children }) {
       />
 
       <div className="relative z-10">
-        <Navbar />
         <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6 py-12">
           {children}
         </main>

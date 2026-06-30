@@ -13,3 +13,7 @@ export const updateUserProfile = (userId, updatedData) => {
 export const updateUserAvatar = (userId, avatarData) => {
   return api.put(API_URL + userId + "/avatar", avatarData);
 };
+
+export const deleteUser = (userId) => {
+  return api.delete(API_URL + userId);
+};

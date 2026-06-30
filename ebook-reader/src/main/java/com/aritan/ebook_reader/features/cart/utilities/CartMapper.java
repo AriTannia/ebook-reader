@@ -3,14 +3,11 @@ package com.aritan.ebook_reader.features.cart.utilities;
 import com.aritan.ebook_reader.common.models.Book;
 import com.aritan.ebook_reader.common.models.cart.Cart;
 import com.aritan.ebook_reader.common.models.cart.CartItem;
-import com.aritan.ebook_reader.common.models.order.Order;
-import com.aritan.ebook_reader.common.models.order.OrderItem;
 import com.aritan.ebook_reader.features.book.utilities.BookMapper;
 import com.aritan.ebook_reader.features.cart.dtos.CartItemResponse;
 import com.aritan.ebook_reader.features.cart.dtos.CartResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 import java.math.BigDecimal;
 
@@ -20,7 +17,7 @@ import java.math.BigDecimal;
 )
 public interface CartMapper {
     @Mapping(target = "totalPrice", expression = "java(calculateTotalPrice(cart))")
-    CartResponse toCarResponse(Cart cart);
+    CartResponse toCartResponse(Cart cart);
 
     @Mapping(target = "book", source = "book")
     CartItemResponse toCarItemResponse(CartItem cartItem);

@@ -33,11 +33,11 @@ public class CartController {
 
     @DeleteMapping("items/{cartItemId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<?>> removeItemToCart(
+    public ResponseEntity<EBResponse<CartResponse>> removeItemToCart(
             @PathVariable Long cartItemId){
 
-        cartService.removeItemFromCart(cartItemId);
-        return ResponseEntity.ok(EBResponse.Success(null, "Item removed from cart successfully"));
+        var result = cartService.removeItemFromCart(cartItemId);
+        return ResponseEntity.ok(EBResponse.Success(result, "Item removed from cart successfully"));
     }
 
     @DeleteMapping

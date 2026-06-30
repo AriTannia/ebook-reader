@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Library, Pencil, Loader2 } from "lucide-react";
-import Navbar from "../components/Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserProfile } from "../reducers/user";
 import AvatarUploadModal from "../components/AvatarUploadModal";
@@ -49,7 +48,6 @@ const Profile = () => {
   if (!currentUser) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar />
         <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6">
           <div className="text-center">
             <p className="text-muted-foreground">
@@ -129,8 +127,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-
       <main className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-2xl flex-col items-center justify-center px-6 py-12">
         <div className="w-full max-w-lg animate-fade-in-up">
           {/* ── Profile Card ── */}

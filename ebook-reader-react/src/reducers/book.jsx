@@ -14,8 +14,6 @@ export const fetchBooks = createAsyncThunk(
         badge,
       );
 
-      console.log("API Response:", response.data);
-
       return {
         key,
         books: response.data.data.content,

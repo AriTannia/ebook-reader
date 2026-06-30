@@ -1,6 +1,6 @@
 import api from "./api";
 
-const API_URL = "/v1/books/";
+const API_URL = "/v1/books";
 
 export const getAllBooks = (filters = {}, badge) => {
   return api.get(API_URL, {
@@ -12,7 +12,7 @@ export const getAllBooks = (filters = {}, badge) => {
 };
 
 export const getBookDetails = (bookId) => {
-  return api.get(API_URL + bookId);
+  return api.get(API_URL + "/" + bookId);
 };
 
 export const addNewBook = (bookData) => {
@@ -20,9 +20,9 @@ export const addNewBook = (bookData) => {
 };
 
 export const updateBookDetails = (bookId, updatedData) => {
-  return api.put(API_URL + bookId, updatedData);
+  return api.put(API_URL + "/" + bookId, updatedData);
 };
 
 export const deleteBook = (bookId) => {
-  return api.delete(API_URL + bookId);
+  return api.delete(API_URL + "/" + bookId);
 };

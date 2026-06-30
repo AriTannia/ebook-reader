@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ShoppingCart, Check, Loader2,  ChevronLeft, ChevronRight } from "lucide-react";
-import Navbar from "../components/Navbar";
 import RatingSummary from "../components/RatingSummary";
 import ReviewCard from "../components/ReviewCard";
 import { fetchBookDetails } from "../reducers/book";
 import { fetchReviewsByBookId } from "../reducers/review";
+import { addToCart } from "../reducers/cart";
 
 export default function BookDetails() {
   const { bookId } = useParams();
@@ -41,8 +41,11 @@ export default function BookDetails() {
 
   const handleAddToCart = async () => {
     setIsAddingToCart(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await dispatch(
+      addToCart({
+        bookId: book.bookId
+      })
+    );
     setIsInCart(true);
     setIsAddingToCart(false);
   };
