@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
     private final IOrderService orderService;
 
+    // Public
     @PostMapping("/checkout")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EBResponse<OrderResponse>> createMyOrder() {
@@ -47,8 +48,9 @@ public class OrderController {
         return ResponseEntity.ok(EBResponse.Success(result, "Order cancelled successfully"));
     }
 
+    // Admin
     @GetMapping("/admin")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<Page<OrderResponse>>> getAllOrders(Pageable pageable) {
         var result = orderService.getAllOrders(pageable);
 
@@ -56,7 +58,7 @@ public class OrderController {
     }
 
     @GetMapping("/admin/{orderId}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<OrderResponse>> getOrderByIdForAdmin(@PathVariable Long orderId) {
         var result = orderService.getOrderByIdForAdmin(orderId);
 
@@ -64,15 +66,15 @@ public class OrderController {
     }
 
     @PatchMapping("/admin/{orderId}/cancel")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<OrderResponse>> cancelOrderByAdmin(@PathVariable Long orderId) {
         var result = orderService.cancelOrderByAdmin(orderId);
 
         return ResponseEntity.ok(EBResponse.Success(result, "Order cancelled successfully"));
     }
 
-    @PatchMapping("/me/{orderId}/refund")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PatchMapping("/admin/{orderId}/refund")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<OrderResponse>> refundOrder(@PathVariable Long orderId) {
         var result = orderService.refundOrder(orderId);
 

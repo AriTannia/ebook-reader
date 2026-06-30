@@ -61,6 +61,21 @@ public class BookService implements IBookService{
     }
 
     @Override
+    public Page<BookAdminResponse> searchBooks(BookFilterRequest request, Pageable pageable, BookBadge badge) {
+        Specification<Book> spec = Specification
+                .where(BookSpecification.hasAuthor(request.getAuthorId()))
+                .and(BookSpecification.hasCategory(request.getCategoryId()))
+                .and(BookSpecification.hasStatus(BookStatus.ACTIVE))
+                .and(BookSpecification.hasPublisher(request.getPublisherId()))
+                .and(BookSpecification.hasKeyword(request.getKeyword()))
+                .and(BookSpecification.hasBadge(badge));
+
+        Page<Book> books = bookRepository.findAll(spec, pageable);
+
+        return books.map(bookMapper::toAdminResponse);
+    }
+
+    @Override
     public BookDetailsResponse getBookById(Long bookId) {
         Book book = bookRepository.findByBookId(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException(

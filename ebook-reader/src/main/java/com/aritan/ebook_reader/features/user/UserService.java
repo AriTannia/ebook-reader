@@ -107,4 +107,20 @@ public class UserService implements IUserService {
 
         return userMapper.toUserResponse(user);
     }
+
+    @Override
+    public UserResponse updateUserRole(Long userId, UserUpdateRoleRequest updateRoleRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
+
+        Set<Role> roles = updateRoleRequest.getRoles().stream()
+                .map(roleName -> roleRepository.findByName(ERole.valueOf(roleName))
+                        .orElseThrow(() -> new ResourceNotFoundException(UserMessage.ROLE_NOT_FOUND)))
+                .collect(Collectors.toSet());
+
+        user.setRoles(roles);
+        userRepository.save(user);
+
+        return userMapper.toUserResponse(user);
+    }
 }

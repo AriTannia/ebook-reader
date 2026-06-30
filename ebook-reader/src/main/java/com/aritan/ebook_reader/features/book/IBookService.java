@@ -11,6 +11,8 @@ import java.util.List;
 public interface IBookService {
     Page<BookResponse> getPagedBooks(BookFilterRequest request, Pageable pageable, BookBadge badge);
 
+    Page<BookAdminResponse> searchBooks(BookFilterRequest request, Pageable pageable, BookBadge badge);
+
     BookDetailsResponse getBookById(Long bookId);
 
     List<BookDetailsResponse> createBook(List<BookCreateRequest> requests);

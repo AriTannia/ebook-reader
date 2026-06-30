@@ -14,4 +14,6 @@ public interface IUserService {
     void deleteUser(Long userId);
 
     UserResponse updateUserAvatar(Long userId, @Valid UserUpdateAvatarRequest updateAvatarRequest);
+
+    UserResponse updateUserRole(Long userId, UserUpdateRoleRequest updateRoleRequest);
 }

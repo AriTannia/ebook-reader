@@ -79,6 +79,9 @@ public interface BookMapper {
     @Mapping(target = "authorNames", source = "authors")
     BookSumaryResponse toSummaryResponse(Book book);
 
+    @Mapping(target = "authorNames", source = "authors")
+    BookAdminResponse toAdminResponse(Book book);
+
     default String toAuthorNames(Set<Author> authors){
         if(authors == null) return null;
 

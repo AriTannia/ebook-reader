@@ -19,6 +19,7 @@ import java.util.List;
 public class BookController {
     private final IBookService bookService;
 
+    // Public
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EBResponse<Page<BookResponse>>> getAllBooks(
@@ -39,7 +40,20 @@ public class BookController {
                         String.format(BookMessage.BOOK_RETRIEVED_SUCCESSFULLY, bookId)));
     }
 
-    @PostMapping
+
+    // Admin
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<Page<BookAdminResponse>>> getAllBooksForAdmin(
+            BookFilterRequest request,
+            Pageable pageable,
+            @RequestParam(required = false) BookBadge badge){
+        var result = bookService.searchBooks(request, pageable, badge);
+
+        return ResponseEntity.ok(EBResponse.Success(result, BookMessage.BOOKS_RETRIEVED_SUCCESSFULLY));
+    }
+
+    @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<List<BookDetailsResponse>>> createBook(
             @RequestBody List<BookCreateRequest> requests){
@@ -47,7 +61,7 @@ public class BookController {
         return ResponseEntity.ok(EBResponse.Created(result, BookMessage.BOOK_CREATED_SUCCESSFULLY));
     }
 
-    @PutMapping("{bookId}")
+    @PutMapping("/{bookId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<BookDetailsResponse>> updateBook(
             @RequestBody BookUpdateRequest updateRequest,
@@ -58,7 +72,7 @@ public class BookController {
                         String.format(BookMessage.BOOK_UPDATED_SUCCESSFULLY, bookId)));
     }
 
-    @DeleteMapping("{bookId}")
+    @DeleteMapping("{bookId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<?>> deleteBook(@PathVariable Long bookId){
         bookService.deleteBook(bookId);
