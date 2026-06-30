@@ -2,11 +2,11 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as UserService from "../services/user.service";
 import { setMessage } from "./message";
 
-export const fetchUserProfile = createAsyncThunk(
-  "user/fetchUserProfile",
+export const fetchUserById = createAsyncThunk(
+  "user/fetchUserById",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.getUserProfile(userId);
+      const response = await UserService.getUserById(userId);
       return response.data;
     } catch (error) {
       const message =
@@ -55,6 +55,57 @@ export const updateUserAvatar = createAsyncThunk(
   },
 );
 
+export const fetchAllUsers = createAsyncThunk(
+  "user/fetchAllUsers",
+  async (filters = {}, thunkAPI) => {
+    try {
+      const response = await UserService.getAllUsers(filters);
+      return response.data.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while fetching users.";
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
+);
+
+export const createUser = createAsyncThunk(
+  "user/createUser",
+  async (userData, thunkAPI) => {
+    try {
+      const response = await UserService.createUser(userData);
+      return response.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while creating the user.";
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
+);
+
+export const updateUserRole = createAsyncThunk(
+  "user/updateUserRole",
+  async ({ userId, roleData }, thunkAPI) => {
+    try {
+      const response = await UserService.updateUserRole(userId, roleData);
+      return response.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while updating the user role.";
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
+);
+
 export const deleteUser = createAsyncThunk(
   "user/deleteUser",
   async (userId, thunkAPI) => {
@@ -73,6 +124,8 @@ export const deleteUser = createAsyncThunk(
 );
 
 const initialState = {
+  users: [],
+  page: null,
   profile: null,
   isFetching: false,
   isUpdating: false,
@@ -85,15 +138,15 @@ const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserProfile.pending, (state) => {
+      .addCase(fetchUserById.pending, (state) => {
         state.isFetching = true;
         state.error = null;
       })
-      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+      .addCase(fetchUserById.fulfilled, (state, action) => {
         state.isFetching = false;
         state.profile = action.payload.data;
       })
-      .addCase(fetchUserProfile.rejected, (state, action) => {
+      .addCase(fetchUserById.rejected, (state, action) => {
         state.isFetching = false;
         state.error = action.payload;
       })
@@ -121,6 +174,53 @@ const userSlice = createSlice({
         state.isUpdating = false;
         state.error = action.payload;
       })
+      .addCase(fetchAllUsers.pending, (state) => {
+        state.isFetching = true;
+        state.error = null;
+      })
+      .addCase(fetchAllUsers.fulfilled, (state, action) => {
+        state.isFetching = false;
+        state.page = action.payload;
+      })
+      .addCase(fetchAllUsers.rejected, (state, action) => {
+        state.isFetching = false;
+        state.error = action.payload;
+      })
+      .addCase(createUser.pending, (state) => {
+        state.isUpdating = true;
+        state.error = null;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.isUpdating = false;
+        if (!state.users) {
+          state.users = [];
+        }
+        state.users.push(action.payload.data);
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.isUpdating = false;
+        state.error = action.payload;
+      })
+      .addCase(updateUserRole.pending, (state) => {
+        state.isUpdating = true;
+        state.error = null;
+      })
+      .addCase(updateUserRole.fulfilled, (state, action) => {
+        state.isUpdating = false;
+        const updatedUser = action.payload.data;
+        if (state.users) {
+          const index = state.users.findIndex(
+            (user) => user.id === updatedUser.id,
+          );
+          if (index !== -1) {
+            state.users[index] = updatedUser;
+          }
+        }
+      })
+      .addCase(updateUserRole.rejected, (state, action) => {
+        state.isUpdating = false;
+        state.error = action.payload;
+      })
       .addCase(deleteUser.pending, (state) => {
         state.isUpdating = true;
         state.error = null;
@@ -128,6 +228,11 @@ const userSlice = createSlice({
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.isUpdating = false;
         state.profile = null;
+        if (state.users) {
+          state.users = state.users.filter(
+            (user) => user.id !== action.payload.data.id,
+          );
+        }
       })
       .addCase(deleteUser.rejected, (state, action) => {
         state.isUpdating = false;

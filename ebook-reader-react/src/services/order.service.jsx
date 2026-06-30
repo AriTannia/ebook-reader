@@ -21,3 +21,23 @@ export const getMyOrderById = (orderId) => {
 export const cancelMyOrder = (orderId) => {
     return api.delete(API_URL + "/me/" + orderId + "/cancel");
 };
+
+export const getAllOrdersForAdmin = (filters = {}) => {
+  return api.get(`${API_URL}/admin`, {
+    params: {
+      ...filters,
+    },
+  });
+};
+
+export const getOrderByIdForAdmin = (orderId) => {
+  return api.get(`${API_URL}/admin/${orderId}`);
+};
+
+export const cancelOrderByAdmin = (orderId) => {
+  return api.patch(`${API_URL}/admin/${orderId}/cancel`);
+};
+
+export const refundOrder = (orderId) => {
+  return api.patch(`${API_URL}/admin/${orderId}/refund`);
+};

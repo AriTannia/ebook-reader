@@ -15,14 +15,23 @@ export const getBookDetails = (bookId) => {
   return api.get(API_URL + "/" + bookId);
 };
 
-export const addNewBook = (bookData) => {
-  return api.post(API_URL, bookData);
+export const getAllBooksForAdmin = (filters = {}, badge) => {
+  return api.get(`${API_URL}/admin`, {
+    params: {
+      ...filters,
+      badge
+    },
+  });
+};
+
+export const addNewBook = (bookDataList) => {
+  return api.post(`${API_URL}/admin`, bookDataList);
 };
 
 export const updateBookDetails = (bookId, updatedData) => {
-  return api.put(API_URL + "/" + bookId, updatedData);
+  return api.put(`${API_URL}/${bookId}/admin`, updatedData);
 };
 
 export const deleteBook = (bookId) => {
-  return api.delete(API_URL + "/" + bookId);
+  return api.delete(`${API_URL}/${bookId}/admin`);
 };

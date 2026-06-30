@@ -16,6 +16,7 @@ public class BookSpecification {
             if (authorId == null)
                 return cb.conjunction();
 
+            query.distinct(true);
             return cb.equal(
                     root.join("authors").get("authorId"),
                     authorId);
@@ -28,6 +29,7 @@ public class BookSpecification {
             if (categoryId == null)
                 return cb.conjunction();
 
+            query.distinct(true);
             return cb.equal(
                     root.join("categories").get("categoryId"),
                     categoryId);

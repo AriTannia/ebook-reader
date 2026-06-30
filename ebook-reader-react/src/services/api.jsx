@@ -1,6 +1,7 @@
 import axios from "axios";
 
 let refreshPromise = null;
+let isRedirecting = false;
 
 const api = axios.create({
   baseURL: "/api",
@@ -40,7 +41,10 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (e) {
-        window.location.href = "/login";
+        if (!isRedirecting && window.location.pathname !== "/login") {
+          isRedirecting = true;
+          window.location.href = "/login";
+        }
         return Promise.reject(e);
       }
     }

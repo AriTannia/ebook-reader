@@ -1,6 +1,7 @@
 package com.aritan.ebook_reader.features.book;
 
 import com.aritan.ebook_reader.common.models.Book;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -17,7 +18,8 @@ public interface IBookRepository extends
     @EntityGraph(attributePaths = {
             "authors"
     })
-    Page<Book> findAll(Specification<Book> spec, Pageable pageable);
+    @NonNull
+    Page<Book> findAll(@NonNull Specification<Book> spec, @NonNull Pageable pageable);
     @EntityGraph(attributePaths = {
             "authors",
             "categories",

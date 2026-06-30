@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, User, LogOut, Search, ShoppingCart } from "lucide-react";
+import { BookOpen, User, LogOut, Search, ShoppingCart, LayoutDashboard } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../reducers/auth";
 
@@ -45,6 +45,14 @@ export default function Navbar() {
     }
   };
 
+  const handleDashboardClick = () => {
+    if (isLoggedIn) {
+      navigate("/admin");
+    } else {
+      navigate("/login");
+    }
+  };
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -59,28 +67,26 @@ export default function Navbar() {
 
   // Derive initials for the avatar placeholder
   const initials = currentUser?.fullName
-  ? currentUser.fullName
-      .trim()
-      .split(/\s+/)
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase()
-  : "";
+    ? currentUser.fullName
+        .trim()
+        .split(/\s+/)
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "";
 
-  console.log("AVT: " + initials);
+  useEffect(() => {
+    console.log(
+      "Trạng thái đăng nhập thay đổi! isLoggedIn =",
+      isLoggedIn,
+      "User =",
+      currentUser,
+    );
+  }, [isLoggedIn, currentUser]);
 
-    useEffect(() => {
-      console.log(
-        "Trạng thái đăng nhập thay đổi! isLoggedIn =",
-        isLoggedIn,
-        "User =",
-        currentUser,
-      );
-    }, [isLoggedIn, currentUser]);
-
-    const hasUser =
-      isLoggedIn && currentUser && Object.keys(currentUser).length > 0;
+  const hasUser =
+    isLoggedIn && currentUser && Object.keys(currentUser).length > 0;
 
   return (
     <header className="sticky top-0 z-20 border-b border-border/70 bg-background/80 backdrop-blur-md">
@@ -196,6 +202,16 @@ export default function Navbar() {
                     <User className="h-4 w-4 shrink-0 text-muted-foreground" />
                     View Profile
                   </Link>
+
+                  <button
+                    role="menuitem"
+                    onClick={handleDashboardClick}
+                    hidden={!currentUser.roles.includes("ROLE_ADMIN")}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                  >
+                    <LayoutDashboard className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    Dashboard
+                  </button>
 
                   <button
                     role="menuitem"

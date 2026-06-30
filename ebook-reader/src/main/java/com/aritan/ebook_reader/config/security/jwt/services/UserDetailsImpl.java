@@ -4,6 +4,7 @@ import com.aritan.ebook_reader.common.models.User;
 import com.aritan.ebook_reader.features.auth.AuthService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +22,12 @@ import java.util.stream.Collectors;
 public class UserDetailsImpl implements UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
-    private Long id;
-    private String email;
-    private String username;
-    private String fullName;
+    private final Long id;
+    private final String email;
+    private final String username;
+    private final String fullName;
     @JsonIgnore
-    private String password;
+    private final String password;
 
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsImpl.class);
     private Collection<? extends GrantedAuthority> authorities;
@@ -42,13 +43,11 @@ public class UserDetailsImpl implements UserDetails {
 
     // Factory Method
     public static UserDetailsImpl build(User user){
-        long start = System.currentTimeMillis();
-
         List<GrantedAuthority> authorityList = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
 
-        logger.info("Load Role time: {} ms", System.currentTimeMillis() - start);
+        logger.info(">>> User {} has authorities: {}", user.getEmail(), authorityList);
 
         return new UserDetailsImpl(
                 user.getUserId(),
@@ -58,6 +57,7 @@ public class UserDetailsImpl implements UserDetails {
                 authorityList);
     }
     @Override
+    @NonNull
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
@@ -68,6 +68,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
+    @NonNull
     public String getUsername() {
         return username;
     }

@@ -13,12 +13,8 @@ import {
 import { getMyOrderById } from "../reducers/order";
 import { getPaymentsByOrderId, createPaymentIntent } from "../reducers/payment";
 
-function formatPrice(price) {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(Number(price ?? 0));
+function formatPrice(value) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 }
 
 function formatDate(value) {

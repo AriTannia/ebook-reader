@@ -5,12 +5,12 @@ import { setMessage } from "./message";
 export const fetchBooks = createAsyncThunk(
   "book/fetchBooks",
   async (
-    { key, filters = {}, badge = null, page = 0, size = 10 },
+    { key, filters = {}, badge = null},
     thunkAPI,
   ) => {
     try {
       const response = await BookService.getAllBooks(
-        { ...filters, page, size },
+        { ...filters },
         badge,
       );
 
@@ -46,11 +46,34 @@ export const fetchBookDetails = createAsyncThunk(
   },
 );
 
+export const fetchBooksForAdmin = createAsyncThunk(
+  "book/fetchBooksForAdmin",
+  async ({ filters = {}, badge = null }, thunkAPI) => {
+    try {
+      const response = await BookService.getAllBooksForAdmin(
+        { ...filters },
+        badge,
+      );
+
+      return {
+        books: response.data,
+      };
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while fetching books for admin.";
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
+);
+
 export const addBook = createAsyncThunk(
   "book/addBook",
-  async (bookData, thunkAPI) => {
+  async (bookDataList, thunkAPI) => {
     try {
-      const response = await BookService.addBook(bookData);
+      const response = await BookService.addNewBook(bookDataList);
       return response.data.data;
     } catch (error) {
       const message =
@@ -99,6 +122,7 @@ export const deleteBook = createAsyncThunk(
 
 const initialState = {
   books: [],
+  page: null,
   sections: {},
   selectedBook: null,
   loadingSections: {},
@@ -137,13 +161,25 @@ const bookSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchBooksForAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchBooksForAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.page = action.payload.books.data;
+      })
+      .addCase(fetchBooksForAdmin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(addBook.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(addBook.fulfilled, (state, action) => {
         state.loading = false;
-        state.books.push(action.payload);
+        state.page?.content?.push(action.payload);
       })
       .addCase(addBook.rejected, (state, action) => {
         state.loading = false;
@@ -156,12 +192,12 @@ const bookSlice = createSlice({
       .addCase(updateBookDetails.fulfilled, (state, action) => {
         state.loading = false;
 
-        const index = state.books.findIndex(
+        const index = state.page?.content?.findIndex(
           (book) => book.bookId === action.payload.bookId,
         );
 
         if (index !== -1) {
-          state.books[index] = action.payload;
+          state.page.content[index] = action.payload;
         }
 
         if (
@@ -183,9 +219,12 @@ const bookSlice = createSlice({
       .addCase(deleteBook.fulfilled, (state, action) => {
         state.loading = false;
 
-        state.books = state.books.filter(
-          (book) => book.bookId !== action.payload,
-        );
+        state.page = {
+          ...state.page,
+          content: state.page?.content?.filter(
+            (book) => book.bookId !== action.payload
+          )
+        };
 
         if (
           state.selectedBook &&

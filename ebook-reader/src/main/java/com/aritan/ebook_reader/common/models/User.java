@@ -2,7 +2,6 @@ package com.aritan.ebook_reader.common.models;
 
 import com.aritan.ebook_reader.common.constants.tables.RoleTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.UserTableConstants;
-import com.aritan.ebook_reader.common.validation.ValidRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,7 @@
 package com.aritan.ebook_reader.features.order;
 
 import com.aritan.ebook_reader.common.models.order.Order;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -23,4 +24,11 @@ public interface IOrderRepository extends JpaRepository<Order, Long> {
             "items.book"
     })
     Optional<Order> findByOrderIdAndUser_UserId(Long orderId, Long userId);
+
+    @EntityGraph(attributePaths = {
+            "items",
+            "items.book"
+    })
+    @NonNull
+    Page<Order> findAll(@NonNull Pageable pageable);
 }

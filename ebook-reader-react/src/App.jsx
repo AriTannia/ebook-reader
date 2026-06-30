@@ -10,6 +10,7 @@ import RootPage from "./pages/RootPage";
 import BookDetails from "./pages/BookDetails";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import Dashboard from "./pages/admin/Dashboard";
 
 import { logout, getCurrentUser } from "./reducers/auth";
 import { clearMessage } from "./reducers/message";
@@ -47,6 +48,7 @@ const App = () => {
         <Route exact path="/books/:bookId" element={<BookDetails />} />
         <Route exact path="/cart" element={<Cart />} />
         <Route exact path="/checkout/:orderId" element={<Checkout />} />
+        <Route path="/admin/*" element={<Dashboard />} />
       </Routes>
     </>
   );
