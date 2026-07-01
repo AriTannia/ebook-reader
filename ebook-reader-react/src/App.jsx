@@ -14,7 +14,7 @@ import Dashboard from "./pages/admin/Dashboard";
 
 import { logout, getCurrentUser } from "./reducers/auth";
 import { clearMessage } from "./reducers/message";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/common/Navbar";
 
 const App = () => {
   const dispatch = useDispatch();

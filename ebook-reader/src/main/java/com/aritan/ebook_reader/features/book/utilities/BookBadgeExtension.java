@@ -2,7 +2,7 @@ package com.aritan.ebook_reader.features.book.utilities;
 
 import com.aritan.ebook_reader.common.constants.rules.BookBadgeRules;
 import com.aritan.ebook_reader.common.enums.book.BookBadge;
-import com.aritan.ebook_reader.common.models.Book;
+import com.aritan.ebook_reader.common.models.book.Book;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -34,6 +34,6 @@ public class BookBadgeExtension {
             return BookBadge.HOT;
         }
 
-        return null;
+        return BookBadge.NONE;
     }
 }

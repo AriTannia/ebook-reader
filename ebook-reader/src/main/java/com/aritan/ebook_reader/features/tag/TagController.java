@@ -21,10 +21,11 @@ import java.util.UUID;
 public class TagController {
     private final ITagService tagService;
 
+    // Public
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<Page<TagResponse>>> getAllTags(Pageable page){
-        var result = tagService.getAllTags(page);
+    public ResponseEntity<EBResponse<List<TagResponse>>> getAllTags(){
+        var result = tagService.getAllTags();
 
         return ResponseEntity.ok(EBResponse.Success(result, TagMessage.TAG_RETRIEVED_SUCCESSFULLY));
     }
@@ -38,15 +39,24 @@ public class TagController {
                 EBResponse.Success(result, TagMessage.TAG_RETRIEVED_SUCCESSFULLY));
     }
 
-    @PostMapping
+    // Admin
+    @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<Page<TagResponse>>> getAllTagsByAdmin(Pageable page){
+        var result = tagService.getAllTagsByAdmin(page);
+
+        return ResponseEntity.ok(EBResponse.Success(result, TagMessage.TAG_RETRIEVED_SUCCESSFULLY));
+    }
+
+    @PostMapping("/admin")
+    @PreAuthorize("/admin/hasRole('ADMIN')")
     public ResponseEntity<EBResponse<List<TagResponse>>> createTag(
             @RequestBody List<TagCreateRequest> requests){
         var result = tagService.createTag(requests);
         return ResponseEntity.ok(EBResponse.Created(result, TagMessage.TAG_CREATED_SUCCESSFULLY));
     }
 
-    @PutMapping("{tagId}")
+    @PutMapping("/{tagId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<TagResponse>> updateTag(
             @RequestBody TagUpdatedRequest updateRequest,
@@ -56,7 +66,7 @@ public class TagController {
                 EBResponse.Success(result, TagMessage.TAG_UPDATED_SUCCESSFULLY));
     }
 
-    @DeleteMapping("{tagId}")
+    @DeleteMapping("/{tagId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<?>> deleteTag(@PathVariable UUID tagId){
         tagService.deleteTag(tagId);

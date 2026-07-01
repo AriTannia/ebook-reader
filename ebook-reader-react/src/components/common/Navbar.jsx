@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BookOpen, User, LogOut, Search, ShoppingCart, LayoutDashboard } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../reducers/auth";
+import { logout } from "../../reducers/auth";
 
 export default function Navbar() {
   const dispatch = useDispatch();
@@ -89,7 +89,7 @@ export default function Navbar() {
     isLoggedIn && currentUser && Object.keys(currentUser).length > 0;
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border/70 bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/80 backdrop-blur-md">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-2">
         {/* Branding — far left */}
         <div className="flex items-center gap-3 shrink-0">

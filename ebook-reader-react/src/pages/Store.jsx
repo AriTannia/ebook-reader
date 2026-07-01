@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { BookOpen, Sparkles } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import HorizontalScrollSection from "../components/HorizontalScrollSection";
+import HorizontalScrollSection from "../components/book/HorizontalScrollSection";
 
 import { fetchBooks } from "../reducers/book";
 

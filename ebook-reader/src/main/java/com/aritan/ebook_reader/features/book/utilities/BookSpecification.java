@@ -3,7 +3,7 @@ package com.aritan.ebook_reader.features.book.utilities;
 import com.aritan.ebook_reader.common.constants.rules.BookBadgeRules;
 import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.enums.book.BookStatus;
-import com.aritan.ebook_reader.common.models.Book;
+import com.aritan.ebook_reader.common.models.book.Book;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -114,6 +114,8 @@ public class BookSpecification {
                         root.get("soldCopies"),
                         BookBadgeRules.BESTSELLER_SOLD
                 );
+
+                default -> cb.conjunction();
             };
         };
     }

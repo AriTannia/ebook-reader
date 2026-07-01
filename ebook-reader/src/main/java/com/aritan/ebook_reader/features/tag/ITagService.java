@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ITagService {
-    Page<TagResponse> getAllTags(Pageable page);
+    Page<TagResponse> getAllTagsByAdmin(Pageable page);
 
     TagResponse getTagById(UUID tagId);
 
@@ -19,4 +19,6 @@ public interface ITagService {
     TagResponse updateTag(TagUpdatedRequest updateRequest, UUID tagId);
 
     void deleteTag(UUID tagId);
+
+    List<TagResponse> getAllTags();
 }

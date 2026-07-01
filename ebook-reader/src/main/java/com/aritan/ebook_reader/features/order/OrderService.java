@@ -11,7 +11,9 @@ import com.aritan.ebook_reader.common.models.order.OrderItem;
 import com.aritan.ebook_reader.features.auth.IAuthService;
 import com.aritan.ebook_reader.features.cart.ICartRepository;
 import com.aritan.ebook_reader.features.cart.cartItem.ICartItemRepository;
+import com.aritan.ebook_reader.features.order.dtos.OrderAdminResponse;
 import com.aritan.ebook_reader.features.order.dtos.OrderResponse;
+import com.aritan.ebook_reader.features.order.dtos.OrderUserResponse;
 import com.aritan.ebook_reader.features.order.utilities.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -99,10 +101,10 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+    public Page<OrderAdminResponse> getAllOrders(Pageable pageable) {
         Page<Order> orders = orderRepository.findAll(pageable);
 
-        return orders.map(orderMapper::toResponse);
+        return orders.map(orderMapper::toAdminResponse);
     }
 
     @Override

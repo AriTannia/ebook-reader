@@ -1,11 +1,11 @@
 package com.aritan.ebook_reader.features.book.utilities;
 
 import com.aritan.ebook_reader.common.enums.book.BookStatus;
-import com.aritan.ebook_reader.common.models.Book;
-import com.aritan.ebook_reader.common.models.BookFormat;
-import com.aritan.ebook_reader.common.models.Author;
-import com.aritan.ebook_reader.common.models.Category;
-import com.aritan.ebook_reader.common.models.Publisher;
+import com.aritan.ebook_reader.common.models.book.Book;
+import com.aritan.ebook_reader.common.models.book.BookFormat;
+import com.aritan.ebook_reader.common.models.book.Author;
+import com.aritan.ebook_reader.common.models.book.Category;
+import com.aritan.ebook_reader.common.models.book.Publisher;
 import com.aritan.ebook_reader.features.author.utilities.AuthorMapper;
 import com.aritan.ebook_reader.features.book.dtos.*;
 import com.aritan.ebook_reader.features.category.utilities.CategoryMapper;
@@ -44,6 +44,7 @@ public interface BookMapper {
     @Mapping(target = "createdAt", ignore = true)
     Book toBook(BookCreateRequest createRequest);
 
+    @Mapping(target = "bookId", ignore = true)
     @Mapping(target = "authors", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "tags", ignore = true)

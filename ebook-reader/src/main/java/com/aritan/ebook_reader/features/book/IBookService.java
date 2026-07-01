@@ -15,9 +15,9 @@ public interface IBookService {
 
     BookDetailsResponse getBookById(Long bookId);
 
-    List<BookDetailsResponse> createBook(List<BookCreateRequest> requests);
+    List<BookAdminResponse> createBook(List<BookCreateRequest> requests);
 
-    BookDetailsResponse updateBook(BookUpdateRequest updateRequest, Long bookId);
+    BookAdminResponse updateBook(BookUpdateRequest updateRequest, Long bookId);
 
     void deleteBook(Long bookId);
 }

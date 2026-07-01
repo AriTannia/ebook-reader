@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.tag.utilities;
 
-import com.aritan.ebook_reader.common.models.Tag;
+import com.aritan.ebook_reader.common.models.book.Tag;
 import com.aritan.ebook_reader.features.tag.dtos.TagCreateRequest;
 import com.aritan.ebook_reader.features.tag.dtos.TagResponse;
 import com.aritan.ebook_reader.features.tag.dtos.TagUpdatedRequest;

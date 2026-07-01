@@ -7,6 +7,11 @@ import messageReducer from './reducers/message';
 import cartReducer from './reducers/cart';
 import orderReducer from './reducers/order';
 import paymentReducer from './reducers/payment';
+import bookFormatReducer from './reducers/book.format';
+import authorReducer from './reducers/author';
+import categoryReducer from './reducers/category';
+import publisherReducer from './reducers/publisher';
+import tagReducer from './reducers/tag';
 
 const store = configureStore({
   reducer: {
@@ -18,6 +23,11 @@ const store = configureStore({
     cart: cartReducer,
     order: orderReducer,
     payment: paymentReducer,
+    bookFormat: bookFormatReducer,
+    author: authorReducer,
+    category: categoryReducer,
+    publisher: publisherReducer,
+    tag: tagReducer,
   },
 });
 

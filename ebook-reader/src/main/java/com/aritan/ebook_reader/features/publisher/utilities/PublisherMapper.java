@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.publisher.utilities;
 
-import com.aritan.ebook_reader.common.models.Publisher;
+import com.aritan.ebook_reader.common.models.book.Publisher;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherCreateRequest;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherResponse;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherUpdatedRequest;

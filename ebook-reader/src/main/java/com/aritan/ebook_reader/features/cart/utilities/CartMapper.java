@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.cart.utilities;
 
-import com.aritan.ebook_reader.common.models.Book;
+import com.aritan.ebook_reader.common.models.book.Book;
 import com.aritan.ebook_reader.common.models.cart.Cart;
 import com.aritan.ebook_reader.common.models.cart.CartItem;
 import com.aritan.ebook_reader.features.book.utilities.BookMapper;

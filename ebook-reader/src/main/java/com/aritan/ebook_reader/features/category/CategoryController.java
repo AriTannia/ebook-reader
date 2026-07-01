@@ -21,13 +21,15 @@ import java.util.List;
 public class CategoryController {
     private final ICategoryService categoryService;
 
+    // Public
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<Page<CategoryResponse>>> getAllCategories(CategoryFilterRequest request, Pageable page){
-        var result = categoryService.getAllCategories(request, page);
+    public ResponseEntity<EBResponse<List<CategoryResponse>>> getAllCategories(){
+        var result = categoryService.getAllCategories();
 
         return ResponseEntity.ok(EBResponse.Success(result, CategoryMessage.CATEGORIES_RETRIEVED_SUCCESSFULLY));
     }
+
 
     @GetMapping("{categoryId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -38,7 +40,16 @@ public class CategoryController {
                         String.format(CategoryMessage.CATEGORY_RETRIEVED_SUCCESSFULLY, categoryId)));
     }
 
-    @PostMapping
+    // Admin
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<Page<CategoryResponse>>> getAllCategoriesByAdmin(CategoryFilterRequest request, Pageable page){
+        var result = categoryService.getAllCategoriesByAdmin(request, page);
+
+        return ResponseEntity.ok(EBResponse.Success(result, CategoryMessage.CATEGORIES_RETRIEVED_SUCCESSFULLY));
+    }
+
+    @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<List<CategoryResponse>>> createCategory(
             @RequestBody List<CategoryCreateRequest> requests){
@@ -46,7 +57,7 @@ public class CategoryController {
         return ResponseEntity.ok(EBResponse.Created(result, CategoryMessage.CATEGORY_CREATED_SUCCESSFULLY));
     }
 
-    @PutMapping("{categoryId}")
+    @PutMapping("/{categoryId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<CategoryResponse>> updateCategory(
             @RequestBody CategoryUpdateRequest updateRequest,
@@ -57,7 +68,7 @@ public class CategoryController {
                         String.format(CategoryMessage.CATEGORY_UPDATED_SUCCESSFULLY, categoryId)));
     }
 
-    @DeleteMapping("{categoryId}")
+    @DeleteMapping("/{categoryId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<?>> deleteCategory(@PathVariable Long categoryId){
         categoryService.deleteCategory(categoryId);

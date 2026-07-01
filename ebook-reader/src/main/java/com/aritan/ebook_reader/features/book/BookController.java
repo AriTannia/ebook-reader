@@ -55,7 +55,7 @@ public class BookController {
 
     @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<List<BookDetailsResponse>>> createBook(
+    public ResponseEntity<EBResponse<List<BookAdminResponse>>> createBook(
             @RequestBody List<BookCreateRequest> requests){
         var result = bookService.createBook(requests);
         return ResponseEntity.ok(EBResponse.Created(result, BookMessage.BOOK_CREATED_SUCCESSFULLY));
@@ -63,7 +63,7 @@ public class BookController {
 
     @PutMapping("/{bookId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<BookDetailsResponse>> updateBook(
+    public ResponseEntity<EBResponse<BookAdminResponse>> updateBook(
             @RequestBody BookUpdateRequest updateRequest,
             @PathVariable Long bookId){
         var result = bookService.updateBook(updateRequest, bookId);

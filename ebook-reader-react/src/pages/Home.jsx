@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { ArrowRight, BookOpen } from "lucide-react"
-import Navbar from "../components/Navbar"
+import Navbar from "../components/common/Navbar"
 
 const Home = () => {
   return (

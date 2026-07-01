@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Star, ShoppingCart } from "lucide-react"
-import { fetchBookDetails } from "../reducers/book"
+import { fetchBookDetails } from "../../reducers/book"
 
 export default function BookCard({ book, onAddToCart }) {
   const navigate = useNavigate()

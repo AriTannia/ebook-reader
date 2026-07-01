@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.tag;
 
-import com.aritan.ebook_reader.common.models.Tag;
+import com.aritan.ebook_reader.common.models.book.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

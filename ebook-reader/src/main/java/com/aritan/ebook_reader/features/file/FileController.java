@@ -28,4 +28,42 @@ public class FileController {
                         Map.of("url", url, "filename", filename),
                         FileMessage.PRESIGNED_URL_GENERATED_SUCCESSFULLY));
     }
+
+    @PostMapping("/book/pre-signed-url")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<Map<String, Object>>> generateResignedBookUrl(
+            @RequestParam(name = "filename", required = false, defaultValue = "") String filename) {
+        filename = FileHelper.buildBookFileName(filename);
+        String url = fileService.generatePresignedUrl(filename);
+
+        return ResponseEntity.ok(
+                EBResponse.Success(
+                        Map.of("url", url, "filename", filename),
+                        FileMessage.PRESIGNED_URL_GENERATED_SUCCESSFULLY));
+    }
+
+    @PostMapping("/book-format/pre-signed-url")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<Map<String, Object>>> generateResignedBookFormatUrl(
+            @RequestParam(name = "filename", required = false, defaultValue = "") String filename) {
+        filename = FileHelper.buildBookFormatFileName(filename);
+        String url = fileService.generatePresignedUrl(filename);
+
+        return ResponseEntity.ok(
+                EBResponse.Success(
+                        Map.of("url", url, "filename", filename),
+                        FileMessage.PRESIGNED_URL_GENERATED_SUCCESSFULLY));
+    }
+
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<String>> deleteFile(
+            @RequestParam(name = "filename", required = false, defaultValue = "") String filename) {
+        filename = FileHelper.buildAvatarFileName(filename);
+        fileService.deleteFile(filename);
+        return ResponseEntity.ok(
+                EBResponse.Success(
+                        filename,
+                        String.format(FileMessage.FILE_DELETED_SUCCESSFULLY, filename)));
+    }
 }

@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FileMessage {
     public static final String PRESIGNED_URL_GENERATED_SUCCESSFULLY = "Pre-signed URL generated successfully";
-    public static final String UNSUPPORTED_HTTP_METHOD =
-            "Unsupported HTTP method for presigned URL generation: %s";
+    public static final String FILE_DELETED_SUCCESSFULLY = "File deleted successfully";
+
+
 }

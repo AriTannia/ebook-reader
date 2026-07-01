@@ -7,6 +7,7 @@ import com.aritan.ebook_reader.common.models.Role;
 import com.aritan.ebook_reader.common.models.User;
 import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRoleRepository;
+import com.aritan.ebook_reader.features.file.IFileService;
 import com.aritan.ebook_reader.features.user.dtos.*;
 import com.aritan.ebook_reader.features.user.utilities.UserMapper;
 import com.aritan.ebook_reader.features.user.utilities.UserSpecification;
@@ -28,6 +29,7 @@ public class UserService implements IUserService {
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final IFileService fileService;
     private final StorageUrlExtension storageUrlExtension;
 
     @Override
@@ -102,8 +104,14 @@ public class UserService implements IUserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
 
+        String oldAvatarUrl = user.getAvatarUrl();
+
         user.setAvatarUrl(updateAvatarRequest.getAvatarUrl());
         userRepository.save(user);
+
+        if(oldAvatarUrl != null && !oldAvatarUrl.equals(updateAvatarRequest.getAvatarUrl())) {
+            fileService.deleteFile(oldAvatarUrl);
+        }
 
         return userMapper.toUserResponse(user);
     }

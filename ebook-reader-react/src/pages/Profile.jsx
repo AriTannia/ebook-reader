@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Library, Pencil, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserProfile } from "../reducers/user";
-import AvatarUploadModal from "../components/AvatarUploadModal";
+import AvatarUploadModal from "../components/profile/AvatarUploadModal";
 import toast from "react-hot-toast";
 
 const Profile = () => {

@@ -7,10 +7,10 @@ import com.aritan.ebook_reader.common.constants.messages.PublisherMessage;
 import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.enums.book.BookStatus;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.Author;
-import com.aritan.ebook_reader.common.models.Book;
-import com.aritan.ebook_reader.common.models.Category;
-import com.aritan.ebook_reader.common.models.Publisher;
+import com.aritan.ebook_reader.common.models.book.Author;
+import com.aritan.ebook_reader.common.models.book.Book;
+import com.aritan.ebook_reader.common.models.book.Category;
+import com.aritan.ebook_reader.common.models.book.Publisher;
 import com.aritan.ebook_reader.features.author.IAuthorRepository;
 import com.aritan.ebook_reader.features.book.dtos.*;
 import com.aritan.ebook_reader.features.book.factory.BookFactory;
@@ -18,8 +18,11 @@ import com.aritan.ebook_reader.features.book.resolver.BookReferenceResolver;
 import com.aritan.ebook_reader.features.book.utilities.BookSpecification;
 import com.aritan.ebook_reader.features.book.utilities.BookMapper;
 import com.aritan.ebook_reader.features.category.ICategoryRepository;
+import com.aritan.ebook_reader.features.file.IFileService;
 import com.aritan.ebook_reader.features.publisher.IPublisherRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,8 @@ public class BookService implements IBookService{
     private final BookReferenceResolver referenceResolver;
     private final BookFactory bookFactory;
     private final BookMapper bookMapper;
+    private final IFileService fileService;
+    private static final Logger logger = LoggerFactory.getLogger(BookService.class);
 
     @Override
     public Page<BookResponse> getPagedBooks(
@@ -82,11 +87,13 @@ public class BookService implements IBookService{
                         String.format(BookMessage.BOOK_NOT_FOUND, bookId)
                 ));
 
+        logger.info("DTMBP: {}", book.getTags());
+
         return bookMapper.toDetailsResponse(book);
     }
 
     @Override
-    public List<BookDetailsResponse> createBook(List<BookCreateRequest> requests) {
+    public List<BookAdminResponse> createBook(List<BookCreateRequest> requests) {
         BookReferenceContext context = referenceResolver.resolve(requests);
 
         List<Book> books = requests.stream()
@@ -96,17 +103,19 @@ public class BookService implements IBookService{
         List<Book> savedBooks = bookRepository.saveAll(books);
 
         return savedBooks.stream()
-                .map(bookMapper::toDetailsResponse)
+                .map(bookMapper::toAdminResponse)
                 .toList();
     }
 
     @Override
     @Transactional
-    public BookDetailsResponse updateBook(BookUpdateRequest updateRequest, Long bookId) {
+    public BookAdminResponse updateBook(BookUpdateRequest updateRequest, Long bookId) {
         Book existedBook = bookRepository.findByBookId(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format(BookMessage.BOOK_NOT_FOUND, bookId)
                 ));
+
+        String oldCoverImgUrl = existedBook.getCoverImageUrl();
 
         Set<Author> authors = new HashSet<>(
                 authorRepository.findAllById(updateRequest.getAuthorIds())
@@ -129,13 +138,19 @@ public class BookService implements IBookService{
 
         bookMapper.updateBook(updateRequest, existedBook);
 
+        existedBook.setBookId(bookId);
         existedBook.setAuthors(authors);
         existedBook.setCategories(categories);
         existedBook.setPublisher(publisher);
 
         Book savedBook = bookRepository.save(existedBook);
 
-        return bookMapper.toDetailsResponse(savedBook);
+        if(oldCoverImgUrl != null && oldCoverImgUrl.equals(updateRequest.getCoverImageUrl())) {
+            // delete old cover image file
+            fileService.deleteFile(oldCoverImgUrl);
+        }
+
+        return bookMapper.toAdminResponse(savedBook);
     }
 
     @Override
@@ -146,5 +161,9 @@ public class BookService implements IBookService{
                 ));
 
         bookRepository.delete(existedBook);
+
+        if(existedBook.getCoverImageUrl() != null){
+            fileService.deleteFile(existedBook.getCoverImageUrl());
+        }
     }
 }

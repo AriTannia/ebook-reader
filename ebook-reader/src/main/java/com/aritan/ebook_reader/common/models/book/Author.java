@@ -1,4 +1,4 @@
-package com.aritan.ebook_reader.common.models;
+package com.aritan.ebook_reader.common.models.book;
 
 import com.aritan.ebook_reader.common.constants.tables.AuthorTableConstants;
 import jakarta.persistence.*;
@@ -7,8 +7,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = AuthorTableConstants.TABLE_NAME, schema = AuthorTableConstants.SCHEMA)

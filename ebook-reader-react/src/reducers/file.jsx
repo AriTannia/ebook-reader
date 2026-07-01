@@ -3,36 +3,44 @@ import * as FileService from "../services/file.service";
 import { setMessage } from "./message";
 import axios from "axios";
 
+export const FILE_UPLOAD_TYPE = {
+  AVATAR: "avatar",
+  BOOK: "book",
+  BOOK_FORMAT: "book-format",
+};
+
+const presignedUrlGenerators = {
+  [FILE_UPLOAD_TYPE.AVATAR]: FileService.generatePresignedAvatarUrl,
+  [FILE_UPLOAD_TYPE.BOOK]: FileService.generatePresignedBookUrl,
+  [FILE_UPLOAD_TYPE.BOOK_FORMAT]: FileService.generatePresignedBookFormatUrl,
+};
+
 export const uploadFile = createAsyncThunk(
   "file/uploadFile",
-  async ({file, onProgress}, thunkAPI) => {
+  async ({ file, type }, thunkAPI) => {
     try {
 
       // Get presigned URL
-      const presignedResponse =
-        await FileService.generatePresignedAvatarUrl(file.name);
+      const generator = presignedUrlGenerators[type];
 
-      const { uploadUrl, filePath } =
+      if (!generator) {
+        throw new Error(`Unsupported upload type: ${type}`);
+      }
+
+      const presignedResponse = await generator(file.name);
+
+      const { filename, url } =
         presignedResponse.data.data;
 
       // Upload on S3
-      await axios.put(uploadUrl, file, {
+      await axios.put(url, file, {
         headers: {
           "Content-Type": file.type,
-        },
-        onUploadProgress: (progressEvent) => {
-            if(!progressEvent.total) return;
-            const progress = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            if (onProgress) {
-              onProgress(progress);
-            }
-          },
+        }
       });
 
       return {
-        filePath,
+        filePath: filename,
       };
 
     } catch (error) {

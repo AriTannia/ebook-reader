@@ -21,11 +21,11 @@ import java.util.List;
 public class PublisherController {
     private final IPublisherService publisherService;
 
+    // Public
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<Page<PublisherResponse>>> getAllPublishers(
-            PublisherFilterRequest request, Pageable page){
-        var result = publisherService.getAllPublishers(request, page);
+    public ResponseEntity<EBResponse<List<PublisherResponse>>> getAllPublishers(){
+        var result = publisherService.getAllPublishers();
 
         return ResponseEntity.ok(EBResponse.Success(result, PublisherMessage.PUBLISHERS_RETRIEVED_SUCCESSFULLY));
     }
@@ -39,7 +39,16 @@ public class PublisherController {
                         String.format(PublisherMessage.PUBLISHER_RETRIEVED_SUCCESSFULLY, publisherId)));
     }
 
-    @PostMapping
+    // Admin
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<Page<PublisherResponse>>> getAllPublishersByAdmin(
+            PublisherFilterRequest request, Pageable page){
+        var result = publisherService.getAllPublishersByAdmin(request, page);
+
+        return ResponseEntity.ok(EBResponse.Success(result, PublisherMessage.PUBLISHERS_RETRIEVED_SUCCESSFULLY));
+    }
+    @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<List<PublisherResponse>>> createPublisher(
             @RequestBody List<PublisherCreateRequest> requests){
@@ -47,7 +56,7 @@ public class PublisherController {
         return ResponseEntity.ok(EBResponse.Created(result, PublisherMessage.PUBLISHER_CREATED_SUCCESSFULLY));
     }
 
-    @PutMapping("{publisherId}")
+    @PutMapping("/{publisherId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<PublisherResponse>> updatePublisher(
             @RequestBody PublisherUpdatedRequest updateRequest,
@@ -58,7 +67,7 @@ public class PublisherController {
                         String.format(PublisherMessage.PUBLISHER_UPDATED_SUCCESSFULLY, publisherId)));
     }
 
-    @DeleteMapping("{publisherId}")
+    @DeleteMapping("/{publisherId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<?>> deletePublisher(@PathVariable Long publisherId){
         publisherService.deletePublisher(publisherId);

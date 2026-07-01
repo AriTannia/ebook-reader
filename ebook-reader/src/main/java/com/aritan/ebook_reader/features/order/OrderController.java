@@ -1,6 +1,7 @@
 package com.aritan.ebook_reader.features.order;
 
 import com.aritan.ebook_reader.common.models.EBResponse;
+import com.aritan.ebook_reader.features.order.dtos.OrderAdminResponse;
 import com.aritan.ebook_reader.features.order.dtos.OrderResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,7 +52,7 @@ public class OrderController {
     // Admin
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<Page<OrderResponse>>> getAllOrders(Pageable pageable) {
+    public ResponseEntity<EBResponse<Page<OrderAdminResponse>>> getAllOrders(Pageable pageable) {
         var result = orderService.getAllOrders(pageable);
 
         return ResponseEntity.ok(EBResponse.Success(result, "Order retrieved successfully"));

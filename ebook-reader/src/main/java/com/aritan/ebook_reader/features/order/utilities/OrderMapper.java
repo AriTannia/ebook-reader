@@ -1,11 +1,14 @@
 package com.aritan.ebook_reader.features.order.utilities;
 
+import com.aritan.ebook_reader.common.models.User;
 import com.aritan.ebook_reader.common.models.cart.Cart;
 import com.aritan.ebook_reader.common.models.cart.CartItem;
 import com.aritan.ebook_reader.common.models.order.Order;
 import com.aritan.ebook_reader.common.models.order.OrderItem;
+import com.aritan.ebook_reader.features.order.dtos.OrderAdminResponse;
 import com.aritan.ebook_reader.features.order.dtos.OrderItemResponse;
 import com.aritan.ebook_reader.features.order.dtos.OrderResponse;
+import com.aritan.ebook_reader.features.order.dtos.OrderUserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -33,11 +36,23 @@ public interface OrderMapper {
     @Mapping(target = "priceSnapshot", source = "book.price")
     OrderItem toEntity(CartItem item);
 
+    @Mapping(target = "user", source = "user")
+    OrderAdminResponse toAdminResponse(Order order);
+
     default BigDecimal calculateTotalAmount(Cart cart) {
         return cart.getItems().stream()
                 .map(item -> item.getBook()
                         .getPrice()
                         .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    default OrderUserResponse toUserResponse(User user) {
+        OrderUserResponse response = new OrderUserResponse();
+
+        response.setFullName(user.getFullName());
+        response.setEmail(user.getEmail());
+
+        return response;
     }
 }

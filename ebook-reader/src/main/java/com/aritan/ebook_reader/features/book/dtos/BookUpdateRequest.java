@@ -13,7 +13,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class BookUpdateRequest {
-    private Long bookId;
     private String title;
     private String description;
     private BigDecimal price;

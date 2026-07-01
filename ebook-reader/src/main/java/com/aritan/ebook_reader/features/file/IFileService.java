@@ -4,4 +4,5 @@ import software.amazon.awssdk.http.SdkHttpMethod;
 
 public interface IFileService {
     String generatePresignedUrl(String filePath);
+    void deleteFile(String filePath);
 }

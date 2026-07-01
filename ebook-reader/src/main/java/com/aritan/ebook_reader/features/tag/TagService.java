@@ -2,7 +2,7 @@ package com.aritan.ebook_reader.features.tag;
 
 import com.aritan.ebook_reader.common.constants.messages.TagMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.Tag;
+import com.aritan.ebook_reader.common.models.book.Tag;
 import com.aritan.ebook_reader.features.tag.dtos.TagCreateRequest;
 import com.aritan.ebook_reader.features.tag.dtos.TagResponse;
 import com.aritan.ebook_reader.features.tag.dtos.TagUpdatedRequest;
@@ -21,7 +21,7 @@ public class TagService implements ITagService{
     private final ITagRepository tagRepository;
     private final TagMapper tagMapper;
     @Override
-    public Page<TagResponse> getAllTags(Pageable page) {
+    public Page<TagResponse> getAllTagsByAdmin(Pageable page) {
         Page<Tag> tags = tagRepository.findAll(page);
         return tags.map(tagMapper::toTagResponse);
     }
@@ -58,5 +58,11 @@ public class TagService implements ITagService{
                 .orElseThrow(() -> new ResourceNotFoundException(TagMessage.TAG_NOT_FOUND));
 
         tagRepository.delete(tag);
+    }
+
+    @Override
+    public List<TagResponse> getAllTags() {
+        List<Tag> tags = tagRepository.findAll();
+        return tags.stream().map(tagMapper::toTagResponse).toList();
     }
 }

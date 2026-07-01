@@ -1,9 +1,9 @@
 package com.aritan.ebook_reader.features.book.resolver;
 
-import com.aritan.ebook_reader.common.models.Author;
-import com.aritan.ebook_reader.common.models.Category;
-import com.aritan.ebook_reader.common.models.Publisher;
-import com.aritan.ebook_reader.common.models.Tag;
+import com.aritan.ebook_reader.common.models.book.Author;
+import com.aritan.ebook_reader.common.models.book.Category;
+import com.aritan.ebook_reader.common.models.book.Publisher;
+import com.aritan.ebook_reader.common.models.book.Tag;
 import com.aritan.ebook_reader.features.author.IAuthorRepository;
 import com.aritan.ebook_reader.features.book.dtos.BookCreateRequest;
 import com.aritan.ebook_reader.features.book.dtos.BookReferenceContext;

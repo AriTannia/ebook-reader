@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.author.utilities;
 
-import com.aritan.ebook_reader.common.models.Author;
+import com.aritan.ebook_reader.common.models.book.Author;
 import org.springframework.data.jpa.domain.Specification;
 
 public class AuthorSpecification {

@@ -41,7 +41,7 @@ export function Avatar({ src, name, className }) {
         "inline-flex size-8 shrink-0 items-center justify-center",
         "overflow-hidden rounded-full text-xs font-semibold",
         !showImage ? tintFor(name) : "",
-        className || ""
+        className || "",
       )}
       aria-hidden="true"
     >
@@ -84,7 +84,9 @@ export function RolePill({ role }) {
     <span
       className={cx(
         "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium capitalize",
-        isAdmin ? "bg-accent text-accent-foreground" : "bg-neutral-soft text-neutral-soft-foreground"
+        isAdmin
+          ? "bg-accent text-accent-foreground"
+          : "bg-neutral-soft text-neutral-soft-foreground",
       )}
     >
       {label.toLowerCase()}
@@ -94,14 +96,14 @@ export function RolePill({ role }) {
 
 // --- Status badge --------------------------------------------------------
 // variant: "success" | "warning" | "danger" | "neutral"
- 
+
 const BADGE_STYLES = {
   success: "bg-success text-success-foreground",
   warning: "bg-warning text-warning-foreground",
   danger: "bg-danger text-danger-foreground",
   neutral: "bg-neutral-soft text-neutral-soft-foreground",
 };
- 
+
 export function StatusBadge({ label, variant }) {
   return (
     <span
@@ -130,7 +132,7 @@ export function orderStatusVariant(status) {
       return "neutral";
   }
 }
- 
+
 export function bookStatusVariant(status) {
   return status === "ACTIVE" ? "success" : "neutral";
 }
@@ -153,7 +155,9 @@ export function SortableHeader({ label, field, sort, onSort, align = "left" }) {
           "group inline-flex cursor-pointer items-center gap-1 rounded-sm outline-none transition-colors",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
           align === "right" && "flex-row-reverse",
-          active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+          active
+            ? "text-primary"
+            : "text-muted-foreground hover:text-foreground",
         )}
         aria-label={`Sort by ${label}`}
       >
@@ -180,7 +184,7 @@ export function useSortState(initialField = null, initialDir = "asc") {
   const [sort, setSort] = useState(
     initialField ? { field: initialField, dir: initialDir } : null,
   );
- 
+
   const handleSort = (field) => {
     setSort((prev) => {
       if (prev?.field === field) {
@@ -189,9 +193,9 @@ export function useSortState(initialField = null, initialDir = "asc") {
       return { field, dir: "asc" };
     });
   };
- 
+
   const sortParam = sort ? `${sort.field},${sort.dir}` : undefined;
- 
+
   return { sort, handleSort, sortParam };
 }
 
@@ -201,7 +205,7 @@ export function Pagination({ page, onPrev, onNext }) {
   const total = page ? page.totalPages : 1;
   const baseBtn =
     "inline-flex cursor-pointer items-center rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
- 
+
   return (
     <div className="flex items-center justify-between gap-4 border-t border-border px-4 py-3">
       <p className="text-sm text-muted-foreground">
@@ -231,7 +235,7 @@ export function Pagination({ page, onPrev, onNext }) {
 }
 
 // --- Skeleton rows -------------------------------------------------------
- 
+
 export function SkeletonRows({ rows, cols }) {
   return (
     <>
@@ -250,9 +254,9 @@ export function SkeletonRows({ rows, cols }) {
     </>
   );
 }
- 
+
 // --- Empty state ---------------------------------------------------------
- 
+
 export function EmptyRow({ cols, message }) {
   return (
     <tr className="border-t border-border">
@@ -265,9 +269,9 @@ export function EmptyRow({ cols, message }) {
     </tr>
   );
 }
- 
+
 // --- Confirm dialog ------------------------------------------------------
- 
+
 export function ConfirmDialog({
   open,
   title,
@@ -280,7 +284,7 @@ export function ConfirmDialog({
   const titleId = useId();
   const descId = useId();
   const confirmRef = useRef(null);
- 
+
   useEffect(() => {
     if (!open) return;
     confirmRef.current?.focus();
@@ -290,9 +294,9 @@ export function ConfirmDialog({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onCancel]);
- 
+
   if (!open) return null;
- 
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="presentation">
       <button
@@ -307,34 +311,36 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className="relative z-10 w-full max-w-sm rounded-lg border border-border bg-card p-5 shadow-lg"
+        className="relative z-10 w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg"
       >
         <h2 id={titleId} className="text-base font-semibold text-foreground">
           {title}
         </h2>
-        <div id={descId} className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+
+        <div id={descId} className="mt-3 space-y-2.5 text-sm leading-relaxed">
           {description}
         </div>
-        <div className="mt-5 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="inline-flex cursor-pointer items-center rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-          >
-            Cancel
-          </button>
+
+        <div className="mt-6 flex justify-end gap-3">
           <button
             ref={confirmRef}
             type="button"
             onClick={onConfirm}
             className={cx(
-              "inline-flex cursor-pointer items-center rounded-md px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+              "inline-flex cursor-pointer items-center rounded-md px-4 py-2 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-card",
               destructive
-                ? "bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive"
+                ? "bg-red-600 hover:bg-red-700 focus-visible:ring-red-600"
                 : "bg-primary hover:bg-primary/90 focus-visible:ring-ring",
             )}
           >
             {confirmLabel}
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="inline-flex cursor-pointer items-center rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+          >
+            Cancel
           </button>
         </div>
       </div>

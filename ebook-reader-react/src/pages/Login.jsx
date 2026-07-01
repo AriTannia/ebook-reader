@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom"
 import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react"
-import AuthLayout from "../components/AuthLayout"
-import InputField from "../components/InputField"
-import Alert from "../components/Alert"
+import AuthLayout from "../components/auth/AuthLayout"
+import InputField from "../components/common/InputField"
+import Alert from "../components/common/Alert"
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { login } from '../reducers/auth';

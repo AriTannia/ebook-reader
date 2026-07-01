@@ -2,7 +2,7 @@ package com.aritan.ebook_reader.features.category;
 
 import com.aritan.ebook_reader.common.constants.messages.CategoryMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.Category;
+import com.aritan.ebook_reader.common.models.book.Category;
 import com.aritan.ebook_reader.features.category.dtos.CategoryCreateRequest;
 import com.aritan.ebook_reader.features.category.dtos.CategoryFilterRequest;
 import com.aritan.ebook_reader.features.category.dtos.CategoryResponse;
@@ -24,7 +24,7 @@ public class CategoryService implements ICategoryService{
     private final ICategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     @Override
-    public Page<CategoryResponse> getAllCategories(CategoryFilterRequest request, Pageable page) {
+    public Page<CategoryResponse> getAllCategoriesByAdmin(CategoryFilterRequest request, Pageable page) {
         Specification<Category> spec = Specification
                 .where(CategorySpecification.hasKeyword(request.getKeyword()));
 
@@ -74,5 +74,11 @@ public class CategoryService implements ICategoryService{
                 ));
 
         categoryRepository.delete(category);
+    }
+
+    @Override
+    public List<CategoryResponse> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream().map(categoryMapper::toCategoryResponse).toList();
     }
 }

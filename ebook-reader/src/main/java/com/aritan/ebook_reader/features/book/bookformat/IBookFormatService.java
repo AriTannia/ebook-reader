@@ -1,10 +1,8 @@
 package com.aritan.ebook_reader.features.book.bookformat;
 
-import com.aritan.ebook_reader.common.models.BookFormat;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatCreateRequest;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatResponse;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatUpdateRequest;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 

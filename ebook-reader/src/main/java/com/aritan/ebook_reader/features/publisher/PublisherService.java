@@ -2,7 +2,7 @@ package com.aritan.ebook_reader.features.publisher;
 
 import com.aritan.ebook_reader.common.constants.messages.PublisherMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.Publisher;
+import com.aritan.ebook_reader.common.models.book.Publisher;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherCreateRequest;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherFilterRequest;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherResponse;
@@ -24,7 +24,7 @@ public class PublisherService implements IPublisherService{
     private final IPublisherRepository publisherRepository;
     private final PublisherMapper publisherMapper;
     @Override
-    public Page<PublisherResponse> getAllPublishers(PublisherFilterRequest request, Pageable page) {
+    public Page<PublisherResponse> getAllPublishersByAdmin(PublisherFilterRequest request, Pageable page) {
         Specification<Publisher> spec = Specification
                 .where(PublisherSpecification.hasKeyword(request.getKeyword()));
 
@@ -70,5 +70,11 @@ public class PublisherService implements IPublisherService{
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format(PublisherMessage.PUBLISHER_NOT_FOUND, publisherId)));
         publisherRepository.delete(publisher);
+    }
+
+    @Override
+    public List<PublisherResponse> getAllPublishers() {
+        List<Publisher> publishers = publisherRepository.findAll();
+        return publishers.stream().map(publisherMapper::toPublisherResponse).toList();
     }
 }

@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.category.utilities;
 
-import com.aritan.ebook_reader.common.models.Category;
+import com.aritan.ebook_reader.common.models.book.Category;
 import com.aritan.ebook_reader.features.category.dtos.CategoryCreateRequest;
 import com.aritan.ebook_reader.features.category.dtos.CategoryResponse;
 import com.aritan.ebook_reader.features.category.dtos.CategoryUpdateRequest;

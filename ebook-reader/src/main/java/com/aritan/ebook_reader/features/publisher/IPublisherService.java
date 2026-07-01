@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface IPublisherService {
-    Page<PublisherResponse> getAllPublishers(PublisherFilterRequest request, Pageable page);
+    Page<PublisherResponse> getAllPublishersByAdmin(PublisherFilterRequest request, Pageable page);
 
     PublisherResponse getPublisherById(Long publisherId);
 
@@ -19,4 +19,6 @@ public interface IPublisherService {
     PublisherResponse updatePublisher(PublisherUpdatedRequest updateRequest, Long publisherId);
 
     void deletePublisher(Long publisherId);
+
+    List<PublisherResponse> getAllPublishers();
 }

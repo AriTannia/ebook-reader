@@ -20,10 +20,11 @@ import java.util.List;
 @RequestMapping("/api/v1/authors")
 public class AuthorController {
     private final IAuthorService authorService;
+    // Public
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<Page<AuthorResponse>>> getAllAuthors(AuthorFilterRequest request, Pageable page){
-        var result = authorService.getAllAuthors(request, page);
+    public ResponseEntity<EBResponse<List<AuthorResponse>>> getAllAuthors(){
+        var result = authorService.getAllAuthors();
 
         return ResponseEntity.ok(EBResponse.Success(result, AuthorMessage.AUTHORS_RETRIEVED_SUCCESSFULLY));
     }
@@ -36,7 +37,16 @@ public class AuthorController {
                 EBResponse.Success(result, String.format(AuthorMessage.AUTHOR_RETRIEVED_SUCCESSFULLY, authorId)));
     }
 
-    @PostMapping
+    // Admin
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<Page<AuthorResponse>>> getAllAuthorsByAdmin(AuthorFilterRequest request, Pageable page){
+        var result = authorService.getAllAuthorsByAdmin(request, page);
+
+        return ResponseEntity.ok(EBResponse.Success(result, AuthorMessage.AUTHORS_RETRIEVED_SUCCESSFULLY));
+    }
+
+    @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<List<AuthorResponse>>> createAuthor(
             @RequestBody List<AuthorCreateRequest> requests){
@@ -44,7 +54,7 @@ public class AuthorController {
         return ResponseEntity.ok(EBResponse.Created(result, AuthorMessage.AUTHOR_CREATED_SUCCESSFULLY));
     }
 
-    @PutMapping("{authorId}")
+    @PutMapping("/{authorId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<AuthorResponse>> updateAuthor(
             @RequestBody AuthorUpdatedRequest updateRequest,
@@ -54,7 +64,7 @@ public class AuthorController {
                 EBResponse.Success(result, String.format(AuthorMessage.AUTHOR_UPDATED_SUCCESSFULLY, authorId)));
     }
 
-    @DeleteMapping("{authorId}")
+    @DeleteMapping("/{authorId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<?>> deleteAuthor(@PathVariable Long authorId){
         authorService.deleteAuthor(authorId);

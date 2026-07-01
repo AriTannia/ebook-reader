@@ -1,15 +1,15 @@
-package com.aritan.ebook_reader.common.models;
+package com.aritan.ebook_reader.common.models.book;
 
 import com.aritan.ebook_reader.common.constants.tables.BookTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.ReviewTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.UserTableConstants;
+import com.aritan.ebook_reader.common.models.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 

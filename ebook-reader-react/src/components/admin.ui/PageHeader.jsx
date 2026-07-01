@@ -9,7 +9,10 @@ export function PageHeader({
   action,
 }) {
   return (
-    <header className="flex flex-col gap-3 border-b border-border bg-card px-4 py-3 md:flex-row md:items-center md:gap-4 md:px-6">
+    <header 
+    className="sticky top-16 z-20 flex flex-col gap-3 border-b border-border bg-card/95 px-4 py-3 backdrop-blur md:flex-row md:items-center md:gap-4 md:px-6"
+    style={{ minHeight: "64px" }}
+    >
       <h1 className="shrink-0 text-lg font-semibold text-foreground">{title}</h1>
 
       <div className="relative md:mx-auto md:w-full md:max-w-md">

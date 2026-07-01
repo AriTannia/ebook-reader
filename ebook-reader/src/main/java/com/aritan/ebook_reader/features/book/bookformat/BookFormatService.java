@@ -3,13 +3,14 @@ package com.aritan.ebook_reader.features.book.bookformat;
 import com.aritan.ebook_reader.common.constants.messages.BookFormatMessage;
 import com.aritan.ebook_reader.common.constants.messages.BookMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.Book;
-import com.aritan.ebook_reader.common.models.BookFormat;
+import com.aritan.ebook_reader.common.models.book.Book;
+import com.aritan.ebook_reader.common.models.book.BookFormat;
 import com.aritan.ebook_reader.features.book.IBookRepository;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatCreateRequest;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatResponse;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatUpdateRequest;
 import com.aritan.ebook_reader.features.book.utilities.BookMapper;
+import com.aritan.ebook_reader.features.file.IFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.util.List;
 public class BookFormatService implements IBookFormatService {
     private final IBookFormatRepository bookFormatRepository;
     private final IBookRepository bookRepository;
+    private final IFileService fileService;
     private final BookMapper bookMapper;
 
     @Override
@@ -84,7 +86,7 @@ public class BookFormatService implements IBookFormatService {
 
     @Override
     public void deleteBookFormat(Long bookId, Long bookFormatId) {
-        Book book = bookRepository.findById(bookId)
+        bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format(BookMessage.BOOK_NOT_FOUND, bookId)
                 ));
@@ -95,5 +97,10 @@ public class BookFormatService implements IBookFormatService {
                 ));
 
         bookFormatRepository.delete(bookFormat);
+
+        String fileUrl = bookFormat.getStorageUrl();
+        if(fileUrl != null){
+            fileService.deleteFile(fileUrl);
+        }
     }
 }

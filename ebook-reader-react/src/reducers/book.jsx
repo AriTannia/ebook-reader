@@ -34,7 +34,7 @@ export const fetchBookDetails = createAsyncThunk(
   async (bookId, thunkAPI) => {
     try {
       const response = await BookService.getBookDetails(bookId);
-      return response.data.data;
+      return response.data;
     } catch (error) {
       const message =
         error.response?.data?.message ||
@@ -179,7 +179,6 @@ const bookSlice = createSlice({
       })
       .addCase(addBook.fulfilled, (state, action) => {
         state.loading = false;
-        state.page?.content?.push(action.payload);
       })
       .addCase(addBook.rejected, (state, action) => {
         state.loading = false;

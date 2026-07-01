@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ThumbsUp, CheckCircle, Edit2, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateReviewHelpfulCount } from "../reducers/review";
+import { updateReviewHelpfulCount } from "../../reducers/review";
 import StarRating from "./StarRating";
 import toast from "react-hot-toast";
 

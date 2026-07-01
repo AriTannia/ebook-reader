@@ -4,8 +4,9 @@ import com.aritan.ebook_reader.common.constants.messages.AuthorMessage;
 import com.aritan.ebook_reader.common.constants.messages.CategoryMessage;
 import com.aritan.ebook_reader.common.constants.messages.PublisherMessage;
 import com.aritan.ebook_reader.common.constants.messages.TagMessage;
+import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.*;
+import com.aritan.ebook_reader.common.models.book.*;
 import com.aritan.ebook_reader.features.book.dtos.BookCreateRequest;
 import com.aritan.ebook_reader.features.book.dtos.BookReferenceContext;
 import com.aritan.ebook_reader.features.book.utilities.BookMapper;
@@ -34,6 +35,7 @@ public class BookFactory {
         book.setCategories(categories);
         book.setTags(tags);
         book.setPublisher(publisher);
+        book.setBadge(BookBadge.NONE);
 
         return book;
     }

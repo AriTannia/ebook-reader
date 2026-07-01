@@ -28,7 +28,7 @@ public class BookFormatController {
                         String.format(BookFormatMessage.BOOK_FORMATS_RETRIEVED_SUCCESSFULLY, bookId)));
     }
 
-    @GetMapping("{bookFormatId}")
+    @GetMapping("{bookFormatId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<BookFormatResponse>> getBookFormat(@PathVariable Long bookId, @PathVariable Long bookFormatId) {
         var result = bookFormatService.getBookFormatById(bookId, bookFormatId);
@@ -38,7 +38,7 @@ public class BookFormatController {
                         String.format(BookFormatMessage.BOOK_FORMAT_RETRIEVED_SUCCESSFULLY, bookFormatId, bookId)));
     }
 
-    @PostMapping
+    @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<BookFormatResponse>> createBookFormat(
             @PathVariable Long bookId, @RequestBody BookFormatCreateRequest request) {
@@ -49,7 +49,7 @@ public class BookFormatController {
                         String.format(BookFormatMessage.BOOK_FORMAT_CREATED_SUCCESSFULLY, bookId)));
     }
 
-    @PutMapping("{bookFormatId}")
+    @PutMapping("{bookFormatId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<BookFormatResponse>> updateBookFormat(
             @PathVariable Long bookId, @PathVariable Long bookFormatId, @RequestBody BookFormatUpdateRequest request) {
@@ -60,7 +60,7 @@ public class BookFormatController {
                         String.format(BookFormatMessage.BOOK_FORMAT_UPDATED_SUCCESSFULLY, bookFormatId, bookId)));
     }
 
-    @DeleteMapping("{bookFormatId}")
+    @DeleteMapping("{bookFormatId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<?>> deleteBookFormat(
             @PathVariable Long bookId, @PathVariable Long bookFormatId) {
