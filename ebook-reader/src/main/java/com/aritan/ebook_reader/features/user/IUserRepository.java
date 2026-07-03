@@ -29,5 +29,6 @@ public interface IUserRepository extends
     Optional<User> findById(@NonNull Long id);
 
     @EntityGraph(attributePaths = {"roles"})
-    Page<User> findAll(Specification<User> spec, Pageable pageable);
+    @NonNull
+    Page<User> findAll(@NonNull Specification<User> spec, @NonNull Pageable pageable);
 }

@@ -29,7 +29,7 @@ public class BookFormatService implements IBookFormatService {
 
     @Override
     public List<BookFormatResponse> getBookFormatsByBookId(Long bookId) {
-        Book book = bookRepository.findById(bookId)
+        bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format(BookMessage.BOOK_NOT_FOUND, bookId)
                 ));

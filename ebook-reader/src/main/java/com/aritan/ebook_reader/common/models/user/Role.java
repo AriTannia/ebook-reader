@@ -23,8 +23,4 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @Column(name = RoleTableConstants.NAME, nullable = false, unique = true, length = 20)
     private ERole name;
-
-    public Role(ERole name){
-        this.name = name;
-    }
 }
