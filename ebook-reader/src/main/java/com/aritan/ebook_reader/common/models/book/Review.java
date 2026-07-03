@@ -1,9 +1,9 @@
 package com.aritan.ebook_reader.common.models.book;
 
-import com.aritan.ebook_reader.common.constants.tables.BookTableConstants;
-import com.aritan.ebook_reader.common.constants.tables.ReviewTableConstants;
-import com.aritan.ebook_reader.common.constants.tables.UserTableConstants;
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.constants.tables.book.BookTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.book.ReviewTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.user.UserTableConstants;
+import com.aritan.ebook_reader.common.models.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

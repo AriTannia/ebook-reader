@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.common.models.book;
 
-import com.aritan.ebook_reader.common.constants.tables.BookFormatTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.book.BookFormatTableConstants;
 import com.aritan.ebook_reader.common.enums.FormatType;
 import jakarta.persistence.*;
 import lombok.*;

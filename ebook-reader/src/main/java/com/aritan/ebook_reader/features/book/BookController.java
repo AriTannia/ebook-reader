@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.book;
 
-import com.aritan.ebook_reader.common.constants.messages.BookMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.BookMessage;
 import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.features.book.dtos.*;

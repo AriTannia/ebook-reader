@@ -2,7 +2,7 @@ package com.aritan.ebook_reader.features.review.utilities;
 
 import com.aritan.ebook_reader.common.models.book.Book;
 import com.aritan.ebook_reader.common.models.book.Review;
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.features.review.dtos.ReviewCreateRequest;
 import com.aritan.ebook_reader.features.review.dtos.ReviewResponse;
 import com.aritan.ebook_reader.features.review.dtos.ReviewUpdatedRequest;

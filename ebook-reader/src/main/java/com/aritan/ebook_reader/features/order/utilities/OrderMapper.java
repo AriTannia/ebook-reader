@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.order.utilities;
 
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.common.models.cart.Cart;
 import com.aritan.ebook_reader.common.models.cart.CartItem;
 import com.aritan.ebook_reader.common.models.order.Order;

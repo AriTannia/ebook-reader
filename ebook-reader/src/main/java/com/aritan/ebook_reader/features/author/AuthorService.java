@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.author;
 
-import com.aritan.ebook_reader.common.constants.messages.AuthorMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.AuthorMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.Author;
 import com.aritan.ebook_reader.features.author.dtos.AuthorCreateRequest;

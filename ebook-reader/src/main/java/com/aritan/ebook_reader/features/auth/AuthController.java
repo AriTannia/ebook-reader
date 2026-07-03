@@ -2,10 +2,8 @@ package com.aritan.ebook_reader.features.auth;
 
 import com.aritan.ebook_reader.common.constants.messages.AuthMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
-import com.aritan.ebook_reader.common.models.User;
 import com.aritan.ebook_reader.features.auth.dtos.LoginRequest;
 import com.aritan.ebook_reader.features.auth.dtos.SignupRequest;
-import com.aritan.ebook_reader.features.auth.dtos.UserJwtHeaderResponse;
 import com.aritan.ebook_reader.features.user.dtos.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

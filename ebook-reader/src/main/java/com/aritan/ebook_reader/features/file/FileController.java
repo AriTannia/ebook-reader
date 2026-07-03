@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import software.amazon.awssdk.http.SdkHttpMethod;
 
+import java.time.Duration;
 import java.util.Map;
 
 @RestController
@@ -21,7 +22,7 @@ public class FileController {
     public ResponseEntity<EBResponse<Map<String, Object>>> generateResignedAvatarUrl(
             @RequestParam(name = "filename", required = false, defaultValue = "") String filename) {
         filename = FileHelper.buildAvatarFileName(filename);
-        String url = fileService.generatePresignedUrl(filename);
+        String url = fileService.generatePublicPresignedUrl(filename);
 
         return ResponseEntity.ok(
                 EBResponse.Success(
@@ -34,7 +35,7 @@ public class FileController {
     public ResponseEntity<EBResponse<Map<String, Object>>> generateResignedBookUrl(
             @RequestParam(name = "filename", required = false, defaultValue = "") String filename) {
         filename = FileHelper.buildBookFileName(filename);
-        String url = fileService.generatePresignedUrl(filename);
+        String url = fileService.generatePublicPresignedUrl(filename);
 
         return ResponseEntity.ok(
                 EBResponse.Success(
@@ -47,7 +48,7 @@ public class FileController {
     public ResponseEntity<EBResponse<Map<String, Object>>> generateResignedBookFormatUrl(
             @RequestParam(name = "filename", required = false, defaultValue = "") String filename) {
         filename = FileHelper.buildBookFormatFileName(filename);
-        String url = fileService.generatePresignedUrl(filename);
+        String url = fileService.generatePrivatePresignedUrl(filename, Duration.ofMinutes(60));
 
         return ResponseEntity.ok(
                 EBResponse.Success(

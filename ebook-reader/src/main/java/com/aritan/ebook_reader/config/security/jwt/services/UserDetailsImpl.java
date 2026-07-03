@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.config.security.jwt.services;
 
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.jspecify.annotations.NonNull;

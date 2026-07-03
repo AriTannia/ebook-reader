@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.user.utilities;
 
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.User;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 

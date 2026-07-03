@@ -12,6 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TooManyListenersException;
 
 @RestControllerAdvice
 public class TokenRefreshHandler {
@@ -28,5 +29,12 @@ public class TokenRefreshHandler {
         response.setData(errorDetails);
 
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(TokenRefreshException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ResponseEntity<EBResponse<Object>> handleTooManyRequests(TooManyListenersException ex){
+        EBResponse<Object> response = EBResponse.Error(HttpStatus.TOO_MANY_REQUESTS.value(), ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.TOO_MANY_REQUESTS);
     }
 }

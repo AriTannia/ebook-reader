@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.common.models.book;
 
-import com.aritan.ebook_reader.common.constants.tables.AuthorTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.book.AuthorTableConstants;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

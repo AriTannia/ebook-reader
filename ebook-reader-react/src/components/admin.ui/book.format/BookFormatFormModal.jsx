@@ -7,12 +7,11 @@ import { FileUploadField } from "../../file/FileUploadField";
 import { uploadFile, FILE_UPLOAD_TYPE } from "../../../reducers/file";
 import { addBookFormat } from "../../../reducers/book.format";
 
-const FORMAT_TYPES = ["EPUB", "PDF", "MOBI", "AZW3", "TXT"];
+const FORMAT_TYPES = ["EPUB", "PDF", "TXT"];
 
 const MIME_TO_FORMAT = {
   "application/epub+zip": "EPUB",
   "application/pdf": "PDF",
-  "application/x-mobipocket-ebook": "MOBI",
   "text/plain": "TXT",
 };
 
@@ -129,8 +128,8 @@ export default function BookFormatFormModal({
             </label>
             <FileUploadField
               file={file}
-              accept=".epub,.pdf,.mobi,.azw3,.txt"
-              hint="EPUB, PDF, MOBI, AZW3, or TXT"
+              accept=".epub,.pdf,.txt"
+              hint="EPUB, PDF, or TXT"
               disabled={isSubmitting}
               onSelectFile={handleSelectFile}
               onRemove={handleRemoveFile}

@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.common.models.cart;
 
-import com.aritan.ebook_reader.common.constants.tables.BookTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.book.BookTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.cart.CartItemTableConstant;
 import com.aritan.ebook_reader.common.constants.tables.cart.CartTableConstant;
 import com.aritan.ebook_reader.common.models.book.Book;

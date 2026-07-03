@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.common.models.book;
 
-import com.aritan.ebook_reader.common.constants.tables.TagTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.book.TagTableConstants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

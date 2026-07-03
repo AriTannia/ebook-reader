@@ -1,8 +1,13 @@
 package com.aritan.ebook_reader.features.file;
 
-import software.amazon.awssdk.http.SdkHttpMethod;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.http.HttpHeaders;
+import java.time.Duration;
 
 public interface IFileService {
-    String generatePresignedUrl(String filePath);
+    void streamWithRange(String filePath, HttpHeaders requestHeaders, HttpServletResponse response);
+    String generatePublicPresignedUrl(String filePath);
+    String generatePrivatePresignedUrl(String filePath, Duration ttl);
     void deleteFile(String filePath);
 }

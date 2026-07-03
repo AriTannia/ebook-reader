@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.common.validation;
 
-import com.aritan.ebook_reader.common.constants.messages.UserMessage;
+import com.aritan.ebook_reader.common.constants.messages.user.UserMessage;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

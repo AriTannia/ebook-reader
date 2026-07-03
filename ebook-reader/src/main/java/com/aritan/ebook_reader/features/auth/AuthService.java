@@ -1,15 +1,15 @@
 package com.aritan.ebook_reader.features.auth;
 
 import com.aritan.ebook_reader.common.constants.messages.AuthMessage;
-import com.aritan.ebook_reader.common.constants.messages.UserMessage;
+import com.aritan.ebook_reader.common.constants.messages.user.UserMessage;
 import com.aritan.ebook_reader.common.enums.ERole;
 import com.aritan.ebook_reader.common.exception.AuthenticationException;
 import com.aritan.ebook_reader.common.exception.DataDuplicateException;
 import com.aritan.ebook_reader.common.exception.InvalidRequestException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.RefreshToken;
-import com.aritan.ebook_reader.common.models.Role;
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.Role;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
 import com.aritan.ebook_reader.config.security.jwt.services.UserDetailsImpl;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRoleRepository;

@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.config.security.jwt.utilities;
 
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.config.security.jwt.services.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

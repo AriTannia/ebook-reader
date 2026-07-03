@@ -1,11 +1,11 @@
 package com.aritan.ebook_reader.features.review;
 
-import com.aritan.ebook_reader.common.constants.messages.BookMessage;
-import com.aritan.ebook_reader.common.constants.messages.ReviewMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.BookMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.ReviewMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.Book;
 import com.aritan.ebook_reader.common.models.book.Review;
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
 import com.aritan.ebook_reader.features.auth.IAuthService;
 import com.aritan.ebook_reader.features.book.IBookRepository;

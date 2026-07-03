@@ -1,8 +1,8 @@
 package com.aritan.ebook_reader.common.models.cart;
 
-import com.aritan.ebook_reader.common.constants.tables.UserTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.user.UserTableConstants;
 import com.aritan.ebook_reader.common.constants.tables.cart.CartTableConstant;
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

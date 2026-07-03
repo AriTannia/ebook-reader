@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.auth;
 
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.features.auth.dtos.*;
 import com.aritan.ebook_reader.features.user.dtos.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;

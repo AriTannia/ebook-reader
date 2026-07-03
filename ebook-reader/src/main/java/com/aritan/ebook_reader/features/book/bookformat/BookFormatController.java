@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.book.bookformat;
 
-import com.aritan.ebook_reader.common.constants.messages.BookFormatMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.BookFormatMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatCreateRequest;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatResponse;

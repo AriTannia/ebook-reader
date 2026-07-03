@@ -1,9 +1,9 @@
 package com.aritan.ebook_reader.features.book;
 
-import com.aritan.ebook_reader.common.constants.messages.AuthorMessage;
-import com.aritan.ebook_reader.common.constants.messages.BookMessage;
-import com.aritan.ebook_reader.common.constants.messages.CategoryMessage;
-import com.aritan.ebook_reader.common.constants.messages.PublisherMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.AuthorMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.BookMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.CategoryMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.PublisherMessage;
 import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.enums.book.BookStatus;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;

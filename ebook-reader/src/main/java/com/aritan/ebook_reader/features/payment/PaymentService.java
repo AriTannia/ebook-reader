@@ -7,7 +7,6 @@ import com.aritan.ebook_reader.common.exception.InvalidRequestException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.order.Order;
 import com.aritan.ebook_reader.common.models.payment.Payment;
-import com.aritan.ebook_reader.features.auth.IAuthService;
 import com.aritan.ebook_reader.features.order.IOrderRepository;
 import com.aritan.ebook_reader.features.payment.dtos.PaymentInitResponse;
 import com.aritan.ebook_reader.features.payment.dtos.PaymentResponse;
@@ -34,7 +33,6 @@ public class PaymentService implements IPaymentService{
     private final IPaymentRepository paymentRepository;
     private final IOrderRepository orderRepository;
     private final PaymentMapper paymentMapper;
-    private final IAuthService authService;
     private final PaymentGatewayFactory gatewayFactory;
 
     @Override

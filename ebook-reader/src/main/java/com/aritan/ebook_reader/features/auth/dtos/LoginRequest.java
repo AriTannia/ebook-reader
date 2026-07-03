@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.auth.dtos;
 
-import com.aritan.ebook_reader.common.constants.messages.UserMessage;
+import com.aritan.ebook_reader.common.constants.messages.user.UserMessage;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

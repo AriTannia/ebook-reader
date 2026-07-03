@@ -1,9 +1,9 @@
 package com.aritan.ebook_reader.common.models.book;
 
-import com.aritan.ebook_reader.common.constants.tables.AuthorTableConstants;
-import com.aritan.ebook_reader.common.constants.tables.BookTableConstants;
-import com.aritan.ebook_reader.common.constants.tables.CategoryTableConstants;
-import com.aritan.ebook_reader.common.constants.tables.TagTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.book.AuthorTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.book.BookTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.book.CategoryTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.book.TagTableConstants;
 import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.enums.book.BookStatus;
 import jakarta.persistence.*;

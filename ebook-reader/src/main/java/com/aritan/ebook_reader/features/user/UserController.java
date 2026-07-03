@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.user;
 
-import com.aritan.ebook_reader.common.constants.messages.UserMessage;
+import com.aritan.ebook_reader.common.constants.messages.user.UserMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.features.user.dtos.*;
 import jakarta.validation.Valid;

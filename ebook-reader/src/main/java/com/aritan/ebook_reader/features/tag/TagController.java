@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.tag;
 
-import com.aritan.ebook_reader.common.constants.messages.TagMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.TagMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.features.tag.dtos.TagCreateRequest;
 import com.aritan.ebook_reader.features.tag.dtos.TagResponse;

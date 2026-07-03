@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.category;
 
-import com.aritan.ebook_reader.common.constants.messages.CategoryMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.CategoryMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.Category;
 import com.aritan.ebook_reader.features.category.dtos.CategoryCreateRequest;

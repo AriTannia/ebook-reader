@@ -1,7 +1,8 @@
 package com.aritan.ebook_reader.common.models;
 
 import com.aritan.ebook_reader.common.constants.tables.RefreshTokenTableConstants;
-import com.aritan.ebook_reader.common.constants.tables.UserTableConstants;
+import com.aritan.ebook_reader.common.constants.tables.user.UserTableConstants;
+import com.aritan.ebook_reader.common.models.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

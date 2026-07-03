@@ -1,10 +1,10 @@
 package com.aritan.ebook_reader.features.user;
 
-import com.aritan.ebook_reader.common.constants.messages.UserMessage;
+import com.aritan.ebook_reader.common.constants.messages.user.UserMessage;
 import com.aritan.ebook_reader.common.enums.ERole;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.Role;
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.Role;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRoleRepository;
 import com.aritan.ebook_reader.features.file.IFileService;
@@ -18,7 +18,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 

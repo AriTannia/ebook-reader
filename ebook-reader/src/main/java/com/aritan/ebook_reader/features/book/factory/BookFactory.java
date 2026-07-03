@@ -1,9 +1,9 @@
 package com.aritan.ebook_reader.features.book.factory;
 
-import com.aritan.ebook_reader.common.constants.messages.AuthorMessage;
-import com.aritan.ebook_reader.common.constants.messages.CategoryMessage;
-import com.aritan.ebook_reader.common.constants.messages.PublisherMessage;
-import com.aritan.ebook_reader.common.constants.messages.TagMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.AuthorMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.CategoryMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.PublisherMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.TagMessage;
 import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.*;

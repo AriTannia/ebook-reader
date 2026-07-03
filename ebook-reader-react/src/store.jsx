@@ -12,6 +12,8 @@ import authorReducer from './reducers/author';
 import categoryReducer from './reducers/category';
 import publisherReducer from './reducers/publisher';
 import tagReducer from './reducers/tag';
+import libraryReducer from './reducers/library';
+import readingProgressReducer from './reducers/reading.progress';
 
 const store = configureStore({
   reducer: {
@@ -28,6 +30,8 @@ const store = configureStore({
     category: categoryReducer,
     publisher: publisherReducer,
     tag: tagReducer,
+    library: libraryReducer,
+    readingProgress: readingProgressReducer,
   },
 });
 

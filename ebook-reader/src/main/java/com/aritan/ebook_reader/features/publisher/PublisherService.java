@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.publisher;
 
-import com.aritan.ebook_reader.common.constants.messages.PublisherMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.PublisherMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.Publisher;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherCreateRequest;

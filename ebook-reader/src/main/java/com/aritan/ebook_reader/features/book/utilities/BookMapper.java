@@ -68,6 +68,7 @@ public interface BookMapper {
 
     @Mapping(target = "bookFormatId", ignore = true)
     @Mapping(target = "book", ignore = true)
+    @Mapping(target = "storageUrl", ignore = true)
     @Mapping(target = "formatType", ignore = true)
     @Mapping(target = "mimeType", ignore = true)
     @Mapping(target = "fileSize", ignore = true)

@@ -3,7 +3,7 @@ package com.aritan.ebook_reader.features.cart;
 import com.aritan.ebook_reader.common.exception.DataDuplicateException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.Book;
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.common.models.cart.Cart;
 import com.aritan.ebook_reader.common.models.cart.CartItem;
 import com.aritan.ebook_reader.features.auth.IAuthService;

@@ -8,6 +8,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class BookFormatUpdateRequest {
-    private String storageUrl;
     private Boolean isPrimary;
 }

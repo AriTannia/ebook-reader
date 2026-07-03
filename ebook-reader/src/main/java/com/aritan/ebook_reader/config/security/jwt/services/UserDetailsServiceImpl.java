@@ -1,7 +1,7 @@
 package com.aritan.ebook_reader.config.security.jwt.services;
 
-import com.aritan.ebook_reader.common.constants.messages.UserMessage;
-import com.aritan.ebook_reader.common.models.User;
+import com.aritan.ebook_reader.common.constants.messages.user.UserMessage;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.features.user.IUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

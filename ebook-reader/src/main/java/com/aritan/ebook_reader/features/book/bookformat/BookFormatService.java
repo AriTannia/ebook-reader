@@ -1,7 +1,7 @@
 package com.aritan.ebook_reader.features.book.bookformat;
 
-import com.aritan.ebook_reader.common.constants.messages.BookFormatMessage;
-import com.aritan.ebook_reader.common.constants.messages.BookMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.BookFormatMessage;
+import com.aritan.ebook_reader.common.constants.messages.book.BookMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.Book;
 import com.aritan.ebook_reader.common.models.book.BookFormat;
@@ -11,6 +11,7 @@ import com.aritan.ebook_reader.features.book.dtos.BookFormatResponse;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatUpdateRequest;
 import com.aritan.ebook_reader.features.book.utilities.BookMapper;
 import com.aritan.ebook_reader.features.file.IFileService;
+import com.aritan.ebook_reader.features.library.readinghistory.IReadingProgressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class BookFormatService implements IBookFormatService {
     private final IBookFormatRepository bookFormatRepository;
     private final IBookRepository bookRepository;
     private final IFileService fileService;
+    private final IReadingProgressService readingProgressService;
     private final BookMapper bookMapper;
 
     @Override
@@ -80,6 +82,8 @@ public class BookFormatService implements IBookFormatService {
 
         bookMapper.updateBookFormat(request, bookFormat);
         BookFormat savedBookFormat = bookFormatRepository.save(bookFormat);
+
+        readingProgressService.resetProgressByBookId(bookId);
 
         return bookMapper.toFormatResponse(savedBookFormat);
     }
