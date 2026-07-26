@@ -9,8 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,10 +50,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            AccessDeniedException.class,
-            InvalidRequestException.class,
-            org.springframework.security.access.AccessDeniedException.class
+            org.springframework.security.access.AccessDeniedException.class,
+            com.aritan.ebook_reader.common.exception.AccessDeniedException.class
     })
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseEntity<EBResponse<Object>> handleForbiddenException(Exception e) {
         EBResponse<Object> response = EBResponse.Forbidden(HttpStatus.FORBIDDEN.value(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
@@ -61,20 +61,38 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<EBResponse<Object>> handleInvalidException(Exception e){
+    public ResponseEntity<EBResponse<Object>> handleInvalidException(InvalidRequestException e){
         EBResponse<Object> response = EBResponse.Error(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<EBResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<EBResponse<Map<String, String>>> handleMethodValidationExceptions(MethodArgumentNotValidException ex) {
         EBResponse<Map<String, String>> response = new EBResponse<>(EBResponseCode.Error);
         response.setCodeNumber(HttpStatus.BAD_REQUEST.value());
+
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+
         response.setData(errors);
         response.setMessage(ex.getMessage());
+
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<EBResponse<Object>> handleValidationExceptions(ValidationException ex) {
+        EBResponse<Object> response = EBResponse.Error(HttpStatus.CONFLICT.value(), ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<EBResponse<Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String message = String.format("Invalid value for parameter '%s'", ex.getName());
+        EBResponse<Object> response = EBResponse.Error(HttpStatus.BAD_REQUEST.value(), message);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

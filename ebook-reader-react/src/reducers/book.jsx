@@ -5,14 +5,11 @@ import { setMessage } from "./message";
 export const fetchBooks = createAsyncThunk(
   "book/fetchBooks",
   async (
-    { key, filters = {}, badge = null},
+    { key, filters = {}, badge },
     thunkAPI,
   ) => {
     try {
-      const response = await BookService.getAllBooks(
-        { ...filters },
-        badge,
-      );
+      const response = await BookService.getAllBooks(filters, badge);
 
       return {
         key,
@@ -23,6 +20,24 @@ export const fetchBooks = createAsyncThunk(
         error.response?.data?.message ||
         error.message ||
         "An error occurred while fetching books.";
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
+);
+
+export const searchBooks = createAsyncThunk(
+  "book/searchBooks",
+  async (filters = {}, thunkAPI) => {
+    console.log("Searching books with filters:", filters);
+    try {
+      const response = await BookService.searchBooks({...filters});
+      return response.data.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while searching for books.";
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -128,6 +143,8 @@ const initialState = {
   loadingSections: {},
   loading: false,
   error: null,
+  searchResults: null,
+  searchLoading: false,
 };
 
 const bookSlice = createSlice({
@@ -149,13 +166,25 @@ const bookSlice = createSlice({
         state.loadingSections[action.meta.arg.key] = false;
         state.error = action.payload;
       })
+      .addCase(searchBooks.pending, (state) => {
+        state.searchLoading = true;
+        state.error = null;
+      })
+      .addCase(searchBooks.fulfilled, (state, action) => {
+        state.searchLoading = false;
+        state.searchResults = action.payload;
+      })
+      .addCase(searchBooks.rejected, (state, action) => {
+        state.searchLoading = false;
+        state.error = action.payload;
+      })
       .addCase(fetchBookDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchBookDetails.fulfilled, (state, action) => {
         state.loading = false;
-        state.selectedBook = action.payload;
+        state.selectedBook = action.payload.data;
       })
       .addCase(fetchBookDetails.rejected, (state, action) => {
         state.loading = false;

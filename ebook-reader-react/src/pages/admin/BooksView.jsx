@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useMemo } from "react";
 import {
   ChevronRight,
   Pencil,
@@ -12,23 +12,24 @@ import toast from "react-hot-toast";
 
 import { useTableQuery } from "../../components/admin.ui/UseTableQuery";
 import { PageHeader, TableShell } from "../../components/admin.ui/PageHeader";
+import { BookCover } from "../../components/admin.ui/book/BookCover";
+import { StatusBadge, bookStatusVariant } from "../../components/admin.ui/book/Badges";
+import { ConfirmDialog } from "../../components/common/ConfirmDialog";
 import {
-  BookCover,
-  ConfirmDialog,
   EmptyRow,
   Pagination,
   SkeletonRows,
   SortableHeader,
-  StatusBadge,
-  bookStatusVariant,
-} from "../../components/admin.ui/CommonUI";
+} from "../../components/admin.ui/table/DataTable";
+
 import {
   fetchBooksForAdmin,
   deleteBook,
-  fetchBookDetails,
+  fetchBookDetails, 
 } from "../../reducers/book";
 import {
   fetchAllBookFormats,
+  setPrimaryBookFormat,
   deleteBookFormat,
 } from "../../reducers/book.format";
 import BookFormModal from "../../components/admin.ui/book/BookFormModal";
@@ -85,6 +86,14 @@ export function BooksView() {
   const [pendingPrimarySet, setPendingPrimarySet] = useState(null);
   const [isSettingPrimary, setIsSettingPrimary] = useState(false);
 
+  const sortedFormats = useMemo(() => {
+    if (!formats) return formats;
+    return [...formats].sort((a, b) => {
+      if (a.isPrimary === b.isPrimary) return 0;
+      return a.isPrimary ? -1 : 1;
+    });
+  }, [formats]);
+
   const refreshList = () => {
     dispatch(
       fetchBooksForAdmin({
@@ -129,11 +138,9 @@ export function BooksView() {
   };
 
   const toggleExpand = (bookId) => {
-    setExpandedBookId((current) => {
-      const next = current === bookId ? null : bookId;
-      if (next !== null) dispatch(fetchAllBookFormats(next));
-      return next;
-    });
+    const next = expandedBookId === bookId ? null : bookId;
+    setExpandedBookId(next);
+    if (next !== null) dispatch(fetchAllBookFormats(next));
   };
 
   const handleConfirmDeleteFormat = async () => {
@@ -163,6 +170,7 @@ export function BooksView() {
         setPrimaryBookFormat({
           bookId: pendingPrimarySet.bookId,
           formatId: pendingPrimarySet.format.bookFormatId,
+          isPrimary: true,
         }),
       ).unwrap();
       toast.success(
@@ -212,7 +220,7 @@ export function BooksView() {
                   sort={q.sort}
                   onSort={q.toggleSort}
                 />
-                <th scope="col" className="px-4 py-2.5 font-medium">
+                <th scope="col" className="px-4 py-2.5 font-medium normal-case">
                   Authors
                 </th>
                 <SortableHeader
@@ -229,10 +237,14 @@ export function BooksView() {
                   onSort={q.toggleSort}
                   align="right"
                 />
-                <th scope="col" className="px-4 py-2.5 font-medium">
-                  Status
-                </th>
-                <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                <SortableHeader
+                  label="Status"
+                  field="status"
+                  sort={q.sort}
+                  onSort={q.toggleSort}
+                  align="right"
+                />
+                <th scope="col" className="px-4 py-2.5 text-right font-medium normal-case">
                   Actions
                 </th>
               </tr>
@@ -364,7 +376,7 @@ export function BooksView() {
                                 </p>
                               ) : (
                                 <ul className="divide-y divide-border">
-                                  {formats.map((fmt) => (
+                                  {sortedFormats.map((fmt) => (
                                     <li
                                       key={fmt.bookFormatId}
                                       className="flex items-center justify-between gap-4 px-3 py-2 text-sm"
@@ -395,6 +407,24 @@ export function BooksView() {
                                         <span className="text-xs">
                                           {formatBytes(fmt.fileSize)}
                                         </span>
+                                        {!fmt.isPrimary && (
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              setPendingPrimarySet({
+                                                bookId: book.bookId,
+                                                format: fmt,
+                                              })
+                                            }
+                                            className="inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-amber-500/10 hover:text-amber-600"
+                                          >
+                                            <Star
+                                              className="size-3.5"
+                                              aria-hidden="true"
+                                            />
+                                            Set primary
+                                          </button>
+                                        )}
                                         <button
                                           type="button"
                                           onClick={() =>
@@ -468,6 +498,24 @@ export function BooksView() {
         destructive
         onCancel={() => setPendingFormatDelete(null)}
         onConfirm={handleConfirmDeleteFormat}
+      />
+
+      <ConfirmDialog
+        open={pendingPrimarySet !== null}
+        title="Set as primary format"
+        description={
+          <>
+            Make{" "}
+            <span className="font-medium text-foreground">
+              {pendingPrimarySet?.format.formatType}
+            </span>{" "}
+            the primary format for this book? Readers will be served this format
+            by default.
+          </>
+        }
+        confirmLabel={isSettingPrimary ? "Setting..." : "Set primary"}
+        onCancel={() => setPendingPrimarySet(null)}
+        onConfirm={handleConfirmSetPrimary}
       />
 
       <BookFormModal

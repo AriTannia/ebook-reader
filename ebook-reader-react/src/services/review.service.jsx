@@ -8,6 +8,10 @@ export const getReviewsByBookId = (bookId, filters = {}) => {
   });
 }
 
+export const getReviewStatsByBookId = (bookId) => {
+  return api.get(`${API_URL}${bookId}/reviews/stats`);
+}
+
 export const addReview = (bookId, reviewData) => {
   return api.post(`${API_URL}${bookId}/reviews`, reviewData);
 }

@@ -1,5 +1,9 @@
 package com.aritan.ebook_reader.common.constants.tables.book;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReadingProgressTableConstants {
     // Table
     public static final String TABLE_NAME = "reading_progresses";

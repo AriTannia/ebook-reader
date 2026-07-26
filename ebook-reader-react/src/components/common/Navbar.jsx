@@ -9,7 +9,6 @@ export default function Navbar() {
   const currentUser = useSelector((state) => state.auth.user);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const timeoutRef = useRef(null);
   const navigate = useNavigate();
   const [imgError, setImgError] = useState(false);
@@ -53,18 +52,6 @@ export default function Navbar() {
     }
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim() !== "") {
-      navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-    }
-  };
-
   // Derive initials for the avatar placeholder
   const initials = currentUser?.fullName
     ? currentUser.fullName
@@ -105,30 +92,7 @@ export default function Navbar() {
               Ebook<span className="text-primary">-store</span>
             </span>
           </Link>
-
-          {/* Search bar */}
-          <form
-            onSubmit={handleSearchSubmit}
-            className="flex items-center bg-card rounded-lg border border-input shadow-sm transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 w-64"
-          >
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder="Search books, authors, categories..."
-              className="flex-1 bg-transparent px-4 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
-              aria-label="Search books"
-            />
-            <button
-              type="submit"
-              className="mr-2 flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
-              aria-label="Search"
-            >
-              <Search className="h-4 w-4" />
-            </button>
-          </form>
-        </div>
-
+          </div>
         {/* Spacer */}
         <div className="flex-1" />
 

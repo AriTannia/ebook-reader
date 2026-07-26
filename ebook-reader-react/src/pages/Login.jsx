@@ -159,12 +159,12 @@ const Login = () => {
                 icon={<Lock className="h-4 w-4" />}
               />
               <div className="flex justify-end">
-                <a
-                  href="#"
+                <Link
+                  to="/forgot-password"
                   className="text-xs font-medium text-primary transition-opacity hover:opacity-80 cursor-pointer"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
             </div>
 

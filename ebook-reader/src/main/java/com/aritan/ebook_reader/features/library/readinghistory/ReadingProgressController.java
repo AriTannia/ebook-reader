@@ -1,9 +1,9 @@
 package com.aritan.ebook_reader.features.library.readinghistory;
 
+import com.aritan.ebook_reader.common.constants.messages.library.ReadingProgressMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.features.auth.IAuthService;
-import com.aritan.ebook_reader.features.library.dtos.BookReaderResponse;
 import com.aritan.ebook_reader.features.library.dtos.ReadingProgressResponse;
 import com.aritan.ebook_reader.features.library.dtos.SaveProgressRequest;
 import jakarta.validation.Valid;
@@ -28,18 +28,8 @@ public class ReadingProgressController {
         User user = authService.getCurrentUser();
         var result = readingProgressService.saveProgress(user.getUserId(), request);
 
-        return ResponseEntity.ok(EBResponse.Success(result, "Reading progress saved successfully."));
-    }
-
-    @GetMapping("{bookId}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<BookReaderResponse>> openBookForReading(
-            @PathVariable Long bookId
-    ){
-        User user = authService.getCurrentUser();
-        var result = readingProgressService.getBookForReading(user.getUserId(), bookId);
-
-        return ResponseEntity.ok(EBResponse.Success(result, "Book retrieved successfully."));
+        return ResponseEntity.ok(EBResponse.Success(
+                result, ReadingProgressMessage.READING_PROGRESS_SAVED_SUCCESSFULLY));
     }
 
     @GetMapping("/recent")
@@ -50,7 +40,8 @@ public class ReadingProgressController {
         User user = authService.getCurrentUser();
         var result = readingProgressService.getRecentlyRead(user.getUserId(), limit);
 
-        return ResponseEntity.ok(EBResponse.Success(result, "Recently read books retrieved successfully."));
+        return ResponseEntity.ok(EBResponse.Success(
+                result, ReadingProgressMessage.RECENTLY_READ_BOOKS_RETRIEVED_SUCCESSFULLY));
     }
 
     @PatchMapping("/{bookId}/finish")
@@ -61,6 +52,7 @@ public class ReadingProgressController {
         User user = authService.getCurrentUser();
         readingProgressService.markAsFinished(user.getUserId(), bookId);
 
-        return ResponseEntity.ok(EBResponse.Success(null, "Book marked as finished."));
+        return ResponseEntity.ok(EBResponse.Success(
+                null, ReadingProgressMessage.BOOK_MARKED_AS_FINISHED));
     }
 }

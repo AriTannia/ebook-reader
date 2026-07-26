@@ -1,6 +1,6 @@
 export default function AuthLayout({ children }) {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
+    <div className="relative min-h-full overflow-hidden bg-background">
       {/* Subtle abstract geometric background */}
       <div
         aria-hidden="true"

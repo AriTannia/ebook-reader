@@ -54,7 +54,7 @@ public interface BookMapper {
     @Mapping(target = "reviewCount", ignore = true)
     @Mapping(target = "soldCopies", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    void updateBook(
+    void toBook(
             BookUpdateRequest request,
             @MappingTarget Book book
     );
@@ -73,13 +73,13 @@ public interface BookMapper {
     @Mapping(target = "mimeType", ignore = true)
     @Mapping(target = "fileSize", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    void updateBookFormat(
+    void toBookFormat(
             BookFormatUpdateRequest request,
             @MappingTarget BookFormat bookFormat
     );
 
     @Mapping(target = "authorNames", source = "authors")
-    BookSumaryResponse toSummaryResponse(Book book);
+    BookSummaryResponse toSummaryResponse(Book book);
 
     @Mapping(target = "authorNames", source = "authors")
     BookAdminResponse toAdminResponse(Book book);

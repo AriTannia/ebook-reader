@@ -24,7 +24,7 @@ public interface LibraryMapper {
     @Mapping(target = "userLibraryId", ignore = true)
     @Mapping(target = "user", source = "user")
     @Mapping(target = "book", source = "item.book")
-    @Mapping(target = "sourceOrderItem", source = "item")
+    @Mapping(target = "orderItem", source = "item")
     @Mapping(target = "accessStatus", ignore = true)
     @Mapping(target = "isFavorite", ignore = true)
     @Mapping(target = "acquiredAt", ignore = true)

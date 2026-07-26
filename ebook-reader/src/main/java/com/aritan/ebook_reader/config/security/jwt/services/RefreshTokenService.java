@@ -1,8 +1,8 @@
 package com.aritan.ebook_reader.config.security.jwt.services;
 
-import com.aritan.ebook_reader.common.constants.messages.AuthMessage;
-import com.aritan.ebook_reader.common.exception.TokenRefreshException;
-import com.aritan.ebook_reader.common.models.RefreshToken;
+import com.aritan.ebook_reader.common.constants.messages.user.AuthMessage;
+import com.aritan.ebook_reader.common.exception.TokenException;
+import com.aritan.ebook_reader.common.models.token.RefreshToken;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRefreshTokenRepository;
 import com.aritan.ebook_reader.config.security.jwt.services.interfaces.IRefreshTokenService;
 import com.aritan.ebook_reader.features.user.IUserRepository;
@@ -42,7 +42,7 @@ public class RefreshTokenService implements IRefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if(token.getExpiryDate().compareTo(Instant.now()) < 0){
             refreshTokenRepository.delete(token);
-            throw new TokenRefreshException(token.getToken(), AuthMessage.REFRESH_TOKEN_EXPIRED);
+            throw new TokenException(token.getToken(), AuthMessage.REFRESH_TOKEN_EXPIRED);
         }
 
         return token;

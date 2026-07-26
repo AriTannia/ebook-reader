@@ -1,16 +1,16 @@
 package com.aritan.ebook_reader.features.library.readinghistory;
 
+import com.aritan.ebook_reader.common.constants.messages.library.BookContentMessage;
+import com.aritan.ebook_reader.common.constants.messages.library.ReadingProgressMessage;
 import com.aritan.ebook_reader.common.enums.book.LibraryAccessStatus;
 import com.aritan.ebook_reader.common.enums.book.ReadingStatus;
 import com.aritan.ebook_reader.common.exception.InvalidRequestException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.book.BookFormat;
 import com.aritan.ebook_reader.common.models.book.ReadingProgress;
+import com.aritan.ebook_reader.common.models.order.OrderItem;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.features.book.IBookRepository;
-import com.aritan.ebook_reader.features.book.bookformat.IBookFormatRepository;
-import com.aritan.ebook_reader.features.file.IFileService;
 import com.aritan.ebook_reader.features.library.IUserLibraryRepository;
-import com.aritan.ebook_reader.features.library.dtos.BookReaderResponse;
 import com.aritan.ebook_reader.features.library.dtos.ReadingProgressResponse;
 import com.aritan.ebook_reader.features.library.dtos.SaveProgressRequest;
 import com.aritan.ebook_reader.features.library.utilities.ReadingProgressMapper;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 @Service
@@ -32,9 +31,7 @@ public class ReadingProgressService implements IReadingProgressService{
     private final IUserLibraryRepository userLibraryRepository;
     private final IUserRepository userRepository;
     private final IBookRepository bookRepository;
-    private final IBookFormatRepository bookFormatRepository;
     private final ReadingProgressMapper readingProgressMapper;
-    private final IFileService fileService;
     @Override
     @Transactional
     public ReadingProgressResponse saveProgress(Long userId, SaveProgressRequest request) {
@@ -43,7 +40,9 @@ public class ReadingProgressService implements IReadingProgressService{
                         userId, request.getBookId(), LibraryAccessStatus.ACTIVE);
 
         if(!hasAccess){
-            throw new InvalidRequestException("User does not have access to this book.");
+            throw new InvalidRequestException(
+                    String.format(BookContentMessage.USER_ACCESS_DENIED, userId, request.getBookId())
+            );
         }
 
         ReadingProgress progress = readingProgressRepository
@@ -68,40 +67,6 @@ public class ReadingProgressService implements IReadingProgressService{
     }
 
     @Override
-    public BookReaderResponse getBookForReading(Long userId, Long bookId) {
-        boolean hasAccess = userLibraryRepository
-                .existsByUser_UserIdAndBook_BookIdAndAccessStatus(
-                        userId, bookId, LibraryAccessStatus.ACTIVE);
-
-        if(!hasAccess){
-            throw new InvalidRequestException("User does not have access to this book.");
-        }
-
-        BookFormat primaryFormat = bookFormatRepository
-                .findByBook_BookIdAndIsPrimaryTrue(bookId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Primary format not found for bookId: " + bookId));
-
-        String presingedUrl = fileService.generatePrivatePresignedUrl(primaryFormat.getStorageUrl(), Duration.ofMinutes(60));
-
-        ReadingProgress progress = readingProgressRepository
-                .findByUser_UserIdAndBook_BookId(userId, bookId)
-                .orElse(null);
-
-        BookReaderResponse response = readingProgressMapper.toBookReaderResponse(primaryFormat, presingedUrl);
-
-        if (progress != null) {
-            response.setLocator(progress.getLocator());
-            response.setProgressPercent(progress.getProgressPercent());
-        } else {
-            response.setLocator(null);
-            response.setProgressPercent(BigDecimal.ZERO);
-        }
-
-        return response;
-    }
-
-    @Override
     public List<ReadingProgressResponse> getRecentlyRead(Long userId, int limit) {
         Pageable pageable = PageRequest.ofSize(limit);
 
@@ -118,8 +83,7 @@ public class ReadingProgressService implements IReadingProgressService{
         ReadingProgress progress = readingProgressRepository
                 .findByUser_UserIdAndBook_BookId(userId, bookId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Reading progress not found for userId: "
-                                + userId + " and bookId: " + bookId));
+                        String.format(ReadingProgressMessage.READING_PROGRESS_NOT_FOUND, userId, bookId)));
 
         progress.setStatus(ReadingStatus.FINISHED);
         progress.setProgressPercent(BigDecimal.valueOf(100));
@@ -132,5 +96,11 @@ public class ReadingProgressService implements IReadingProgressService{
     @Transactional
     public void resetProgressByBookId(Long bookId) {
         readingProgressRepository.deleteByBook_BookId(bookId);
+    }
+
+    @Override
+    public void createReadingProgress(User user, OrderItem orderItem) {
+        ReadingProgress progress = readingProgressMapper.toEntity(orderItem, user);
+        readingProgressRepository.save(progress);
     }
 }

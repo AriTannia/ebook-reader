@@ -9,14 +9,6 @@ import toast from "react-hot-toast";
  * app (avatar, book cover, book format file) render this for the
  * "nothing selected yet" state and manage their own preview/selected
  * state afterwards.
- *
- * Props:
- *  - accept: string                 input[accept] value
- *  - hint: string                   helper text under the icon
- *  - validate(file): string|null    return an error message to reject
- *  - onPick(file): void             called with a validated File
- *  - disabled: boolean
- *  - size: "sm" | "md"              controls padding/icon size
  */
 export function FileDropZone({ accept, hint, validate, onPick, disabled, size = "md" }) {
   const [isDragging, setIsDragging] = useState(false);

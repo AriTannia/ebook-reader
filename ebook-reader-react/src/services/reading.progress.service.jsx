@@ -6,10 +6,6 @@ export const saveProgress = (progressData) => {
   return api.put(API_URL, progressData);
 }
 
-export const openBookForReading = (bookId) => {
-  return api.post(`${API_URL}/${bookId}`);
-}
-
 export const refreshReadingUrl = (bookId) => {
   return api.post(`${API_URL}/${bookId}/refresh`);
 }

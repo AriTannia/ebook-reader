@@ -3,7 +3,10 @@ package com.aritan.ebook_reader.features.book;
 import com.aritan.ebook_reader.common.constants.messages.book.BookMessage;
 import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.models.EBResponse;
+import com.aritan.ebook_reader.common.models.user.User;
+import com.aritan.ebook_reader.features.auth.IAuthService;
 import com.aritan.ebook_reader.features.book.dtos.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api/v1/books")
 public class BookController {
     private final IBookService bookService;
+    private final IAuthService authService;
 
     // Public
     @GetMapping
@@ -25,16 +29,28 @@ public class BookController {
     public ResponseEntity<EBResponse<Page<BookResponse>>> getAllBooks(
             BookFilterRequest request,
             Pageable pageable,
-            @RequestParam(required = false) BookBadge badge){
-        var result = bookService.getPagedBooks(request, pageable, badge);
+            @RequestParam(required = false)
+            BookBadge badge){
+        var result = bookService.getAllBooks(request, pageable, badge);
 
+        return ResponseEntity.ok(EBResponse.Success(result, BookMessage.BOOKS_RETRIEVED_SUCCESSFULLY));
+    }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<Page<BookResponse>>> searchBooks(
+            BookFilterRequest request,
+            Pageable pageable){
+        var result = bookService.getPagedBooks(request, pageable);
         return ResponseEntity.ok(EBResponse.Success(result, BookMessage.BOOKS_RETRIEVED_SUCCESSFULLY));
     }
 
     @GetMapping("{bookId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EBResponse<BookDetailsResponse>> getBookById(@PathVariable Long bookId){
-        var result = bookService.getBookById(bookId);
+        User user = authService.getCurrentUser();
+
+        var result = bookService.getBookById(user.getUserId(), bookId);
         return ResponseEntity.ok(
                 EBResponse.Success(result,
                         String.format(BookMessage.BOOK_RETRIEVED_SUCCESSFULLY, bookId)));
@@ -56,7 +72,7 @@ public class BookController {
     @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<List<BookAdminResponse>>> createBook(
-            @RequestBody List<BookCreateRequest> requests){
+            @Valid @RequestBody List<BookCreateRequest> requests){
         var result = bookService.createBook(requests);
         return ResponseEntity.ok(EBResponse.Created(result, BookMessage.BOOK_CREATED_SUCCESSFULLY));
     }
@@ -64,7 +80,7 @@ public class BookController {
     @PutMapping("/{bookId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<BookAdminResponse>> updateBook(
-            @RequestBody BookUpdateRequest updateRequest,
+            @Valid @RequestBody BookUpdateRequest updateRequest,
             @PathVariable Long bookId){
         var result = bookService.updateBook(updateRequest, bookId);
         return ResponseEntity.ok(

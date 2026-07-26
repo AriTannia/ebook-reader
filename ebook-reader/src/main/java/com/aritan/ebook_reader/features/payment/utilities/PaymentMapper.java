@@ -4,7 +4,7 @@ import com.aritan.ebook_reader.common.enums.payment.PaymentProvider;
 import com.aritan.ebook_reader.common.models.order.Order;
 import com.aritan.ebook_reader.common.models.payment.Payment;
 import com.aritan.ebook_reader.features.payment.dtos.PaymentResponse;
-import com.aritan.ebook_reader.features.payment.dtos.PaymentVerifyResult;
+import com.aritan.ebook_reader.config.payment.gateway.dtos.PaymentVerifyResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

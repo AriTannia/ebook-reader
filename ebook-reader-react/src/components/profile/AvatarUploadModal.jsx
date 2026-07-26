@@ -98,7 +98,7 @@ export default function AvatarUploadModal({ isOpen, onClose }) {
           <div className="mb-6">
             <FileDropZone
               accept="image/jpeg,image/png,image/webp"
-              hint="JPG, PNG, or WebP \u2022 Max 5MB"
+              hint="JPG, PNG, or WebP  •  Max 5MB"
               validate={(picked) => validateImageFile(picked)}
               onPick={handleFileSelect}
             />

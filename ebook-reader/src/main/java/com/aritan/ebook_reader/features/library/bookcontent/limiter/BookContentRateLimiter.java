@@ -21,8 +21,8 @@ public class BookContentRateLimiter {
 
     public Bucket newBucket() {
         Bandwidth limit = Bandwidth.builder()
-                .capacity(5)
-                .refillGreedy(5, Duration.ofMinutes(1))
+                .capacity(30)
+                .refillGreedy(30, Duration.ofMinutes(1))
                 .build();
 
         return Bucket.builder()

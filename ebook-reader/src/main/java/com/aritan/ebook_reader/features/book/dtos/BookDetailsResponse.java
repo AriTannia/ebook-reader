@@ -22,6 +22,8 @@ public class BookDetailsResponse {
     private String language;
     private LocalDate publishedDate;
     private BookStatus status;
+    private boolean existedInLibrary;
+    private boolean existedUserReview;
     private Set<BookAuthorResponse> authors;
     private Set<BookCategoryResponse> categories;
     private Set<BookTagResponse> tags;

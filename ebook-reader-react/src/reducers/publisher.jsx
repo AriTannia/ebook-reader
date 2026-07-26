@@ -151,7 +151,7 @@ const publisherSlice = createSlice({
             })
             .addCase(fetchPublishersForAdmin.fulfilled, (state, action) => {
                 state.loading = false;
-                state.page = action.payload;
+                state.page = action.payload.data;
             })
             .addCase(fetchPublishersForAdmin.rejected, (state, action) => {
                 state.loading = false;

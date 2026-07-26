@@ -1,7 +1,7 @@
 package com.aritan.ebook_reader.common.models.book;
 
 import com.aritan.ebook_reader.common.constants.tables.book.BookFormatTableConstants;
-import com.aritan.ebook_reader.common.enums.FormatType;
+import com.aritan.ebook_reader.common.enums.book.FormatType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

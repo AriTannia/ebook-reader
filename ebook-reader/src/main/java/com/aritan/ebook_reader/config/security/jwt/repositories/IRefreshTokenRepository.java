@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.config.security.jwt.repositories;
 
-import com.aritan.ebook_reader.common.models.RefreshToken;
+import com.aritan.ebook_reader.common.models.token.RefreshToken;
 import com.aritan.ebook_reader.common.models.user.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

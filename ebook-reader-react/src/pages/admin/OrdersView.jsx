@@ -5,15 +5,15 @@ import toast from "react-hot-toast";
 
 import { useTableQuery } from "../../components/admin.ui/UseTableQuery";
 import { PageHeader, TableShell } from "../../components/admin.ui/PageHeader";
+import { StatusBadge, orderStatusVariant } from "../../components/admin.ui/book/Badges";
+import { ConfirmDialog } from "../../components/common/ConfirmDialog";
 import {
-  ConfirmDialog,
   EmptyRow,
   Pagination,
   SkeletonRows,
   SortableHeader,
-  StatusBadge,
-  orderStatusVariant,
-} from "../../components/admin.ui/CommonUI";
+} from "../../components/admin.ui/table/DataTable";
+
 import { fetchAllOrdersForAdmin, cancelOrderByAdmin, refundOrder } from "../../reducers/order";
 
 const COLS = 6;

@@ -10,8 +10,10 @@ export const checkLibraryItemExists = (bookId) => {
     return api.get(`${API_URL}/${bookId}/access`);
 }
 
-export const toggleFavoriteStatus = (bookId) => {
-    return api.post(`${API_URL}/${bookId}/favorite`);
+export const toggleFavoriteStatus = (bookId, isFavorite) => {
+    return api.patch(`${API_URL}/${bookId}/favorite`, null, {
+        params: { isFavorite },
+    });
 }
 
 export const revokeLibraryItemAccess = (userId, bookId) => {

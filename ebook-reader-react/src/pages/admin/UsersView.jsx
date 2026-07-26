@@ -5,15 +5,16 @@ import toast from "react-hot-toast";
 
 import { useTableQuery } from "../../components/admin.ui/UseTableQuery";
 import { PageHeader, TableShell } from "../../components/admin.ui/PageHeader";
+import { RolePill } from "../../components/admin.ui/book/Badges";
+import { Avatar } from "../../components/admin.ui/avatar/Avatar";
+import { ConfirmDialog } from "../../components/common/ConfirmDialog";
 import {
-  Avatar,
-  ConfirmDialog,
   EmptyRow,
   Pagination,
-  RolePill,
   SkeletonRows,
   SortableHeader,
-} from "../../components/admin.ui/CommonUI";
+} from "../../components/admin.ui/table/DataTable";
+
 import { fetchAllUsers, deleteUser } from "../../reducers/user";
 
 const COLS = 5;

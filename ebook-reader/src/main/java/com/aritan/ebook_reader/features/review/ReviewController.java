@@ -2,6 +2,8 @@ package com.aritan.ebook_reader.features.review;
 
 import com.aritan.ebook_reader.common.constants.messages.book.ReviewMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
+import com.aritan.ebook_reader.common.models.user.User;
+import com.aritan.ebook_reader.features.auth.IAuthService;
 import com.aritan.ebook_reader.features.review.dtos.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +19,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1")
 public class ReviewController {
     private final IReviewService reviewService;
+    private final IAuthService authService;
 
     @GetMapping("/books/{bookId}/reviews")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -37,11 +40,21 @@ public class ReviewController {
                         String.format(ReviewMessage.REVIEW_RETRIEVED_SUCCESSFULLY, userId)));
     }
 
+    @GetMapping("/books/{bookId}/reviews/stats")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<ReviewStatsResponse>> getReviewStats(
+            @PathVariable Long bookId){
+        var result = reviewService.getReviewStats(bookId);
+        return ResponseEntity.ok(EBResponse.Success(result, ReviewMessage.REVIEW_STATS_RETRIEVED_SUCCESSFULLY));
+    }
+
     @PostMapping("/books/{bookId}/reviews")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<ReviewResponse>> createReview(
             @PathVariable Long bookId, @RequestBody ReviewCreateRequest request){
-        var result = reviewService.createReview(bookId, request);
+        User user = authService.getCurrentUser();
+
+        var result = reviewService.createReview(user, bookId, request);
         return ResponseEntity.ok(EBResponse.Created(result, ReviewMessage.REVIEW_CREATED_SUCCESSFULLY));
     }
 
@@ -51,7 +64,8 @@ public class ReviewController {
             @PathVariable Long bookId,
             @RequestBody ReviewUpdatedRequest updateRequest,
             @PathVariable UUID reviewId){
-        var result = reviewService.updateReview(bookId, updateRequest, reviewId);
+        User user = authService.getCurrentUser();
+        var result = reviewService.updateReview(user, bookId, updateRequest, reviewId);
         return ResponseEntity.ok(
                 EBResponse.Success(result,
                         String.format(ReviewMessage.REVIEW_UPDATED_SUCCESSFULLY, reviewId)));

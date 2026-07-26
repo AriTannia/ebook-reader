@@ -6,6 +6,7 @@ import com.aritan.ebook_reader.features.category.dtos.CategoryCreateRequest;
 import com.aritan.ebook_reader.features.category.dtos.CategoryFilterRequest;
 import com.aritan.ebook_reader.features.category.dtos.CategoryResponse;
 import com.aritan.ebook_reader.features.category.dtos.CategoryUpdateRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +53,7 @@ public class CategoryController {
     @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<List<CategoryResponse>>> createCategory(
-            @RequestBody List<CategoryCreateRequest> requests){
+            @Valid @RequestBody List<CategoryCreateRequest> requests){
         var result = categoryService.createCategory(requests);
         return ResponseEntity.ok(EBResponse.Created(result, CategoryMessage.CATEGORY_CREATED_SUCCESSFULLY));
     }
@@ -60,7 +61,7 @@ public class CategoryController {
     @PutMapping("/{categoryId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<CategoryResponse>> updateCategory(
-            @RequestBody CategoryUpdateRequest updateRequest,
+            @Valid @RequestBody CategoryUpdateRequest updateRequest,
             @PathVariable Long categoryId){
         var result = categoryService.updateCategory(updateRequest, categoryId);
         return ResponseEntity.ok(

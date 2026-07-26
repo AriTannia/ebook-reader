@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.book.dtos;
 
-import com.aritan.ebook_reader.common.enums.FormatType;
+import com.aritan.ebook_reader.common.enums.book.FormatType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

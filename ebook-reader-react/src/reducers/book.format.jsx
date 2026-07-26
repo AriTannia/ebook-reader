@@ -37,6 +37,23 @@ export const addBookFormat = createAsyncThunk(
   },
 );
 
+export const setPrimaryBookFormat = createAsyncThunk(
+  "bookFormats/setPrimaryBookFormat",
+  async ({ bookId, formatId, isPrimary }, thunkAPI) => {
+    try {
+      const response = await BookFormatService.updatePrimaryFormat(bookId, formatId, isPrimary);
+      return response.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while updating the primary book format.";
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
+);
+
 export const deleteBookFormat = createAsyncThunk(
   "bookFormats/deleteBookFormat",
   async ({ bookId, formatId }, thunkAPI) => {
@@ -89,6 +106,21 @@ const bookFormatSlice = createSlice({
       .addCase(addBookFormat.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to add book format.";
+      })
+      .addCase(setPrimaryBookFormat.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(setPrimaryBookFormat.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedFormat = action.payload;
+        state.formats = state.formats.map((format) =>
+          format.id === updatedFormat.id ? updatedFormat : format
+        );
+      })
+      .addCase(setPrimaryBookFormat.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to update primary book format.";
       })
       .addCase(deleteBookFormat.pending, (state) => {
         state.loading = true;

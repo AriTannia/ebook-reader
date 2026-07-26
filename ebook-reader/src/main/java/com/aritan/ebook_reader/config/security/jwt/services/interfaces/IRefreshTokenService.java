@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.config.security.jwt.services.interfaces;
 
-import com.aritan.ebook_reader.common.models.RefreshToken;
+import com.aritan.ebook_reader.common.models.token.RefreshToken;
 
 import java.util.Optional;
 

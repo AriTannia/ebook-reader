@@ -21,25 +21,6 @@ export const saveReadingProgress = createAsyncThunk(
   },
 );
 
-export const openBookForReading = createAsyncThunk(
-  "readingProgress/openBookForReading",
-  async (bookId, { rejectWithValue, dispatch }) => {
-    try {
-      const response = await ReadingProgressService.openBookForReading(bookId);
-      return response.data;
-    } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-      dispatch(setMessage(message));
-      return rejectWithValue(message);
-    }
-  },
-);
-
 export const refreshReadingUrl = createAsyncThunk(
   "readingProgress/refreshReadingUrl",
   async (bookId, { rejectWithValue, dispatch }) => {
@@ -119,18 +100,6 @@ const readingProgressSlice = createSlice({
             state.currentReading = action.payload;
         })
         .addCase(saveReadingProgress.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
-        .addCase(openBookForReading.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(openBookForReading.fulfilled, (state, action) => {
-            state.loading = false;
-            state.currentReading = action.payload;
-        })
-        .addCase(openBookForReading.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
         })

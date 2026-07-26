@@ -17,7 +17,6 @@ const MIME_TO_FORMAT = {
 
 function detectFormatType(file) {
   const ext = file.name.split(".").pop()?.toLowerCase();
-  console.log("detectFormatType", file.name, ext, file.type);
   return MIME_TO_FORMAT[file.type] ?? "";
 }
 

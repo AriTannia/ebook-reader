@@ -1,9 +1,8 @@
 package com.aritan.ebook_reader.features.auth;
 
-import com.aritan.ebook_reader.common.constants.messages.AuthMessage;
+import com.aritan.ebook_reader.common.constants.messages.user.AuthMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
-import com.aritan.ebook_reader.features.auth.dtos.LoginRequest;
-import com.aritan.ebook_reader.features.auth.dtos.SignupRequest;
+import com.aritan.ebook_reader.features.auth.dtos.*;
 import com.aritan.ebook_reader.features.user.dtos.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -39,6 +38,26 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, result.getJwtCookie().toString())
                 .header(HttpHeaders.SET_COOKIE, result.getJwtRefreshCookie().toString())
                 .body(EBResponse.Success(null, AuthMessage.SIGN_OUT_SUCCESSFUL));
+    }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<EBResponse<?>> changeUserPassword(@Valid @RequestBody UserChangePasswordRequest request){
+        authService.changeUserPassword(request);
+        return ResponseEntity.ok(EBResponse.Success(null, AuthMessage.PASSWORD_CHANGED_SUCCESSFULLY));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<EBResponse<?>> forgotPassword(@RequestParam String email){
+        authService.forgotPassword(email);
+        return ResponseEntity.ok(EBResponse.Success(null, AuthMessage.PASSWORD_RESET_EMAIL_SENT));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<EBResponse<?>> resetPassword(
+            @Valid @RequestBody UserResetPasswordRequest request){
+
+        authService.resetPassword(request);
+        return ResponseEntity.ok(EBResponse.Success(null, AuthMessage.PASSWORD_RESET_SUCCESSFUL));
     }
 
     @PostMapping("/refresh-token")

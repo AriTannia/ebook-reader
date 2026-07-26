@@ -22,4 +22,6 @@ public  final class UserMessage {
     public static final String PASSWORD_EMPTY = "Password cannot be empty!";
     public static final String PASSWORD_SIZE = "Password must be between 6 and 40 characters long!";
     public static final String DATA_DELETED_SUCCESSFULLY = "Data deleted successfully!";
+    public static final String PASSWORD_SAME_AS_OLD = "Password is the same as old";
+    public static final String PASSWORD_INCORRECT = "Old password is incorrect";
 }

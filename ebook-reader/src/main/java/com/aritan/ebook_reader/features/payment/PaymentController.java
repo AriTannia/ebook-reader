@@ -1,5 +1,6 @@
 package com.aritan.ebook_reader.features.payment;
 
+import com.aritan.ebook_reader.common.constants.messages.payment.PaymentMessage;
 import com.aritan.ebook_reader.common.enums.payment.PaymentProvider;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.features.payment.dtos.PaymentResponse;
@@ -32,7 +33,7 @@ public class PaymentController {
         response.put("paymentId", result.getPaymentId().toString());
         response.put("paymentUrl", result.getPaymentUrl());
 
-        return ResponseEntity.ok(EBResponse.Success(response, "Payment initiated successfully"));
+        return ResponseEntity.ok(EBResponse.Success(response, PaymentMessage.PAYMENT_INITIATED_SUCCESSFULLY));
     }
 
     @GetMapping("/payments/vnpay/callback")
@@ -56,14 +57,14 @@ public class PaymentController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EBResponse<List<PaymentResponse>>> getPaymentsByOrderId(@PathVariable Long orderId) {
         var result = paymentService.getPaymentsByOrderId(orderId);
-        return ResponseEntity.ok(EBResponse.Success(result, "Payments retrieved successfully"));
+        return ResponseEntity.ok(EBResponse.Success(result, PaymentMessage.PAYMENTS_RETRIEVED_SUCCESSFULLY));
     }
 
     @GetMapping("/admin/payments")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<Page<PaymentResponse>>> getAllPayments(Pageable pageable) {
         var result = paymentService.getAllPayments(pageable);
-        return ResponseEntity.ok(EBResponse.Success(result, "Payments retrieved successfully"));
+        return ResponseEntity.ok(EBResponse.Success(result, PaymentMessage.PAYMENTS_RETRIEVED_SUCCESSFULLY));
     }
 
 }

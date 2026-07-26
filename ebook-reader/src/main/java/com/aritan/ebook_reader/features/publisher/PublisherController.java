@@ -6,6 +6,7 @@ import com.aritan.ebook_reader.features.publisher.dtos.PublisherFilterRequest;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherResponse;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherCreateRequest;
 import com.aritan.ebook_reader.features.publisher.dtos.PublisherUpdatedRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +52,7 @@ public class PublisherController {
     @PostMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<List<PublisherResponse>>> createPublisher(
-            @RequestBody List<PublisherCreateRequest> requests){
+            @Valid @RequestBody List<PublisherCreateRequest> requests){
         var result = publisherService.createPublisher(requests);
         return ResponseEntity.ok(EBResponse.Created(result, PublisherMessage.PUBLISHER_CREATED_SUCCESSFULLY));
     }
@@ -59,7 +60,7 @@ public class PublisherController {
     @PutMapping("/{publisherId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EBResponse<PublisherResponse>> updatePublisher(
-            @RequestBody PublisherUpdatedRequest updateRequest,
+            @Valid @RequestBody PublisherUpdatedRequest updateRequest,
             @PathVariable Long publisherId){
         var result = publisherService.updatePublisher(updateRequest, publisherId);
         return ResponseEntity.ok(

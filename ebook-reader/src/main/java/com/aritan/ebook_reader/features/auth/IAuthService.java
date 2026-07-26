@@ -18,4 +18,10 @@ public interface IAuthService {
     User getCurrentUser();
 
     UserResponse getCurrentUserFromCookie(HttpServletRequest request);
+
+    void changeUserPassword(@Valid UserChangePasswordRequest request);
+
+    void forgotPassword(String email);
+
+    void resetPassword(UserResetPasswordRequest request);
 }

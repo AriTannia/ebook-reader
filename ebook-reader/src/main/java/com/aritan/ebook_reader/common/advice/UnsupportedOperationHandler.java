@@ -12,7 +12,9 @@ public class UnsupportedOperationHandler {
     @ExceptionHandler(UnsupportedOperationException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public ResponseEntity<EBResponse<Object>> handleUnsupportedOperationException(UnsupportedOperationException ex) {
-        EBResponse<Object> response = EBResponse.Error(HttpStatus.METHOD_NOT_ALLOWED.value(), ex.getMessage());
+        EBResponse<Object> response = EBResponse.Error(
+                HttpStatus.METHOD_NOT_ALLOWED.value(),
+                ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
     }
 }

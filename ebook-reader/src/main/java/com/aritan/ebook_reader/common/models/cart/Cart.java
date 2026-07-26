@@ -14,7 +14,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = CartTableConstant.TABLE_NAME, schema = CartTableConstant.SCHEMA)
@@ -34,7 +36,7 @@ public class Cart {
     private User user;
 
     @OneToMany(mappedBy = CartTableConstant.CART, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> items = new ArrayList<>();
+    private Set<CartItem> items = new HashSet<>();
 
     @CreatedDate
     @Column(name = CartTableConstant.CREATED_AT, updatable = false, nullable = false)

@@ -11,6 +11,7 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import org.springframework.http.HttpHeaders;
@@ -47,6 +48,23 @@ public class FileService implements IFileService {
 
         return s3Presigner
                 .presignPutObject(presignRequest)
+                .url()
+                .toString();
+    }
+
+    public String generateReadingPresignedUrl(String filePath, Duration ttl) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(privateBucketName)
+                .key(filePath)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(ttl)
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        return s3Presigner
+                .presignGetObject(presignRequest)
                 .url()
                 .toString();
     }
@@ -120,6 +138,7 @@ public class FileService implements IFileService {
     public String generatePrivatePresignedUrl(String filePath, Duration ttl) {
         return generatePresignedUrl(privateBucketName, filePath, ttl);
     }
+
 
     @Override
     public void deleteFile(String filePath){

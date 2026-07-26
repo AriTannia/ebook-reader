@@ -4,7 +4,6 @@ import com.aritan.ebook_reader.common.constants.messages.book.BookFormatMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatCreateRequest;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatResponse;
-import com.aritan.ebook_reader.features.book.dtos.BookFormatUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,11 +48,11 @@ public class BookFormatController {
                         String.format(BookFormatMessage.BOOK_FORMAT_CREATED_SUCCESSFULLY, bookId)));
     }
 
-    @PutMapping("{bookFormatId}/admin")
+    @PatchMapping("{bookFormatId}/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<BookFormatResponse>> updateBookFormat(
-            @PathVariable Long bookId, @PathVariable Long bookFormatId, @RequestBody BookFormatUpdateRequest request) {
-        var result = bookFormatService.updateBookFormat(bookId, bookFormatId, request);
+    public ResponseEntity<EBResponse<BookFormatResponse>> updatePrimaryFormat(
+            @PathVariable Long bookId, @PathVariable Long bookFormatId, @RequestParam boolean isPrimary) {
+        var result = bookFormatService.updateIsPrimaryFormat(bookId, bookFormatId, isPrimary);
         return ResponseEntity
                 .ok(EBResponse.Success(
                         result,

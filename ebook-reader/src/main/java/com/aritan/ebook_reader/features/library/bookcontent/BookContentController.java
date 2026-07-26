@@ -1,8 +1,10 @@
 package com.aritan.ebook_reader.features.library.bookcontent;
 
+import com.aritan.ebook_reader.common.constants.messages.library.BookContentMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.features.auth.IAuthService;
+import com.aritan.ebook_reader.features.library.dtos.BookContentFormatResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,16 @@ public class BookContentController {
     public ResponseEntity<EBResponse<String>> getContentUrl(@PathVariable Long bookId) {
         User user = authService.getCurrentUser();
         String url = bookContentService.getDirectContentUrl(user.getUserId(), bookId);
-        return ResponseEntity.ok(EBResponse.Success(url, ""));
+        return ResponseEntity.ok(EBResponse.Success(url, BookContentMessage.BOOK_CONTENT_RETRIEVED_SUCCESSFULLY));
+    }
+
+    @GetMapping("{bookId}/format")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<EBResponse<BookContentFormatResponse>> openBookFormatForReading(
+            @PathVariable Long bookId){
+        User user = authService.getCurrentUser();
+        var result = bookContentService.getBookFormatForReading(user.getUserId(), bookId);
+
+        return ResponseEntity.ok(EBResponse.Success(result, BookContentMessage.BOOK_FORMAT_RETRIEVED_SUCCESSFULLY));
     }
 }

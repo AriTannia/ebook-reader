@@ -2,7 +2,6 @@ package com.aritan.ebook_reader.features.book.bookformat;
 
 import com.aritan.ebook_reader.features.book.dtos.BookFormatCreateRequest;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatResponse;
-import com.aritan.ebook_reader.features.book.dtos.BookFormatUpdateRequest;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ public interface IBookFormatService {
 
     BookFormatResponse createBookFormat(Long bookId, BookFormatCreateRequest request);
 
-    BookFormatResponse updateBookFormat(Long bookId, Long bookFormatId, BookFormatUpdateRequest request);
+    BookFormatResponse updateIsPrimaryFormat(Long bookId, Long bookFormatId, boolean isPrimary);
 
     void deleteBookFormat(Long bookId, Long bookFormatId);
 }

@@ -1,5 +1,7 @@
 package com.aritan.ebook_reader.features.order;
 
+import com.aritan.ebook_reader.common.constants.messages.cart.CartMessage;
+import com.aritan.ebook_reader.common.constants.messages.order.OrderMessage;
 import com.aritan.ebook_reader.common.enums.order.OrderStatus;
 import com.aritan.ebook_reader.common.exception.InvalidRequestException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
@@ -27,21 +29,21 @@ import java.time.LocalDateTime;
 public class OrderService implements IOrderService {
     private final IOrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    private final IAuthService authService;
     private final ICartRepository cartRepository;
     private final ICartItemRepository cartItemRepository;
 
     @Override
     @Transactional
-    public OrderResponse checkout() {
-        User user = authService.getCurrentUser();
+    public OrderResponse checkout(User user) {
         Long userId = user.getUserId();
 
         Cart cart = cartRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found for user with ID:  " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format(CartMessage.CART_NOT_FOUND_USER_ID, userId)
+                ));
 
         if(cart.getItems().isEmpty()){
-            throw new InvalidRequestException("Cart is empty");
+            throw new InvalidRequestException(CartMessage.CART_IS_EMPTY);
         }
 
         Order order = orderMapper.toEntity(cart);
@@ -57,38 +59,31 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Page<OrderResponse> getMyOrders(Pageable pageable) {
-        User user = authService.getCurrentUser();
-        Long userId = user.getUserId();
-
+    public Page<OrderResponse> getMyOrders(Long userId, Pageable pageable) {
         Page<Order> orders = orderRepository.findAllByUser_UserId(userId, pageable);
         return orders.map(orderMapper::toResponse);
     }
 
     @Override
-    public OrderResponse getMyOrderById(Long orderId) {
-        User user = authService.getCurrentUser();
-        Long userId = user.getUserId();
-
+    public OrderResponse getMyOrderById(Long userId, Long orderId) {
         Order order = orderRepository.findByOrderIdAndUser_UserId(orderId, userId)
-                .orElseThrow(()
-                        -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                                String.format(OrderMessage.ORDER_NOT_FOUND, orderId)));
 
         return orderMapper.toResponse(order);
     }
 
     @Override
-    public OrderResponse cancelMyOrder(Long orderId) {
-        User user = authService.getCurrentUser();
+    public OrderResponse cancelMyOrder(User user, Long orderId) {
         Long userId = user.getUserId();
 
-        Order order =
-                orderRepository.findByOrderIdAndUser_UserId(orderId, userId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Order is not found"));
+        Order order = orderRepository.findByOrderIdAndUser_UserId(orderId, userId)
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                        String.format(
+                                                OrderMessage.ORDER_NOT_FOUND_AND_USER_ID, orderId, userId)));
 
         if(order.getStatus() != OrderStatus.PENDING){
-            throw new InvalidRequestException("Order can not be cancelled");
+            throw new InvalidRequestException(OrderMessage.ORDER_CANNOT_CANCELLED);
         }
 
         order.setStatus(OrderStatus.CANCELLED);
@@ -110,19 +105,23 @@ public class OrderService implements IOrderService {
     public OrderResponse getOrderByIdForAdmin(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found with ID: " + orderId));
+                        new ResourceNotFoundException(
+                                String.format(OrderMessage.ORDER_NOT_FOUND, orderId)
+                        ));
         return orderMapper.toResponse(order);
     }
 
     @Override
+    @Transactional
     public OrderResponse cancelOrderByAdmin(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found with ID: " + orderId));
+                        new ResourceNotFoundException(
+                                String.format(OrderMessage.ORDER_NOT_FOUND, orderId)
+                        ));
 
         if (order.getStatus() != OrderStatus.PENDING) {
-            throw new InvalidRequestException(
-                    "Only PENDING orders can be cancelled. Use refund for PAID orders.");
+            throw new InvalidRequestException(OrderMessage.ORDER_CANNOT_CANCELLED_DETAILS);
         }
 
         order.setStatus(OrderStatus.CANCELLED);
@@ -135,7 +134,9 @@ public class OrderService implements IOrderService {
     public OrderResponse refundOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found with ID: " + orderId));
+                        new ResourceNotFoundException(
+                                String.format(OrderMessage.ORDER_NOT_FOUND, orderId)
+                        ));
         order.setStatus(OrderStatus.REFUNDED);
         orderRepository.save(order);
 
@@ -145,7 +146,9 @@ public class OrderService implements IOrderService {
     private void restoreItemsToCart(User user, Order order){
         Cart cart = cartRepository.findByUser_UserId(user.getUserId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Cart not found for user with ID: " + user.getUserId()));
+                        new ResourceNotFoundException(
+                                String.format(CartMessage.CART_NOT_FOUND_USER_ID, user.getUserId())
+                        ));
 
         for(OrderItem orderItem : order.getItems()){
             Long bookId = orderItem.getBook().getBookId();

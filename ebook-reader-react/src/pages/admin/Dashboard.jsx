@@ -1,17 +1,25 @@
 import { useEffect, useState } from "react";
-import { BookOpen, Menu, ShoppingCart, Users, X } from "lucide-react";
+import { BookOpen, BookUser, Menu, ShoppingCart, Users, Building2, FolderTree, Tag, X } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { UsersView } from "./UsersView";
 import { BooksView } from "./BooksView";
 import { OrdersView } from "./OrdersView";
+import { AuthorView } from "./AuthorView";
+import { PublisherView } from "./PublisherView";
+import { CategoryView } from "./CategoryView";
+import { TagView } from "./TagView";
 import { logout } from "../../reducers/auth";
 
 const NAV = [
   { key: "users", label: "Users", icon: Users },
   { key: "books", label: "Books", icon: BookOpen },
   { key: "orders", label: "Orders", icon: ShoppingCart },
+  { key: "authors", label: "Authors", icon: BookUser},
+  { key: "publishers", label: "Publishers", icon: Building2 },
+  { key: "categories", label: "Categories", icon: FolderTree },
+  { key: "tags", label: "Tags", icon: Tag}
 ];
 
 function cx(...classes) {
@@ -163,6 +171,10 @@ export default function Dashboard() {
           {active === "users" && <UsersView />}
           {active === "books" && <BooksView />}
           {active === "orders" && <OrdersView />}
+          {active === "authors" && <AuthorView />}
+          {active === "publishers" && <PublisherView />}
+          {active === "categories" && <CategoryView />}
+          {active === "tags" && <TagView />}
         </main>
       </div>
     </div>

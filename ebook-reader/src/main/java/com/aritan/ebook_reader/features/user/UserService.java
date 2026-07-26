@@ -2,12 +2,14 @@ package com.aritan.ebook_reader.features.user;
 
 import com.aritan.ebook_reader.common.constants.messages.user.UserMessage;
 import com.aritan.ebook_reader.common.enums.ERole;
+import com.aritan.ebook_reader.common.enums.outbox.FileSourceType;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
+import com.aritan.ebook_reader.common.models.outbox.FileDeletionOutbox;
 import com.aritan.ebook_reader.common.models.user.Role;
 import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRoleRepository;
-import com.aritan.ebook_reader.features.file.IFileService;
+import com.aritan.ebook_reader.features.file.IFileDeletionOutboxRepository;
 import com.aritan.ebook_reader.features.user.dtos.*;
 import com.aritan.ebook_reader.features.user.utilities.UserMapper;
 import com.aritan.ebook_reader.features.user.utilities.UserSpecification;
@@ -26,9 +28,9 @@ import java.util.stream.Collectors;
 public class UserService implements IUserService {
     private final IUserRepository userRepository;
     private final IRoleRepository roleRepository;
+    private final IFileDeletionOutboxRepository fileDeletionOutboxRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-    private final IFileService fileService;
     private final StorageUrlExtension storageUrlExtension;
 
     @Override
@@ -109,7 +111,13 @@ public class UserService implements IUserService {
         userRepository.save(user);
 
         if(oldAvatarUrl != null && !oldAvatarUrl.equals(updateAvatarRequest.getAvatarUrl())) {
-            fileService.deleteFile(oldAvatarUrl);
+            FileDeletionOutbox outbox = new FileDeletionOutbox();
+
+            outbox.setFileUrl(oldAvatarUrl);
+            outbox.setSourceType(FileSourceType.USER_AVATAR);
+            outbox.setSourceEntityId(userId);
+
+            fileDeletionOutboxRepository.save(outbox);
         }
 
         return userMapper.toUserResponse(user);

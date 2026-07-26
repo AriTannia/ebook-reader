@@ -26,4 +26,10 @@ public interface IUserLibraryRepository extends
 
     boolean existsByUser_UserIdAndBook_BookIdAndAccessStatus(
             Long userId, Long bookId, LibraryAccessStatus accessStatus);
+
+    boolean existsByUser_UserIdAndOrderItem_OrderItemId(Long userId, Long orderItemId);
+    boolean existsByUser_UserIdAndBook_BookId(
+            Long userId,
+            Long bookId
+    );
 }

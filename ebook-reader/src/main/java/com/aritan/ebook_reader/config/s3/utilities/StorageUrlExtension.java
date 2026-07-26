@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StorageUrlExtension {
-    @Value("${ebook-reader.app.s3.bucketName}")
+    @Value("${ebook-reader.app.s3.public.bucketName}")
     private String bucketName;
     @Value("${ebook-reader.app.s3.publicBaseUrl}")
     private String publicBaseUrl;

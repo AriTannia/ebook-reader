@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.cart.dtos;
 
-import com.aritan.ebook_reader.features.book.dtos.BookSumaryResponse;
+import com.aritan.ebook_reader.features.book.dtos.BookSummaryResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +14,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CartItemResponse {
     public Long cartItemId;
-    public BookSumaryResponse book;
+    public BookSummaryResponse book;
     public LocalDateTime addedAt;
 }

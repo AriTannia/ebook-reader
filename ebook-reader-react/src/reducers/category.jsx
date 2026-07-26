@@ -63,7 +63,7 @@ export const createCategory = createAsyncThunk(
   "category/createCategory",
   async (categoryData, thunkAPI) => {
     try {
-      const response = await CategoryService.createCategory(categoryData);
+      const response = await CategoryService.addNewCategory(categoryData);
       return response.data;
     } catch (error) {
       const message =
@@ -133,78 +133,80 @@ const categorySlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-    .addCase(fetchAllCategories.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(fetchAllCategories.fulfilled, (state, action) => {
-        state.loading = false;
-        state.categories = action.payload;
-    })
-    .addCase(fetchAllCategories.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-    })
-    .addCase(fetchCategoryById.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(fetchCategoryById.fulfilled, (state, action) => {
-      state.loading = false;
-      state.category = action.payload;
-    })
-    .addCase(fetchCategoryById.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    })
-    .addCase(fetchAllCategoriesForAdmin.pending, (state) => {
+      .addCase(fetchAllCategories.pending, (state) => {
         state.loading = true;
         state.error = null;
-    })
-    .addCase(fetchAllCategoriesForAdmin.fulfilled, (state, action) => {
+      })
+      .addCase(fetchAllCategories.fulfilled, (state, action) => {
         state.loading = false;
-        state.page = action.payload;
-    })
-    .addCase(fetchAllCategoriesForAdmin.rejected, (state, action) => {
+        state.categories = action.payload;
+      })
+      .addCase(fetchAllCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-    })
-    .addCase(createCategory.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(createCategory.fulfilled, (state, action) => {
-      state.loading = false;
-      state.categories.push(action.payload);
-    })
-    .addCase(createCategory.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    })
-    .addCase(updateCategory.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(updateCategory.fulfilled, (state, action) => {
-      state.loading = false;
-      state.category = action.payload;
-    })
-    .addCase(updateCategory.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    })
-    .addCase(deleteCategory.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(deleteCategory.fulfilled, (state, action) => {
-      state.loading = false;
-      state.categories = state.categories.filter((cat) => cat.id !== action.payload);
-    })
-    .addCase(deleteCategory.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+      })
+      .addCase(fetchCategoryById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCategoryById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.category = action.payload;
+      })
+      .addCase(fetchCategoryById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchAllCategoriesForAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllCategoriesForAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.page = action.payload.data;
+      })
+      .addCase(fetchAllCategoriesForAdmin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(createCategory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.categories.push(action.payload);
+      })
+      .addCase(createCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateCategory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.category = action.payload;
+      })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteCategory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.categories = state.categories.filter(
+          (cat) => cat.id !== action.payload,
+        );
+      })
+      .addCase(deleteCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

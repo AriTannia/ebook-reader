@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, Loader2, Plus, Trash2, X } from "lucide-react";
+import { Loader2, Plus, Trash2, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
-import { MultiSelectField } from "../../common/MultiSelectField";
-import { MultiSelectPopover } from "../../common/MultiSelectPopover";
-import { SearchableSelectField } from "../../common/SearchableSelectField";
-import { CoverImageField } from "../../admin.ui/book/CoverImageField";
+import BookSectionForm from "./BookSectionForm";
 
 import { uploadFile, FILE_UPLOAD_TYPE } from "../../../reducers/file";
 import { fetchAuthors } from "../../../reducers/author";
@@ -14,12 +11,6 @@ import { fetchTags } from "../../../reducers/tag";
 import { fetchPublishers } from "../../../reducers/publisher";
 import { fetchAllCategories } from "../../../reducers/category";
 import { addBook, updateBookDetails } from "../../../reducers/book";
-
-const BOOK_STATUS_OPTIONS = [
-  { id: "ACTIVE", name: "Available" },
-  { id: "INACTIVE", name: "Unavailable" },
-  { id: "DELETED", name: "Discontinued" },
-];
 
 function makeKey() {
   return `s_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -63,234 +54,6 @@ function sectionFromBook(book) {
     cover: { file: null, preview: "", existingUrl: book.coverImageUrl ?? "" },
     uploadingCover: false,
   };
-}
-
-function inputClass() {
-  return "w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60";
-}
-
-function Field({ label, required, children }) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-        {label}
-        {required && <span className="ml-0.5 text-destructive">*</span>}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-function BookSectionForm({
-  section,
-  mode,
-  index,
-  showCollapse,
-  showRemove,
-  authors,
-  categories,
-  tags,
-  publishers,
-  onUpdate,
-  onToggleCollapse,
-  onRemove,
-}) {
-  const isEdit = mode === "edit";
-
-  const patch = (fields) => onUpdate(section.key, fields);
-
-  return (
-    <div className="rounded-xl border border-border bg-card">
-      <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2.5">
-        <button
-          type="button"
-          onClick={() => showCollapse && onToggleCollapse(section.key)}
-          className={`flex min-w-0 flex-1 items-center gap-2 text-left text-sm font-semibold text-foreground ${
-            showCollapse ? "cursor-pointer" : "cursor-default"
-          }`}
-        >
-          {showCollapse ? (
-            section.collapsed ? (
-              <ChevronDown
-                className="size-4 shrink-0 text-muted-foreground"
-                aria-hidden="true"
-              />
-            ) : (
-              <ChevronUp
-                className="size-4 shrink-0 text-muted-foreground"
-                aria-hidden="true"
-              />
-            )
-          ) : null}
-          <span className="truncate">
-            {isEdit ? "Book details" : `Book ${index + 1}`}
-            {section.title ? ` \u2013 ${section.title}` : ""}
-          </span>
-        </button>
-        {showRemove && (
-          <button
-            type="button"
-            onClick={() => onRemove(section.key)}
-            aria-label={`Remove book ${index + 1}`}
-            className="shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-          >
-            <Trash2 className="size-4" aria-hidden="true" />
-          </button>
-        )}
-      </div>
-
-      {!section.collapsed && (
-        <div className="grid gap-4 p-4 md:grid-cols-2">
-          {isEdit && (
-            <Field label="Book ID">
-              <input
-                type="text"
-                value={section.bookId ?? ""}
-                disabled
-                className={inputClass()}
-              />
-            </Field>
-          )}
-
-          <Field label="Title" required>
-            <input
-              type="text"
-              value={section.title}
-              onChange={(e) => patch({ title: e.target.value })}
-              placeholder="Book title"
-              className={inputClass()}
-            />
-          </Field>
-
-          <Field label="Price (USD)" required>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={section.price}
-              onChange={(e) => patch({ price: e.target.value })}
-              placeholder="0.00"
-              className={inputClass()}
-            />
-          </Field>
-
-          <Field label="Published date">
-            <input
-              type="date"
-              value={section.publishedDate}
-              onChange={(e) => patch({ publishedDate: e.target.value })}
-              className={inputClass()}
-            />
-          </Field>
-
-          <Field label="Language">
-            <input
-              type="text"
-              value={section.language}
-              onChange={(e) => patch({ language: e.target.value })}
-              placeholder="e.g. English"
-              className={inputClass()}
-            />
-          </Field>
-
-          {isEdit && (
-            <Field label="Status">
-              <select
-                value={section.status}
-                onChange={(e) => patch({ status: e.target.value })}
-                className={inputClass()}
-              >
-                <option value="">Select status</option>
-                {BOOK_STATUS_OPTIONS.map((opt) => (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          )}
-
-          <SearchableSelectField
-            label="Publisher"
-            options={publishers.map((p) => ({
-              id: p.publisherId,
-              name: p.publisherName,
-            }))}
-            value={section.publisherId}
-            onChange={(id) => patch({ publisherId: id })}
-            placeholder="Search publisher..."
-            emptyOptionsMessage="No publishers yet."
-          />
-
-          <div className="md:col-span-2">
-            <Field label="Description">
-              <textarea
-                value={section.description}
-                onChange={(e) => patch({ description: e.target.value })}
-                placeholder="Short description of the book"
-                rows={3}
-                className={inputClass()}
-              />
-            </Field>
-          </div>
-
-          <div className="md:col-span-2">
-            <CoverImageField
-              file={section.cover.file}
-              previewUrl={section.cover.preview || section.cover.existingUrl}
-              disabled={section.uploadingCover}
-              onSelectFile={(file) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                  patch({
-                    cover: {
-                      file,
-                      preview: reader.result,
-                      existingUrl: section.cover.existingUrl,
-                    },
-                  });
-                };
-                reader.readAsDataURL(file);
-              }}
-              onRemove={() =>
-                patch({ cover: { file: null, preview: "", existingUrl: "" } })
-              }
-            />
-          </div>
-
-          <MultiSelectPopover
-            label="Authors"
-            options={authors.map((a) => ({
-              id: a.authorId,
-              name: a.authorName,
-            }))}
-            selectedIds={section.authorIds}
-            onChange={(ids) => patch({ authorIds: ids })}
-            emptyOptionsMessage="No authors yet."
-          />
-
-          <MultiSelectPopover
-            label="Categories"
-            options={categories.map((c) => ({
-              id: c.categoryId,
-              name: c.categoryName,
-            }))}
-            selectedIds={section.categoryIds}
-            onChange={(ids) => patch({ categoryIds: ids })}
-            emptyOptionsMessage="No categories yet."
-          />
-
-          <MultiSelectPopover
-            label="Tags"
-            options={tags.map((t) => ({ id: t.tagId, name: t.tagName }))}
-            selectedIds={section.tagIds}
-            onChange={(ids) => patch({ tagIds: ids })}
-            emptyOptionsMessage="No tags yet."
-          />
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default function BookFormModal({
@@ -374,9 +137,9 @@ export default function BookFormModal({
     updateSection(section.key, { uploadingCover: true });
     try {
       const result = await dispatch(
-        uploadFile({ 
+        uploadFile({
           file: section.cover.file,
-          type: FILE_UPLOAD_TYPE.BOOK
+          type: FILE_UPLOAD_TYPE.BOOK,
         }),
       ).unwrap();
       return result.filePath;
@@ -397,7 +160,6 @@ export default function BookFormModal({
       if (mode === "edit") {
         const section = sections[0];
         const coverImageUrl = await uploadCoverIfNeeded(section);
-        console.log("Section: ", section);
         await dispatch(
           updateBookDetails({
             bookId: section.bookId,
@@ -418,26 +180,44 @@ export default function BookFormModal({
         ).unwrap();
         toast.success(`"${section.title}" was updated.`);
       } else {
-        const requests = [];
-        for (const section of sections) {
-          const coverImageUrl = await uploadCoverIfNeeded(section);
-          requests.push({
-            title: section.title.trim(),
-            description: section.description,
-            price: Number(section.price),
-            coverImageUrl,
-            language: section.language,
-            publishedDate: section.publishedDate || null,
-            authorIds: section.authorIds,
-            categoryIds: section.categoryIds,
-            tagIds: section.tagIds,
-            publisherId: section.publisherId || null,
-          });
+        const emptyIndex = sections.findIndex(
+          (s) =>
+            !s.title.trim() ||
+            !s.description.trim() ||
+            s.price === "" ||
+            !s.language.trim() ||
+            !s.publishedDate.trim() ||
+            new Date(s.publishedDate) > new Date() ||
+            s.authorIds.length === 0 ||
+            s.categoryIds.length === 0 ||
+            s.tagIds.length === 0 ||
+            !s.publisherId.trim() ||
+            Number(s.price) < 0,
+        );
+        if (emptyIndex !== -1) {
+          toast.error(`Book ${emptyIndex + 1}: all fields are required.`);
+          setIsSubmitting(false);
+          return;
         }
-        await dispatch(addBook(requests)).unwrap();
+
+        const payload = sections.map((section) => ({
+          title: section.title.trim(),
+          description: section.description,
+          price: Number(section.price),
+          coverImageUrl: section.cover.existingUrl || "",
+          language: section.language,
+          publishedDate: section.publishedDate || null,
+          authorIds: section.authorIds,
+          categoryIds: section.categoryIds,
+          tagIds: section.tagIds,
+          publisherId: section.publisherId || null,
+        }));
+
+        const result = await dispatch(addBook(payload)).unwrap();
+
         toast.success(
-          requests.length > 1
-            ? `${requests.length} books were created.`
+          result.length > 1
+            ? `${result.length} books were created.`
             : "Book was created.",
         );
       }
@@ -507,13 +287,6 @@ export default function BookFormModal({
 
           <div className="flex justify-end gap-3 border-t border-border px-6 py-4">
             <button
-              onClick={handleClose}
-              disabled={isSubmitting}
-              className="rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-muted disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
               onClick={handleSubmit}
               disabled={isSubmitting}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
@@ -526,6 +299,13 @@ export default function BookFormModal({
                 : sections.length > 1
                   ? `Create ${sections.length} books`
                   : "Create book"}
+            </button>
+            <button
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-muted disabled:opacity-50"
+            >
+              Cancel
             </button>
           </div>
         </div>

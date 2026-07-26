@@ -19,6 +19,23 @@ export const fetchReviewsByBookId = createAsyncThunk(
   },
 );
 
+export const fetchReviewStatsByBookId = createAsyncThunk(
+  "review/fetchReviewStatsByBookId",
+  async (bookId, thunkAPI) => {
+    try {
+      const response = await ReviewService.getReviewStatsByBookId(bookId);
+      return response.data.data;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while fetching review statistics.";
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue(message);
+    }
+  },
+);
+
 export const addReview = createAsyncThunk(
   "review/addReview",
   async ({ bookId, reviewData }, thunkAPI) => {
@@ -96,6 +113,7 @@ export const deleteReview = createAsyncThunk(
 
 const initialState = {
   reviews: [],
+  stats: {},
   selectedReview: null,
   isFetching: false,
   isAdding: false,
@@ -119,12 +137,36 @@ const reviewSlice = createSlice({
       .addCase(fetchReviewsByBookId.rejected, (state) => {
         state.isFetching = false;
       })
+      .addCase(fetchReviewStatsByBookId.pending, (state) => {
+        state.isFetching = true;
+      })
+      .addCase(fetchReviewStatsByBookId.fulfilled, (state, action) => {
+        state.isFetching = false;
+        state.stats = action.payload;
+      })
+      .addCase(fetchReviewStatsByBookId.rejected, (state) => {
+        state.isFetching = false;
+      })
       .addCase(addReview.pending, (state) => {
         state.isAdding = true;
       })
       .addCase(addReview.fulfilled, (state, action) => {
         state.isAdding = false;
-        state.reviews.push(action.payload);
+        state.reviews.unshift(action.payload);
+
+        const newRating = action.payload.rating;
+        const prevTotal = state.stats.totalReviews ?? 0;
+        const preAvg = state.stats.averageRating ?? 0;
+        const newTotal = prevTotal + 1;
+
+        state.stats.totalReviews = newTotal;
+        state.stats.averageRating =
+          (preAvg * prevTotal + newRating) / newTotal;
+
+        if(state.stats.ratingDistribution) {
+          state.stats.ratingDistribution[newRating] =
+            (state.stats.ratingDistribution[newRating] ?? 0) + 1;
+        }
       })
       .addCase(addReview.rejected, (state) => {
         state.isAdding = false;

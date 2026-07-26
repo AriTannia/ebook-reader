@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Library, Pencil, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserProfile } from "../reducers/user";
+import { changePassword } from "../reducers/auth";
 import AvatarUploadModal from "../components/profile/AvatarUploadModal";
+import ChangePasswordModal from "../components/profile/ChangePasswordModal";
 import toast from "react-hot-toast";
 
 const Profile = () => {
@@ -23,6 +25,7 @@ const Profile = () => {
     email: currentUser?.email || "",
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -267,7 +270,10 @@ const Profile = () => {
                   </p>
                 </div>
 
-                <button className="shrink-0 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted cursor-pointer">
+                <button
+                  onClick={() => setIsPasswordModalOpen(true)}
+                  className="shrink-0 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted cursor-pointer"
+                >
                   Change Password
                 </button>
               </div>
@@ -298,7 +304,7 @@ const Profile = () => {
             </div>
           </div>
           <Link
-            to="/"
+            to="/library"
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-primary/30 bg-card px-6 py-3 text-sm font-medium text-primary shadow-sm transition-all hover:bg-primary/5 hover:border-primary/50"
           >
             <Library className="h-4 w-4" />
@@ -310,6 +316,10 @@ const Profile = () => {
       <AvatarUploadModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+      <ChangePasswordModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
       />
     </div>
   );

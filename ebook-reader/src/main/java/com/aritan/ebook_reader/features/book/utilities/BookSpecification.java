@@ -8,31 +8,30 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Set;
+import java.util.UUID;
+
 @Component
 public class BookSpecification {
-    public static Specification<Book> hasAuthor(Long authorId) {
+    public static Specification<Book> hasAuthor(Set<Long> authorIds) {
         return (root, query, cb) -> {
 
-            if (authorId == null)
+            if (authorIds == null || authorIds.isEmpty())
                 return cb.conjunction();
 
             query.distinct(true);
-            return cb.equal(
-                    root.join("authors").get("authorId"),
-                    authorId);
+            return root.join("authors").get("authorId").in(authorIds);
         };
     }
 
-    public static Specification<Book> hasCategory(Long categoryId) {
+    public static Specification<Book> hasCategory(Set<Long> categoryIds) {
         return (root, query, cb) -> {
 
-            if (categoryId == null)
+            if (categoryIds == null || categoryIds.isEmpty())
                 return cb.conjunction();
 
             query.distinct(true);
-            return cb.equal(
-                    root.join("categories").get("categoryId"),
-                    categoryId);
+            return root.join("categories").get("categoryId").in(categoryIds);
         };
     }
 
@@ -117,6 +116,17 @@ public class BookSpecification {
 
                 default -> cb.conjunction();
             };
+        };
+    }
+
+    public static Specification<Book> hasTag(Set<UUID> tagIds) {
+        return (root, query, cb) -> {
+            if (tagIds == null || tagIds.isEmpty()) {
+                return cb.conjunction();
+            }
+
+            query.distinct(true);
+            return root.join("tags").get("tagId").in(tagIds);
         };
     }
 }

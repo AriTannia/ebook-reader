@@ -27,4 +27,6 @@ public interface IBookRepository extends
             "tags"
     })
     Optional<Book> findByBookId(Long bookId);
+    boolean existsByCategories_CategoryId(Long categoryId);
+    boolean existsByBookId(Long bookId);
 }

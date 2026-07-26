@@ -115,7 +115,7 @@ export default function Cart() {
   }
  
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
         {/* Header */}
         <div className="mb-8 flex items-center gap-3 animate-fade-in-up">

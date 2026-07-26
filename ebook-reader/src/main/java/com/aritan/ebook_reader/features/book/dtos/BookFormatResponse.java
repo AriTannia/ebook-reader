@@ -1,7 +1,6 @@
 package com.aritan.ebook_reader.features.book.dtos;
 
-import com.aritan.ebook_reader.common.enums.FormatType;
-import com.aritan.ebook_reader.common.models.book.Book;
+import com.aritan.ebook_reader.common.enums.book.FormatType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BookFormatResponse {
     private Long bookFormatId;
-    private Book book;
     private FormatType formatType;
     private String storageUrl;
     private String mimeType;

@@ -6,7 +6,15 @@ export const getAllBooks = (filters = {}, badge) => {
   return api.get(API_URL, {
     params: {
       ...filters,
-      badge
+      ...(badge ? { badge } : {}),
+    },
+  });
+};
+
+export const searchBooks = (filters = {}) => {
+  return api.get(`${API_URL}/search`, {
+    params: {
+      ...filters,
     },
   });
 };
@@ -19,7 +27,7 @@ export const getAllBooksForAdmin = (filters = {}, badge) => {
   return api.get(`${API_URL}/admin`, {
     params: {
       ...filters,
-      badge
+      ...(badge ? { badge } : {}),
     },
   });
 };

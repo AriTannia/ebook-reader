@@ -148,7 +148,7 @@ const tagSlice = createSlice({
         })
         .addCase(fetchTagsForAdmin.fulfilled, (state, action) => {
             state.loading = false;
-            state.page = action.payload;
+            state.page = action.payload.data;
         })
         .addCase(fetchTagsForAdmin.rejected, (state, action) => {
             state.loading = false;

@@ -203,7 +203,7 @@ export default function OrderDetail() {
  
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="min-h-full bg-background flex items-center justify-center px-4">
         <p className="text-sm text-destructive bg-destructive/10 border border-border rounded-lg px-4 py-3 animate-alert-in">
           {error}
         </p>

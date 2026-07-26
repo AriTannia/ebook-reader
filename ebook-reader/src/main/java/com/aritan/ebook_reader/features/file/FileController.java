@@ -1,6 +1,6 @@
 package com.aritan.ebook_reader.features.file;
 
-import com.aritan.ebook_reader.common.constants.messages.FileMessage;
+import com.aritan.ebook_reader.common.constants.messages.file.FileMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.features.file.utilities.FileHelper;
 import lombok.RequiredArgsConstructor;

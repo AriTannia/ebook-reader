@@ -15,7 +15,7 @@ public class AuthorSpecification {
 
             return cb.or(
                     cb.like(
-                            cb.lower(root.get("author_name")),
+                            cb.lower(root.get("authorName")),
                             pattern
                     ),
 

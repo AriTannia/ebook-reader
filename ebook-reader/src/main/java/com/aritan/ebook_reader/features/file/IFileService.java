@@ -9,5 +9,6 @@ public interface IFileService {
     void streamWithRange(String filePath, HttpHeaders requestHeaders, HttpServletResponse response);
     String generatePublicPresignedUrl(String filePath);
     String generatePrivatePresignedUrl(String filePath, Duration ttl);
+    String generateReadingPresignedUrl(String filePath, Duration ttl);
     void deleteFile(String filePath);
 }

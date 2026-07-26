@@ -9,11 +9,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface IBookService {
-    Page<BookResponse> getPagedBooks(BookFilterRequest request, Pageable pageable, BookBadge badge);
+    Page<BookResponse> getAllBooks(BookFilterRequest request, Pageable pageable, BookBadge badge);
+    Page<BookResponse> getPagedBooks(BookFilterRequest request, Pageable pageable);
 
     Page<BookAdminResponse> searchBooks(BookFilterRequest request, Pageable pageable, BookBadge badge);
 
-    BookDetailsResponse getBookById(Long bookId);
+    BookDetailsResponse getBookById(Long userId, Long bookId);
 
     List<BookAdminResponse> createBook(List<BookCreateRequest> requests);
 

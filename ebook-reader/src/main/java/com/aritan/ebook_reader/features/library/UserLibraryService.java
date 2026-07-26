@@ -1,11 +1,14 @@
 package com.aritan.ebook_reader.features.library;
 
+import com.aritan.ebook_reader.common.constants.messages.library.UserLibraryMessage;
 import com.aritan.ebook_reader.common.enums.book.LibraryAccessStatus;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
+import com.aritan.ebook_reader.common.models.book.Book;
 import com.aritan.ebook_reader.common.models.book.ReadingProgress;
 import com.aritan.ebook_reader.common.models.book.UserLibrary;
 import com.aritan.ebook_reader.common.models.order.Order;
 import com.aritan.ebook_reader.common.models.order.OrderItem;
+import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.features.library.dtos.LibraryFilterRequest;
 import com.aritan.ebook_reader.features.library.dtos.UserLibraryResponse;
 import com.aritan.ebook_reader.features.library.readinghistory.IReadingProgressRepository;
@@ -50,9 +53,9 @@ public class UserLibraryService implements IUserLibraryService {
     public void revokeAccess(Long userId, Long bookId, String reason) {
         UserLibrary library = userLibraryRepository
                 .findByUser_UserIdAndBook_BookId(userId, bookId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User library entry not found for userId: "
-                                + userId + " and bookId: " + bookId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                                String.format(
+                                        UserLibraryMessage.USER_LIBRARY_ENTRY_NOT_FOUND, userId, bookId)));
 
         library.setAccessStatus(LibraryAccessStatus.REVOKED);
         userLibraryRepository.save(library);
@@ -95,11 +98,28 @@ public class UserLibraryService implements IUserLibraryService {
     public void toggleFavorite(Long userId, Long bookId, boolean isFavorite) {
         UserLibrary library = userLibraryRepository
                 .findByUser_UserIdAndBook_BookId(userId, bookId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User library entry not found for userId: "
-                                + userId + " and bookId: " + bookId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                                String.format(
+                                        UserLibraryMessage.USER_LIBRARY_ENTRY_NOT_FOUND, userId, bookId)));
 
         library.setIsFavorite(isFavorite);
         userLibraryRepository.save(library);
     }
+
+    @Override
+    @Transactional
+    public void addBookToUserLibrary(User user, OrderItem orderItem) {
+        boolean existedBook = userLibraryRepository
+                .existsByUser_UserIdAndBook_BookId(
+                        user.getUserId(), orderItem.getBook().getBookId());
+
+        if(!existedBook){
+            UserLibrary userLibrary = new UserLibrary();
+            libraryMapper.toEntity(orderItem, user, userLibrary);
+            userLibrary.setAccessStatus(LibraryAccessStatus.ACTIVE);
+
+            userLibraryRepository.save(userLibrary);
+        }
+    }
+
 }

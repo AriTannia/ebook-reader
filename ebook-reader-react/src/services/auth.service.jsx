@@ -21,6 +21,21 @@ export const login = (email, password) => {
     });
 };
 
+export const changePassword = (oldPassword, newPassword) => {
+  return api.patch(API_URL + "change-password", {oldPassword, newPassword});
+};
+
+export const forgotPassword = (email) => {
+  return api.post(API_URL + "forgot-password", 
+    null,
+    {params: {email},
+  });
+};
+
+export const resetPassword = (token, newPassword) => {
+  return api.post(API_URL + "reset-password", {token, newPassword});   
+};
+
 export const refreshToken = () => {
   return api.post(API_URL + "refresh-token");
 }

@@ -40,7 +40,7 @@ public class UserLibrary {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = OrderItemTableConstant.ORDER_ITEM_ID)
-    private OrderItem sourceOrderItem;
+    private OrderItem orderItem;
 
     @Enumerated(EnumType.STRING)
     @Column(name = UserLibraryTableConstants.ACCESS_STATUS, nullable = false, length = 20)

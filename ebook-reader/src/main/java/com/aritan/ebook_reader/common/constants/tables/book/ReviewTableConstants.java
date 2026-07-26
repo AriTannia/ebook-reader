@@ -1,8 +1,9 @@
 package com.aritan.ebook_reader.common.constants.tables.book;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReviewTableConstants {
     // Table
     public static final String TABLE_NAME = "reviews";

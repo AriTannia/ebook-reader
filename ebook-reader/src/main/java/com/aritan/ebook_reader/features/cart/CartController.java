@@ -1,6 +1,9 @@
 package com.aritan.ebook_reader.features.cart;
 
+import com.aritan.ebook_reader.common.constants.messages.cart.CartMessage;
 import com.aritan.ebook_reader.common.models.EBResponse;
+import com.aritan.ebook_reader.common.models.user.User;
+import com.aritan.ebook_reader.features.auth.IAuthService;
 import com.aritan.ebook_reader.features.cart.dtos.CartAddItemRequest;
 import com.aritan.ebook_reader.features.cart.dtos.CartResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,38 +16,43 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/cart")
 public class CartController {
     private final ICartService cartService;
+    private final IAuthService authService;
 
     @GetMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EBResponse<CartResponse>> getCartByUserId() {
-        var result = cartService.getCartByUserId();
+        User user = authService.getCurrentUser();
+        var result = cartService.getCartByUserId(user);
 
-        return ResponseEntity.ok(EBResponse.Success(result, "Cart retrieved successfully"));
+        return ResponseEntity.ok(EBResponse.Success(result, CartMessage.CART_RETRIEVED_SUCCESSFULLY));
     }
 
     @PostMapping("/items")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EBResponse<CartResponse>> addItemToCart(
             @RequestBody CartAddItemRequest addItemRequest){
-        var result = cartService.addItemToCart(addItemRequest);
+        User user = authService.getCurrentUser();
+        var result = cartService.addItemToCart(user.getUserId(), addItemRequest);
 
-        return ResponseEntity.ok(EBResponse.Success(result, "Item added to cart successfully"));
+        return ResponseEntity.ok(EBResponse.Success(result, CartMessage.CART_ITEM_ADDED_SUCCESSFULLY));
     }
 
     @DeleteMapping("items/{cartItemId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<CartResponse>> removeItemToCart(
+    public ResponseEntity<EBResponse<CartResponse>> removeItemFromCart(
             @PathVariable Long cartItemId){
+        User user = authService.getCurrentUser();
 
-        var result = cartService.removeItemFromCart(cartItemId);
-        return ResponseEntity.ok(EBResponse.Success(result, "Item removed from cart successfully"));
+        var result = cartService.removeItemFromCart(user.getUserId(), cartItemId);
+        return ResponseEntity.ok(EBResponse.Success(result, CartMessage.CART_ITEM_REMOVED_SUCCESSFULLY));
     }
 
     @DeleteMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EBResponse<?>> clearCart(){
+        User user = authService.getCurrentUser();
 
-        cartService.clearCart();
-        return ResponseEntity.ok(EBResponse.Success(null, "Cart cleared successfully"));
+        cartService.clearCart(user.getUserId());
+        return ResponseEntity.ok(EBResponse.Success(null, CartMessage.CART_CLEARED_SUCCESSFULLY));
     }
 }

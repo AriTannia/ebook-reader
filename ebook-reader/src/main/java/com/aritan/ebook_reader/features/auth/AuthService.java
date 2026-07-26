@@ -1,18 +1,24 @@
 package com.aritan.ebook_reader.features.auth;
 
-import com.aritan.ebook_reader.common.constants.messages.AuthMessage;
+import com.aritan.ebook_reader.common.constants.messages.user.AuthMessage;
 import com.aritan.ebook_reader.common.constants.messages.user.UserMessage;
 import com.aritan.ebook_reader.common.enums.ERole;
+import com.aritan.ebook_reader.common.enums.email.EmailTemplateType;
 import com.aritan.ebook_reader.common.exception.AuthenticationException;
 import com.aritan.ebook_reader.common.exception.DataDuplicateException;
 import com.aritan.ebook_reader.common.exception.InvalidRequestException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
-import com.aritan.ebook_reader.common.models.RefreshToken;
+import com.aritan.ebook_reader.common.models.outbox.EmailOutbox;
+import com.aritan.ebook_reader.common.models.token.PasswordResetToken;
+import com.aritan.ebook_reader.common.models.token.RefreshToken;
 import com.aritan.ebook_reader.common.models.user.Role;
 import com.aritan.ebook_reader.common.models.user.User;
-import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
+import com.aritan.ebook_reader.config.smpt.dtos.PasswordResetPayload;
+import com.aritan.ebook_reader.config.smpt.repositories.IEmailOutboxRepository;
+import com.aritan.ebook_reader.config.smpt.utilities.OutboxPayloadMapper;
 import com.aritan.ebook_reader.config.security.jwt.services.UserDetailsImpl;
 import com.aritan.ebook_reader.config.security.jwt.repositories.IRoleRepository;
+import com.aritan.ebook_reader.config.security.jwt.services.interfaces.IPasswordResetTokenService;
 import com.aritan.ebook_reader.config.security.jwt.services.interfaces.IRefreshTokenService;
 import com.aritan.ebook_reader.config.security.jwt.utilities.JwtUtils;
 import com.aritan.ebook_reader.features.auth.dtos.*;
@@ -23,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,6 +38,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -43,10 +51,15 @@ public class AuthService implements IAuthService{
     private final IUserRepository userRepository;
     private final IUserService userService;
     private final IRoleRepository roleRepository;
+    private final IPasswordResetTokenService passwordResetTokenService;
+    private final IEmailOutboxRepository emailOutboxRepository;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final OutboxPayloadMapper payloadMapper;
     private final JwtUtils jwtUtils;
-    private final StorageUrlExtension storageUrlExtension;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     @Override
@@ -169,5 +182,56 @@ public class AuthService implements IAuthService{
                 .orElseThrow(() -> new ResourceNotFoundException(UserMessage.NO_DATA_FOUND));
 
         return userService.getUserById(user.getUserId());
+    }
+
+    @Override
+    @Transactional
+    public void changeUserPassword(UserChangePasswordRequest request) {
+        User user = getCurrentUser();
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
+            throw new InvalidRequestException(UserMessage.PASSWORD_INCORRECT);
+        }
+
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
+            throw new InvalidRequestException(UserMessage.PASSWORD_SAME_AS_OLD);
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void forgotPassword(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            PasswordResetToken token = passwordResetTokenService.createPasswordResetToken(user.getEmail());
+            String resetLink = frontendUrl + "/reset-password?token=" + token.getToken();
+
+            PasswordResetPayload payload = new PasswordResetPayload(token.getToken(), resetLink);
+
+            EmailOutbox outboxItem = new EmailOutbox();
+
+            outboxItem.setToEmail(user.getEmail());
+            outboxItem.setTemplateType(EmailTemplateType.PASSWORD_RESET);
+            outboxItem.setPayload(payloadMapper.serialize(payload));
+
+            emailOutboxRepository.save(outboxItem);
+        });
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(UserResetPasswordRequest request) {
+        PasswordResetToken resetToken = passwordResetTokenService.findByToken(request.getToken())
+                .orElseThrow(() -> new ResourceNotFoundException(AuthMessage.PASSWORD_RESET_TOKEN_NOT_FOUND));
+
+        passwordResetTokenService.verifyExpiration(resetToken);
+        User user = resetToken.getUser();
+
+        passwordResetTokenService.deleteByUserId(user.getUserId());
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }
