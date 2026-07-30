@@ -3,20 +3,21 @@ package com.aritan.ebook_reader.features.cart;
 import com.aritan.ebook_reader.common.constants.messages.book.BookMessage;
 import com.aritan.ebook_reader.common.constants.messages.cart.CartMessage;
 import com.aritan.ebook_reader.common.constants.messages.library.UserLibraryMessage;
+import com.aritan.ebook_reader.common.constants.messages.order.OrderMessage;
+import com.aritan.ebook_reader.common.enums.order.OrderStatus;
 import com.aritan.ebook_reader.common.exception.DataDuplicateException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.Book;
 import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.common.models.cart.Cart;
 import com.aritan.ebook_reader.common.models.cart.CartItem;
-import com.aritan.ebook_reader.features.auth.IAuthService;
-import com.aritan.ebook_reader.features.book.IBookRepository;
+import com.aritan.ebook_reader.features.book.repositories.IBookRepository;
 import com.aritan.ebook_reader.features.cart.cartItem.ICartItemRepository;
 import com.aritan.ebook_reader.features.cart.dtos.CartAddItemRequest;
 import com.aritan.ebook_reader.features.cart.dtos.CartResponse;
 import com.aritan.ebook_reader.features.cart.utilities.CartMapper;
 import com.aritan.ebook_reader.features.library.IUserLibraryRepository;
-import com.aritan.ebook_reader.features.library.IUserLibraryService;
+import com.aritan.ebook_reader.features.order.repositories.IOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +31,7 @@ public class CartService implements ICartService{
     private final ICartItemRepository cartItemRepository;
     private final IBookRepository bookRepository;
     private final IUserLibraryRepository libraryRepository;
+    private final IOrderRepository orderRepository;
     private final CartMapper cartMapper;
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(CartService.class);
     @Override
@@ -58,6 +60,10 @@ public class CartService implements ICartService{
 
         boolean existedItem = cartItemRepository.existsByCart_CartIdAndBook_BookId(cart.getCartId(), bookId);
         boolean existedInLibrary = libraryRepository.existsByUser_UserIdAndBook_BookId(userId, bookId);
+        boolean isPendingOrder = orderRepository.existsByItems_Book_BookIdAndUser_UserIdAndStatus(
+                addItemRequest.getBookId(),
+                userId,
+                OrderStatus.PENDING);
 
         if(existedItem) {
             throw new DataDuplicateException(
@@ -67,6 +73,11 @@ public class CartService implements ICartService{
         if(existedInLibrary){
             throw new DataDuplicateException(
                     String.format(UserLibraryMessage.BOOK_ALREADY_IN_LIBRARY, bookId, userId));
+        }
+
+        if(isPendingOrder) {
+            throw new DataDuplicateException(
+                    String.format(OrderMessage.BOOK_ALREADY_IN_PENDING_ORDER, bookId, userId));
         }
 
         Book book = bookRepository.findByBookId(bookId)
@@ -112,6 +123,7 @@ public class CartService implements ICartService{
                         String.format(CartMessage.CART_NOT_FOUND_USER_ID, userId)
                 ));
 
+        cart.getItems().clear();
         cartItemRepository.deleteByCart_CartId(cart.getCartId());
     }
 

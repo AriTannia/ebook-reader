@@ -1,4 +1,4 @@
-import { Fragment, useState, useMemo } from "react";
+import { Fragment, useEffect, useState, useMemo } from "react";
 import {
   ChevronRight,
   Pencil,
@@ -10,10 +10,20 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
-import { useTableQuery } from "../../components/admin.ui/UseTableQuery";
-import { PageHeader, TableShell } from "../../components/admin.ui/PageHeader";
+import { useTableQuery } from "../../hooks/useTableQuery";
+import {
+  PageHeader,
+  TableShell,
+  TableToolbar,
+  SearchInput,
+} from "../../components/admin.ui/PageHeader";
 import { BookCover } from "../../components/admin.ui/book/BookCover";
-import { StatusBadge, bookStatusVariant } from "../../components/admin.ui/book/Badges";
+import {
+  StatusBadge,
+  bookStatusVariant,
+  BOOK_STATUS_OPTIONS,
+} from "../../components/admin.ui/book/Badges";
+import { FilterBar } from "../../components/search/FilterBar";
 import { ConfirmDialog } from "../../components/common/ConfirmDialog";
 import {
   EmptyRow,
@@ -21,12 +31,17 @@ import {
   SkeletonRows,
   SortableHeader,
 } from "../../components/admin.ui/table/DataTable";
-
 import {
-  fetchBooksForAdmin,
-  deleteBook,
-  fetchBookDetails, 
-} from "../../reducers/book";
+  makeListGroup,
+  makeDateRangeGroup,
+} from "../../components/search/FilterGroupHelper";
+import { useUrlSyncedParams } from "../../hooks/useUrlSyncedParams";
+
+import { fetchBooksForAdmin, fetchBookDetails } from "../../reducers/book";
+import { fetchAuthors } from "../../reducers/author";
+import { fetchAllCategories } from "../../reducers/category";
+import { fetchTags } from "../../reducers/tag";
+import { fetchPublishers } from "../../reducers/publisher";
 import {
   fetchAllBookFormats,
   setPrimaryBookFormat,
@@ -54,11 +69,40 @@ function formatBytes(bytes) {
 export function BooksView() {
   const dispatch = useDispatch();
 
+  const { authors } = useSelector((state) => state.author);
+  const { categories } = useSelector((state) => state.category);
+  const { tags } = useSelector((state) => state.tag);
+  const { publishers } = useSelector((state) => state.publisher);
+
+  const {
+    getAllParams,
+    getParam,
+    addToMultiParam,
+    removeFromMultiParam,
+    setParam,
+  } = useUrlSyncedParams();
+
+  const authorIds = getAllParams("authorIds");
+  const categoryIds = getAllParams("categoryIds");
+  const tagIds = getAllParams("tagIds");
+  const publisherId = getParam("publisherId");
+
+  const extraParams = useMemo(
+    () => ({
+      authorIds: authorIds.length > 0 ? authorIds : undefined,
+      categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
+      tagIds: tagIds.length > 0 ? tagIds : undefined,
+      publisherId: publisherId || undefined,
+    }),
+    [authorIds.join("|"), categoryIds.join("|"), tagIds.join("|"), publisherId],
+  );
+
   const q = useTableQuery({
     fetchAction: fetchBooksForAdmin,
     selectPage: (state) => state.book.page,
     selectIsFetching: (state) => state.book.loading,
     initialSortField: "title",
+    extraParams,
   });
 
   const [target, setTarget] = useState(null);
@@ -94,11 +138,28 @@ export function BooksView() {
     });
   }, [formats]);
 
+  useEffect(() => {
+    dispatch(fetchAuthors());
+    dispatch(fetchAllCategories());
+    dispatch(fetchTags());
+    dispatch(fetchPublishers());
+  }, [dispatch]);
+
   const refreshList = () => {
     dispatch(
       fetchBooksForAdmin({
         keyword: q.searchInput,
-        sort: q.sort ? `${q.sort.field},${q.sort.dir}` : undefined,
+        sort:
+          q.sort.length > 0
+            ? q.sort.map((s) => `${s.field},${s.dir}`)
+            : undefined,
+        statuses: q.statuses.length > 0 ? q.statuses : undefined,
+        createdFrom: q.createdFrom || undefined,
+        createdTo: q.createdTo || undefined,
+        authorIds: authorIds.length > 0 ? authorIds : undefined,
+        categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
+        tagIds: tagIds.length > 0 ? tagIds : undefined,
+        publisherId: publisherId || undefined,
         page: q.page?.number ?? 0,
         size: 10,
       }),
@@ -121,21 +182,6 @@ export function BooksView() {
   };
 
   const closeModal = () => setFormState((prev) => ({ ...prev, isOpen: false }));
-
-  const handleConfirmDelete = async () => {
-    if (!target) return;
-    setIsDeleting(true);
-    try {
-      await dispatch(deleteBook(target.bookId)).unwrap();
-      toast.success(`"${target.title}" was deleted.`);
-      setTarget(null);
-      refreshList();
-    } catch (error) {
-      toast.error(error || "Failed to delete book.");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
 
   const toggleExpand = (bookId) => {
     const next = expandedBookId === bookId ? null : bookId;
@@ -186,27 +232,114 @@ export function BooksView() {
     }
   };
 
+  const authorOptions = useMemo(
+    () =>
+      (authors || []).map((a) => ({
+        id: String(a.authorId),
+        name: a.authorName,
+      })),
+    [authors],
+  );
+  const categoryOptions = useMemo(
+    () =>
+      (categories || []).map((c) => ({
+        id: String(c.categoryId),
+        name: c.categoryName,
+      })),
+    [categories],
+  );
+  const tagOptions = useMemo(
+    () => (tags || []).map((t) => ({ id: t.tagId, name: t.tagName })),
+    [tags],
+  );
+  const publisherOptions = useMemo(
+    () =>
+      (publishers || []).map((p) => ({
+        id: p.publisherId,
+        name: p.publisherName,
+      })),
+    [publishers],
+  );
+
+  const filterGroups = [
+    makeListGroup({
+      key: "status",
+      label: "Status",
+      options: BOOK_STATUS_OPTIONS,
+      selected: q.statuses,
+      onAdd: (id) => q.setStatusFilter([...q.statuses, id]),
+      onRemove: (id) => q.setStatusFilter(q.statuses.filter((s) => s !== id)),
+      onClear: () => q.setStatusFilter([]),
+    }),
+    makeListGroup({
+      key: "authorIds",
+      label: "Author",
+      options: authorOptions,
+      selected: authorIds,
+      onAdd: (id) => addToMultiParam("authorIds", id),
+      onRemove: (id) => removeFromMultiParam("authorIds", id),
+    }),
+    makeListGroup({
+      key: "categoryIds",
+      label: "Category",
+      options: categoryOptions,
+      selected: categoryIds,
+      onAdd: (id) => addToMultiParam("categoryIds", id),
+      onRemove: (id) => removeFromMultiParam("categoryIds", id),
+    }),
+    makeListGroup({
+      key: "tagIds",
+      label: "Tag",
+      options: tagOptions,
+      selected: tagIds,
+      onAdd: (id) => addToMultiParam("tagIds", id),
+      onRemove: (id) => removeFromMultiParam("tagIds", id),
+    }),
+    makeListGroup({
+      key: "publisherId",
+      label: "Publisher",
+      options: publisherOptions,
+      selected: publisherId ? [publisherId] : [],
+      onAdd: (id) => setParam("publisherId", id),
+      onRemove: () => setParam("publisherId", ""),
+    }),
+    makeDateRangeGroup({
+      key: "createdRange",
+      label: "Created date",
+      value: { from: q.createdFrom, to: q.createdTo },
+      onChange: ({ from, to }) =>
+        q.setDateRange({ createdFrom: from, createdTo: to }),
+      onClear: () => q.setDateRange({ createdFrom: "", createdTo: "" }),
+    }),
+  ];
+
   return (
     <>
-      <PageHeader
-        title="Books"
-        searchPlaceholder="Search by title"
-        searchValue={q.searchInput}
-        onSearchChange={q.setSearchInput}
-        isFetching={q.isFetching}
-        action={
-          <button
-            type="button"
-            onClick={openCreateModal}
-            className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card md:w-auto"
-          >
-            <Plus className="size-4" aria-hidden="true" />
-            Add new book
-          </button>
-        }
-      />
+      <PageHeader title="Books" />
 
       <TableShell>
+        <TableToolbar
+          filters={
+            <>
+              <SearchInput
+                value={q.searchInput}
+                onChange={q.setSearchInput}
+                placeholder="Search by title or author"
+              />
+              <FilterBar groups={filterGroups} />
+            </>
+          }
+          actions={
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card md:w-auto"
+            >
+              <Plus className="size-4" aria-hidden="true" />
+              Add book
+            </button>
+          }
+        />
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -244,7 +377,10 @@ export function BooksView() {
                   onSort={q.toggleSort}
                   align="right"
                 />
-                <th scope="col" className="px-4 py-2.5 text-right font-medium normal-case">
+                <th
+                  scope="col"
+                  className="px-4 py-2.5 text-right font-medium normal-case"
+                >
                   Actions
                 </th>
               </tr>
@@ -327,17 +463,6 @@ export function BooksView() {
                               ) : (
                                 <Pencil className="size-4" aria-hidden="true" />
                               )}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setTarget(book);
-                              }}
-                              aria-label={`Delete ${book.title}`}
-                              className="inline-flex cursor-pointer items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-                            >
-                              <Trash2 className="size-4" aria-hidden="true" />
                             </button>
                           </div>
                         </td>
@@ -460,26 +585,6 @@ export function BooksView() {
 
         <Pagination page={q.page} onPrev={q.prevPage} onNext={q.nextPage} />
       </TableShell>
-
-      <ConfirmDialog
-        open={target !== null}
-        title="Delete book"
-        description={
-          <>
-            <p className="font-medium text-foreground">
-              Delete "{target?.title}" from the catalog?
-            </p>
-            <p className="text-muted-foreground">
-              Existing orders keep their snapshot, but this book will no longer
-              be available for purchase.
-            </p>
-          </>
-        }
-        confirmLabel={isDeleting ? "Deleting..." : "Delete book"}
-        destructive
-        onCancel={() => setTarget(null)}
-        onConfirm={handleConfirmDelete}
-      />
 
       <ConfirmDialog
         open={pendingFormatDelete !== null}

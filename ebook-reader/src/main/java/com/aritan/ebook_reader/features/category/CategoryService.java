@@ -4,7 +4,7 @@ import com.aritan.ebook_reader.common.constants.messages.book.CategoryMessage;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.exception.ValidationException;
 import com.aritan.ebook_reader.common.models.book.Category;
-import com.aritan.ebook_reader.features.book.IBookRepository;
+import com.aritan.ebook_reader.features.book.repositories.IBookRepository;
 import com.aritan.ebook_reader.features.category.dtos.CategoryCreateRequest;
 import com.aritan.ebook_reader.features.category.dtos.CategoryFilterRequest;
 import com.aritan.ebook_reader.features.category.dtos.CategoryResponse;

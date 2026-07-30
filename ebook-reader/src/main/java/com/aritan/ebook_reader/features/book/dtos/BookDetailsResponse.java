@@ -24,6 +24,7 @@ public class BookDetailsResponse {
     private BookStatus status;
     private boolean existedInLibrary;
     private boolean existedUserReview;
+    private boolean pendingOrder;
     private Set<BookAuthorResponse> authors;
     private Set<BookCategoryResponse> categories;
     private Set<BookTagResponse> tags;

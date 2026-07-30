@@ -3,8 +3,13 @@ import { Pencil, Plus, Trash2, Loader2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
-import { useTableQuery } from "../../components/admin.ui/UseTableQuery";
-import { PageHeader, TableShell } from "../../components/admin.ui/PageHeader";
+import { useTableQuery } from "../../hooks/useTableQuery";
+import {
+  PageHeader,
+  TableShell,
+  TableToolbar,
+  SearchInput,
+} from "../../components/admin.ui/PageHeader";
 import AuthorFormModal from "../../components/admin.ui/author/AuthorFormModal";
 import { Avatar } from "../../components/admin.ui/avatar/Avatar";
 import { ConfirmDialog } from "../../components/common/ConfirmDialog";
@@ -106,24 +111,30 @@ export function AuthorView() {
 
   return (
     <>
-      <PageHeader
-        title="Authors"
-        searchPlaceholder="Search authors..."
-        searchValue={q.searchInput}
-        onSearchChange={q.setSearchInput}
-        onSearchSubmit={q.isFetching}
-        action={
-          <button
-            type="button"
-            onClick={openCreateModal}
-            className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card md:w-auto"
-          >
-            <Plus className="size-4" aria-hidden="true" />
-            Add new author
-          </button>
-        }
-      />
+      <PageHeader title="Authors" />
       <TableShell>
+        <TableToolbar
+          filters={
+            <SearchInput
+              value={q.searchInput}
+              onChange={q.setSearchInput}
+              placeholder="Search by name or biography..."
+              isFetching={q.isFetching}
+            />
+          }
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={openCreateModal}
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                Add author
+              </button>
+            </>
+          }
+        ></TableToolbar>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>

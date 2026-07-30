@@ -1,14 +1,15 @@
-package com.aritan.ebook_reader.features.payment.services;
+package com.aritan.ebook_reader.features.payment.services.mock;
 
 import com.aritan.ebook_reader.common.constants.messages.payment.PaymentMessage;
 import com.aritan.ebook_reader.common.enums.payment.PaymentProvider;
 import com.aritan.ebook_reader.common.exception.IllegalStateException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.payment.Payment;
-import com.aritan.ebook_reader.features.payment.IPaymentRepository;
+import com.aritan.ebook_reader.features.payment.repositories.IPaymentRepository;
 import com.aritan.ebook_reader.features.payment.IPaymentService;
 import com.aritan.ebook_reader.features.payment.dtos.PaymentInitResponse;
 import com.aritan.ebook_reader.features.payment.dtos.PaymentResponse;
+import com.aritan.ebook_reader.features.payment.services.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -63,7 +64,7 @@ public class MockPaymentServiceDecorator implements IPaymentService {
     private Map<String, String> buildFakeParams(PaymentProvider provider, String txnRef) {
         return switch (provider) {
             case VNPAY -> Map.of("vnp_TxnRef", txnRef, "vnp_ResponseCode", "00");
-            case MOMO -> Map.of("txnRef", txnRef, "resultCode", "0");
+            case MOMO -> Map.of("orderId", txnRef, "resultCode", "0");
             default -> throw new IllegalStateException(
                     String.format(PaymentMessage.UNSUPPORTED_PAYMENT_PROVIDER, provider)
             );

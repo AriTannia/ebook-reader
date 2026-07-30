@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import Login from "./pages/Login";
@@ -16,6 +16,7 @@ import ReadingPage from "./pages/library/ReadingPage";
 import SearchStore from "./pages/SearchStore";
 import ForgotPassword from "./pages/password/ForgotPassword";
 import ResetPassword from "./pages/password/ResetPassword";
+import OrdersView from "./pages/UserOrders";
 
 import { logout, getCurrentUser } from "./reducers/auth";
 import { clearMessage } from "./reducers/message";
@@ -77,7 +78,9 @@ const App = () => {
           <Route exact path="/checkout/:orderId" element={<Checkout />} />
           <Route path="/library" element={<Library />} />
           <Route path="/reading/:bookId" element={<ReadingPage />} />
-          <Route path="/admin/*" element={<Dashboard />} />
+          <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
+          <Route path="/admin/:tab" element={<Dashboard />} />
+          <Route path="/orders" element={<OrdersView />} />
         </Routes>
       </div>
     </div>

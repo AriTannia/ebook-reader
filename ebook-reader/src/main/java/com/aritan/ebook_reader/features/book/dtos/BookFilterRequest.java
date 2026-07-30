@@ -18,6 +18,6 @@ public class BookFilterRequest {
     private Set<Long> categoryIds;
     private Long publisherId;
     private Set<UUID> tagIds;
-    private BookStatus status;
+    private Set<BookStatus> statuses;
     private String keyword;
 }

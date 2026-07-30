@@ -3,8 +3,13 @@ import { Pencil, Plus, Trash2, Loader2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
-import { useTableQuery } from "../../components/admin.ui/UseTableQuery";
-import { PageHeader, TableShell } from "../../components/admin.ui/PageHeader";
+import { useTableQuery } from "../../hooks/useTableQuery";
+import {
+  PageHeader,
+  SearchInput,
+  TableShell,
+  TableToolbar,
+} from "../../components/admin.ui/PageHeader";
 import PublisherFormModal from "../../components/admin.ui/publisher/PublisherFormModal";
 import { Avatar } from "../../components/admin.ui/avatar/Avatar";
 import { ConfirmDialog } from "../../components/common/ConfirmDialog";
@@ -99,24 +104,28 @@ export function PublisherView() {
 
   return (
     <>
-      <PageHeader
-        title="Publisher"
-        searchPlaceholder="Search publishers..."
-        searchValue={q.searchInput}
-        onSearchChange={q.setSearchInput}
-        onSearchSubmit={q.isFetching}
-        action={
-          <button
-            type="button"
-            onClick={openCreateModal}
-            className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card md:w-auto"
-          >
-            <Plus className="size-4" aria-hidden="true" />
-            Add new publisher
-          </button>
-        }
-      />
+      <PageHeader title="Publisher" />
       <TableShell>
+        <TableToolbar
+          filters={
+            <SearchInput
+              placeholder="Search by publisher name..."
+              value={q.searchInput}
+              onChange={q.setSearchInput}
+              onSubmit={q.isFetching}
+            />
+          }
+          actions={
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card md:w-auto"
+            >
+              <Plus className="size-4" aria-hidden="true" />
+              Add new publisher
+            </button>
+          }
+        />
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>

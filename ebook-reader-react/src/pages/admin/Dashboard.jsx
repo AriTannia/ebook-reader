@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
-import { BookOpen, BookUser, Menu, ShoppingCart, Users, Building2, FolderTree, Tag, X } from "lucide-react";
+import {
+  BookOpen,
+  BookUser,
+  Menu,
+  ShoppingCart,
+  Users,
+  Building2,
+  FolderTree,
+  Tag,
+  X,
+} from "lucide-react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, Navigate } from "react-router-dom";
 
 import { UsersView } from "./UsersView";
 import { BooksView } from "./BooksView";
@@ -16,11 +26,13 @@ const NAV = [
   { key: "users", label: "Users", icon: Users },
   { key: "books", label: "Books", icon: BookOpen },
   { key: "orders", label: "Orders", icon: ShoppingCart },
-  { key: "authors", label: "Authors", icon: BookUser},
+  { key: "authors", label: "Authors", icon: BookUser },
   { key: "publishers", label: "Publishers", icon: Building2 },
   { key: "categories", label: "Categories", icon: FolderTree },
-  { key: "tags", label: "Tags", icon: Tag}
+  { key: "tags", label: "Tags", icon: Tag },
 ];
+
+const VALID_TABS = NAV.map((item) => item.key);
 
 function cx(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -73,11 +85,10 @@ function SidebarContent({ active, onNavigate, collapsed, onToggle }) {
 export default function Dashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { tab } = useParams();
 
-  const [active, setActive] = useState("users");
+  const active = tab;
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // Desktop sidebar state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
@@ -96,8 +107,12 @@ export default function Dashboard() {
     };
   }, [drawerOpen]);
 
+  if (!VALID_TABS.includes(tab)) {
+    return <Navigate to="/admin/users" replace />;
+  }
+
   const handleNavigate = (key) => {
-    setActive(key);
+    navigate(`/admin/${key}`);
     setDrawerOpen(false);
   };
 

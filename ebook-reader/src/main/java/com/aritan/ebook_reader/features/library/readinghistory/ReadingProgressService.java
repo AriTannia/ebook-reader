@@ -9,7 +9,7 @@ import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.ReadingProgress;
 import com.aritan.ebook_reader.common.models.order.OrderItem;
 import com.aritan.ebook_reader.common.models.user.User;
-import com.aritan.ebook_reader.features.book.IBookRepository;
+import com.aritan.ebook_reader.features.book.repositories.IBookRepository;
 import com.aritan.ebook_reader.features.library.IUserLibraryRepository;
 import com.aritan.ebook_reader.features.library.dtos.ReadingProgressResponse;
 import com.aritan.ebook_reader.features.library.dtos.SaveProgressRequest;
@@ -45,24 +45,20 @@ public class ReadingProgressService implements IReadingProgressService{
             );
         }
 
+        readingProgressRepository.upsertProgress(
+                userId,
+                request.getBookId(),
+                request.getLocator(),
+                request.getProgressPercent(),
+                LocalDateTime.now()
+        );
+
         ReadingProgress progress = readingProgressRepository
                 .findByUser_UserIdAndBook_BookId(userId, request.getBookId())
-                .orElseGet(() -> {
-                    ReadingProgress newProgress = new ReadingProgress();
-                    newProgress.setUser(userRepository.getReferenceById(userId));
-                    newProgress.setBook(bookRepository.getReferenceById(request.getBookId()));
-                    return newProgress;
-                });
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format(ReadingProgressMessage.READING_PROGRESS_NOT_FOUND, userId, request.getBookId())
+                ));
 
-        progress.setLocator(request.getLocator());
-        progress.setProgressPercent(request.getProgressPercent());
-        progress.setLastReadAt(LocalDateTime.now());
-
-        if(progress.getStatus() == ReadingStatus.NOT_STARTED){
-            progress.setStatus(ReadingStatus.IN_PROGRESS);
-        }
-
-        readingProgressRepository.save(progress);
         return readingProgressMapper.toResponse(progress);
     }
 

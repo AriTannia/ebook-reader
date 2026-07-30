@@ -3,9 +3,19 @@ import { ChevronRight } from "lucide-react";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
-import { useTableQuery } from "../../components/admin.ui/UseTableQuery";
-import { PageHeader, TableShell } from "../../components/admin.ui/PageHeader";
-import { StatusBadge, orderStatusVariant } from "../../components/admin.ui/book/Badges";
+import { useTableQuery } from "../../hooks/useTableQuery";
+import {
+  PageHeader,
+  TableShell,
+  TableToolbar,
+  SearchInput,
+} from "../../components/admin.ui/PageHeader";
+import { makeListGroup, makeDateRangeGroup } from "../../components/search/FilterGroupHelper"; 
+import {
+  StatusBadge,
+  orderStatusVariant,
+  ORDER_STATUS_OPTIONS
+} from "../../components/admin.ui/book/Badges";
 import { ConfirmDialog } from "../../components/common/ConfirmDialog";
 import {
   EmptyRow,
@@ -14,12 +24,20 @@ import {
   SortableHeader,
 } from "../../components/admin.ui/table/DataTable";
 
-import { fetchAllOrdersForAdmin, cancelOrderByAdmin, refundOrder } from "../../reducers/order";
+import {
+  fetchAllOrdersForAdmin,
+  cancelOrderByAdmin,
+  refundOrder,
+} from "../../reducers/order";
+import { FilterBar } from "../../components/search/FilterBar";
 
 const COLS = 6;
 
 function formatPrice(value) {
-  return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(value);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(value);
 }
 
 function formatDate(iso) {
@@ -49,7 +67,13 @@ export function OrdersView() {
     dispatch(
       fetchAllOrdersForAdmin({
         keyword: q.searchInput,
-        sort: q.sort ? `${q.sort.field},${q.sort.dir}` : undefined,
+        sort:
+          q.sort.length > 0
+            ? q.sort.map((s) => `${s.field},${s.dir}`)
+            : undefined,
+        statuses: q.statuses.length > 0 ? q.statuses : undefined,
+        createdFrom: q.createdFrom || undefined,
+        createdTo: q.createdTo || undefined,
         page: q.page?.number ?? 0,
         size: 10,
       }),
@@ -76,17 +100,43 @@ export function OrdersView() {
     }
   };
 
+  const filterGroups = [
+    makeListGroup({
+      key: "status",
+      label: "Status",
+      options: ORDER_STATUS_OPTIONS,
+      selected: q.statuses,
+      onAdd: (id) => q.setStatusFilter([...q.statuses, id]),
+      onRemove: (id) => q.setStatusFilter(q.statuses.filter((s) => s !== id)),
+      onClear: () => q.setStatusFilter([]),
+    }),
+    makeDateRangeGroup({
+      key: "createdRange",
+      label: "Created date",
+      value: { from: q.createdFrom, to: q.createdTo },
+      onChange: ({ from, to }) =>
+        q.setDateRange({ createdFrom: from, createdTo: to }),
+      onClear: () => q.setDateRange({ createdFrom: "", createdTo: "" }),
+    }),
+  ];
+
   return (
     <>
-      <PageHeader
-        title="Orders"
-        searchPlaceholder="Search by buyer name or email"
-        searchValue={q.searchInput}
-        onSearchChange={q.setSearchInput}
-        isFetching={q.isFetching}
-      />
-
+      <PageHeader title="Orders" />
       <TableShell>
+        <TableToolbar
+          filters={
+            <>
+              <SearchInput
+                value={q.searchInput}
+                onChange={q.setSearchInput}
+                placeholder="Search by order ID or buyer..."
+                isFetching={q.isFetching}
+              />   
+              <FilterBar groups={filterGroups} />
+            </>
+          }
+        />
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -97,11 +147,22 @@ export function OrdersView() {
                 <th scope="col" className="px-4 py-2.5 font-medium">
                   Buyer
                 </th>
-                <SortableHeader label="Date" field="createdAt" sort={q.sort} onSort={q.toggleSort} />
+                <SortableHeader
+                  label="Date"
+                  field="createdAt"
+                  sort={q.sort}
+                  onSort={q.toggleSort}
+                />
                 <th scope="col" className="px-4 py-2.5 font-medium">
                   Status
                 </th>
-                <SortableHeader label="Total" field="totalAmount" sort={q.sort} onSort={q.toggleSort} align="right" />
+                <SortableHeader
+                  label="Total"
+                  field="totalAmount"
+                  sort={q.sort}
+                  onSort={q.toggleSort}
+                  align="right"
+                />
                 <th scope="col" className="px-4 py-2.5 text-right font-medium">
                   Actions
                 </th>
@@ -116,7 +177,9 @@ export function OrdersView() {
                 q.rows.map((order) => {
                   const expanded = expandedId === order.orderId;
                   const toggle = () =>
-                    setExpandedId((id) => (id === order.orderId ? null : order.orderId));
+                    setExpandedId((id) =>
+                      id === order.orderId ? null : order.orderId,
+                    );
 
                   return (
                     <Fragment key={order.orderId}>
@@ -160,7 +223,10 @@ export function OrdersView() {
                           {formatDate(order.createdAt)}
                         </td>
                         <td className="px-4 py-3">
-                          <StatusBadge label={order.status} variant={orderStatusVariant(order.status)} />
+                          <StatusBadge
+                            label={order.status}
+                            variant={orderStatusVariant(order.status)}
+                          />
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums text-foreground">
                           {formatPrice(order.totalAmount)}
@@ -189,7 +255,9 @@ export function OrdersView() {
                               Refund
                             </button>
                           ) : (
-                            <span className="text-xs text-muted-foreground">—</span>
+                            <span className="text-xs text-muted-foreground">
+                              —
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -210,10 +278,16 @@ export function OrdersView() {
                                       {item.bookTitleSnapshot}
                                     </span>
                                     <span className="flex items-center gap-4 tabular-nums text-muted-foreground">
-                                      <span>{formatPrice(item.priceSnapshot)}</span>
-                                      <span className="text-xs">× {item.quantity}</span>
+                                      <span>
+                                        {formatPrice(item.priceSnapshot)}
+                                      </span>
+                                      <span className="text-xs">
+                                        × {item.quantity}
+                                      </span>
                                       <span className="w-24 text-right font-medium text-foreground">
-                                        {formatPrice(item.priceSnapshot * item.quantity)}
+                                        {formatPrice(
+                                          item.priceSnapshot * item.quantity,
+                                        )}
                                       </span>
                                     </span>
                                   </li>
@@ -241,8 +315,11 @@ export function OrdersView() {
           pending?.action === "cancel" ? (
             <>
               Cancel order{" "}
-              <span className="font-medium text-foreground">#{pending?.order.orderId}</span>?
-              The buyer will be notified and the pending charge will be voided.
+              <span className="font-medium text-foreground">
+                #{pending?.order.orderId}
+              </span>
+              ? The buyer will be notified and the pending charge will be
+              voided.
             </>
           ) : (
             <>
@@ -251,8 +328,10 @@ export function OrdersView() {
                 {pending ? formatPrice(pending.order.totalAmount) : ""}
               </span>{" "}
               for order{" "}
-              <span className="font-medium text-foreground">#{pending?.order.orderId}</span>?
-              This marks the order as refunded in the system.
+              <span className="font-medium text-foreground">
+                #{pending?.order.orderId}
+              </span>
+              ? This marks the order as refunded in the system.
             </>
           )
         }
@@ -260,8 +339,8 @@ export function OrdersView() {
           isProcessing
             ? "Processing..."
             : pending?.action === "cancel"
-            ? "Cancel order"
-            : "Issue refund"
+              ? "Cancel order"
+              : "Issue refund"
         }
         destructive={pending?.action === "refund"}
         onCancel={() => setPending(null)}

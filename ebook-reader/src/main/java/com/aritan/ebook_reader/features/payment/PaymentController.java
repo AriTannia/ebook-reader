@@ -36,6 +36,7 @@ public class PaymentController {
         return ResponseEntity.ok(EBResponse.Success(response, PaymentMessage.PAYMENT_INITIATED_SUCCESSFULLY));
     }
 
+    // region VNPAY IPN handling
     @GetMapping("/payments/vnpay/callback")
     public ResponseEntity<Void> vnpayCallback(@RequestParam Map<String, String> params) {
         paymentService.handleCallback(PaymentProvider.VNPAY, params);
@@ -52,6 +53,23 @@ public class PaymentController {
         response.put("Message", "Confirm Success");
         return ResponseEntity.ok(response);
     }
+    // endregion
+
+    // region Momo IPN handling
+    @GetMapping("/payments/momo/callback")
+    public ResponseEntity<Void> momoCallback(@RequestParam Map<String, String> params) {
+        paymentService.handleCallback(PaymentProvider.MOMO, params);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("https://yourfrontend.com/payment-result?ref=" + params.get("orderId")))
+                .build();
+    }
+
+    @PostMapping("/payments/momo/ipn")
+    public ResponseEntity<Void> momoIpn(@RequestBody Map<String, String> params) {
+        paymentService.handleIpn(PaymentProvider.MOMO, params);
+        return ResponseEntity.noContent().build();
+    }
+    // endregion
 
     @GetMapping("/orders/me/{orderId}/payments")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")

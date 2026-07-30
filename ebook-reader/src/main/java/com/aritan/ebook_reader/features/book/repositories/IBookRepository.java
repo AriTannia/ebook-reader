@@ -1,4 +1,4 @@
-package com.aritan.ebook_reader.features.book;
+package com.aritan.ebook_reader.features.book.repositories;
 
 import com.aritan.ebook_reader.common.models.book.Book;
 import org.jspecify.annotations.NonNull;
@@ -8,13 +8,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-
-@Repository
 public interface IBookRepository extends
-        JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
+        JpaRepository<Book, Long>,
+        JpaSpecificationExecutor<Book>,
+        IBookRepositoryCustom {
     @EntityGraph(attributePaths = {
             "authors"
     })

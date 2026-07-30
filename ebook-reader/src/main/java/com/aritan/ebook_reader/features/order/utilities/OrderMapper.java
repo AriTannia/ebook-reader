@@ -9,13 +9,18 @@ import com.aritan.ebook_reader.features.order.dtos.OrderAdminResponse;
 import com.aritan.ebook_reader.features.order.dtos.OrderItemResponse;
 import com.aritan.ebook_reader.features.order.dtos.OrderResponse;
 import com.aritan.ebook_reader.features.order.dtos.OrderUserResponse;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
+    @Mapping(target = "remainingSeconds", ignore = true)
     OrderResponse toResponse(Order order);
 
     @Mapping(target = "bookId", source = "book.bookId")
@@ -23,12 +28,17 @@ public interface OrderMapper {
 
     @Mapping(target = "orderId", ignore = true)
     @Mapping(target = "items", source = "items")
-    @Mapping(target = "totalAmount", expression = "java(calculateTotalAmount(cart))")
+    @Mapping(target = "totalAmount", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "paidAt", ignore = true)
     Order toEntity(Cart cart);
+
+    @AfterMapping
+    default void setTotalAmount(Cart cart, @MappingTarget Order order){
+        order.setTotalAmount(calculateTotalAmount(cart));
+    }
 
     @Mapping(target = "orderItemId", ignore = true)
     @Mapping(target = "order", ignore = true)
@@ -54,5 +64,13 @@ public interface OrderMapper {
         response.setEmail(user.getEmail());
 
         return response;
+    }
+
+    @AfterMapping
+    default void setRemainingSeconds(Order order, @MappingTarget OrderResponse response) {
+        if (order.getPaymentExpiresAt() != null) {
+            long seconds = Duration.between(LocalDateTime.now(), order.getPaymentExpiresAt()).getSeconds();
+            response.setRemainingSeconds(Math.max(0, seconds));
+        }
     }
 }

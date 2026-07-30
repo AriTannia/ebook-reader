@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Component
 public class BookSpecification {
-    public static Specification<Book> hasAuthor(Set<Long> authorIds) {
+    public static Specification<Book> hasAuthors(Set<Long> authorIds) {
         return (root, query, cb) -> {
 
             if (authorIds == null || authorIds.isEmpty())
@@ -24,7 +24,7 @@ public class BookSpecification {
         };
     }
 
-    public static Specification<Book> hasCategory(Set<Long> categoryIds) {
+    public static Specification<Book> hasCategories(Set<Long> categoryIds) {
         return (root, query, cb) -> {
 
             if (categoryIds == null || categoryIds.isEmpty())
@@ -35,14 +35,14 @@ public class BookSpecification {
         };
     }
 
-    public static Specification<Book> hasStatus(BookStatus status) {
+    public static Specification<Book> hasStatuses(Set<BookStatus> statuses) {
         return (root, query, cb) -> {
 
-            if (status == null) {
+            if (statuses == null || statuses.isEmpty()) {
                 return cb.conjunction();
             }
 
-            return cb.equal(root.get("status"), status);
+            return root.get("status").in(statuses);
         };
     }
 
@@ -119,7 +119,7 @@ public class BookSpecification {
         };
     }
 
-    public static Specification<Book> hasTag(Set<UUID> tagIds) {
+    public static Specification<Book> hasTags(Set<UUID> tagIds) {
         return (root, query, cb) -> {
             if (tagIds == null || tagIds.isEmpty()) {
                 return cb.conjunction();

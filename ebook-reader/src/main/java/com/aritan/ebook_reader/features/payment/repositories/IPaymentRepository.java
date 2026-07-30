@@ -1,4 +1,4 @@
-package com.aritan.ebook_reader.features.payment;
+package com.aritan.ebook_reader.features.payment.repositories;
 
 import com.aritan.ebook_reader.common.models.payment.Payment;
 import org.jspecify.annotations.NonNull;

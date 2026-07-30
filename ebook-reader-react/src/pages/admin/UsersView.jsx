@@ -3,8 +3,13 @@ import { Trash2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
-import { useTableQuery } from "../../components/admin.ui/UseTableQuery";
-import { PageHeader, TableShell } from "../../components/admin.ui/PageHeader";
+import { useTableQuery } from "../../hooks/useTableQuery";
+import {
+  PageHeader,
+  TableShell,
+  TableToolbar,
+  SearchInput,
+} from "../../components/admin.ui/PageHeader";
 import { RolePill } from "../../components/admin.ui/book/Badges";
 import { Avatar } from "../../components/admin.ui/avatar/Avatar";
 import { ConfirmDialog } from "../../components/common/ConfirmDialog";
@@ -57,15 +62,19 @@ export function UsersView() {
 
   return (
     <>
-      <PageHeader
-        title="Users"
-        searchPlaceholder="Search by name or email"
-        searchValue={q.searchInput}
-        onSearchChange={q.setSearchInput}
-        isFetching={q.isFetching}
-      />
-
+      <PageHeader title="Users" />
       <TableShell>
+        <TableToolbar
+          filters={
+            <>
+              <SearchInput
+                value={q.searchInput}
+                onChange={q.setSearchInput}
+                placeholder="Search by name or email..."
+                isFetching={q.isFetching}
+              />
+            </>
+          } />
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -73,8 +82,18 @@ export function UsersView() {
                 <th scope="col" className="px-4 py-2.5 font-medium">
                   <span className="sr-only">Avatar</span>
                 </th>
-                <SortableHeader label="Full Name" field="fullName" sort={q.sort} onSort={q.toggleSort} />
-                <SortableHeader label="Email" field="email" sort={q.sort} onSort={q.toggleSort} />
+                <SortableHeader
+                  label="Full Name"
+                  field="fullName"
+                  sort={q.sort}
+                  onSort={q.toggleSort}
+                />
+                <SortableHeader
+                  label="Email"
+                  field="email"
+                  sort={q.sort}
+                  onSort={q.toggleSort}
+                />
                 <th scope="col" className="px-4 py-2.5 font-medium">
                   Roles
                 </th>
@@ -97,8 +116,12 @@ export function UsersView() {
                     <td className="px-4 py-3">
                       <Avatar src={user.avatarUrl} name={user.fullName} />
                     </td>
-                    <td className="px-4 py-3 font-medium text-foreground">{user.fullName}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
+                    <td className="px-4 py-3 font-medium text-foreground">
+                      {user.fullName}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {user.email}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {user.roles.map((role) => (
@@ -132,8 +155,10 @@ export function UsersView() {
         description={
           <>
             This permanently deletes{" "}
-            <span className="font-medium text-foreground">{target?.fullName}</span> and
-            all associated data. This action cannot be undone.
+            <span className="font-medium text-foreground">
+              {target?.fullName}
+            </span>{" "}
+            and all associated data. This action cannot be undone.
           </>
         }
         confirmLabel={isDeleting ? "Deleting..." : "Delete user"}

@@ -2,14 +2,12 @@ package com.aritan.ebook_reader.features.book.bookformat;
 
 import com.aritan.ebook_reader.common.constants.messages.book.BookFormatMessage;
 import com.aritan.ebook_reader.common.constants.messages.book.BookMessage;
-import com.aritan.ebook_reader.common.exception.InvalidRequestException;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.Book;
 import com.aritan.ebook_reader.common.models.book.BookFormat;
-import com.aritan.ebook_reader.features.book.IBookRepository;
+import com.aritan.ebook_reader.features.book.repositories.IBookRepository;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatCreateRequest;
 import com.aritan.ebook_reader.features.book.dtos.BookFormatResponse;
-import com.aritan.ebook_reader.features.book.dtos.BookFormatUpdateRequest;
 import com.aritan.ebook_reader.features.book.utilities.BookMapper;
 import com.aritan.ebook_reader.features.file.IFileService;
 import com.aritan.ebook_reader.features.library.readinghistory.IReadingProgressService;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

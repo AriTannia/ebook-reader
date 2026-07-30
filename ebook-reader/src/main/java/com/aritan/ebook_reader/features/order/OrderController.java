@@ -1,10 +1,12 @@
 package com.aritan.ebook_reader.features.order;
 
 import com.aritan.ebook_reader.common.constants.messages.order.OrderMessage;
+import com.aritan.ebook_reader.common.enums.order.OrderStatus;
 import com.aritan.ebook_reader.common.models.EBResponse;
 import com.aritan.ebook_reader.common.models.user.User;
 import com.aritan.ebook_reader.features.auth.IAuthService;
 import com.aritan.ebook_reader.features.order.dtos.OrderAdminResponse;
+import com.aritan.ebook_reader.features.order.dtos.OrderFilterRequest;
 import com.aritan.ebook_reader.features.order.dtos.OrderResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,10 +36,12 @@ public class OrderController {
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<Page<OrderResponse>>> getMyOrders(Pageable pageable) {
+    public ResponseEntity<EBResponse<Page<OrderResponse>>> getMyOrders(
+            OrderFilterRequest request,
+            Pageable pageable) {
         User user = authService.getCurrentUser();
-        var result = orderService.getMyOrders(user.getUserId(), pageable);
 
+        var result = orderService.getMyOrders(user.getUserId(), request, pageable);
         return ResponseEntity.ok(EBResponse.Success(result, OrderMessage.ORDER_RETRIEVED_SUCCESSFULLY));
     }
 
@@ -60,8 +66,9 @@ public class OrderController {
     // Admin
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EBResponse<Page<OrderAdminResponse>>> getAllOrders(Pageable pageable) {
-        var result = orderService.getAllOrders(pageable);
+    public ResponseEntity<EBResponse<Page<OrderAdminResponse>>> getAllOrders(
+            OrderFilterRequest request, Pageable pageable) {
+        var result = orderService.getAllOrders(request, pageable);
 
         return ResponseEntity.ok(EBResponse.Success(result, OrderMessage.ORDER_RETRIEVED_SUCCESSFULLY));
     }

@@ -14,7 +14,10 @@ import { getMyOrderById } from "../reducers/order";
 import { getPaymentsByOrderId, createPaymentIntent } from "../reducers/payment";
 
 function formatPrice(value) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(value);
 }
 
 function formatDate(value) {
@@ -26,6 +29,13 @@ function formatDate(value) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
+}
+
+function formatCountdown(seconds) {
+  if (seconds == null) return "—";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
 const ORDER_STATUS_CONFIG = {
@@ -41,6 +51,11 @@ const ORDER_STATUS_CONFIG = {
   },
   FAILED: {
     label: "Failed",
+    icon: XCircle,
+    badgeClass: "bg-destructive/10 text-destructive",
+  },
+  EXPIRED: {
+    label: "Expired",
     icon: XCircle,
     badgeClass: "bg-destructive/10 text-destructive",
   },
@@ -77,7 +92,6 @@ const PAYMENT_STATUS_CONFIG = {
 const PAYMENT_PROVIDER_LABEL = {
   VNPAY: "VNPay",
   MOMO: "MoMo",
-  COD: "Cash on Delivery",
 };
 
 const PAYMENT_METHODS = [
@@ -101,12 +115,6 @@ const PAYMENT_METHODS = [
       </span>
     ),
   },
-  {
-    provider: "COD",
-    label: "Cash on Delivery",
-    description: "Pay when you receive",
-    icon: <Wallet className="size-4 text-emerald-600" />,
-  },
 ];
 
 function StatusBadge({ config }) {
@@ -125,11 +133,12 @@ export default function OrderDetail() {
   const { orderId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
- 
+
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState(null);
- 
+  const [remainingSeconds, setRemainingSeconds] = useState(null);
+
   const {
     order,
     loading: orderLoading,
@@ -140,40 +149,43 @@ export default function OrderDetail() {
     loading: paymentLoading,
     error: paymentError,
   } = useSelector((state) => state.payment);
- 
+
   useEffect(() => {
     if (orderId) {
       dispatch(getMyOrderById(orderId));
       dispatch(getPaymentsByOrderId(orderId));
     }
   }, [dispatch, orderId]);
- 
+
   const loading = orderLoading || paymentLoading;
   const error = orderError || paymentError;
- 
+
   const latestPayment =
     payments && payments.length > 0
       ? [...payments].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         )[0]
       : null;
- 
+
   // Pre-select the provider from the last payment attempt so user can retry or switch
   useEffect(() => {
     if (latestPayment?.provider && !selectedProvider) {
       setSelectedProvider(latestPayment.provider);
     }
   }, [latestPayment]);
- 
+
   const handleCompletePayment = async () => {
     if (!selectedProvider) return;
     setPaying(true);
     setPayError(null);
     try {
       const result = await dispatch(
-        createPaymentIntent({ orderId: order.orderId, provider: selectedProvider }),
+        createPaymentIntent({
+          orderId: order.orderId,
+          provider: selectedProvider,
+        }),
       ).unwrap();
- 
+
       // If the provider returns a redirect URL (e.g. VNPay, MoMo), navigate there
       if (result?.paymentUrl) {
         window.location.href = result.paymentUrl;
@@ -190,7 +202,30 @@ export default function OrderDetail() {
       setPaying(false);
     }
   };
- 
+
+  useEffect(() => {
+    if (order?.remainingSeconds != null) {
+      setRemainingSeconds(order.remainingSeconds);
+    }
+  }, [order?.remainingSeconds]);
+
+  useEffect(() => {
+    if (remainingSeconds != null && remainingSeconds > 0) {
+      const interval = setInterval(() => {
+        setRemainingSeconds((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            dispatch(getMyOrderById(orderId));
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [remainingSeconds, dispatch, orderId]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -200,7 +235,7 @@ export default function OrderDetail() {
       </div>
     );
   }
- 
+
   if (error) {
     return (
       <div className="min-h-full bg-background flex items-center justify-center px-4">
@@ -210,9 +245,9 @@ export default function OrderDetail() {
       </div>
     );
   }
- 
+
   if (!order) return null;
- 
+
   const items = order.items || [];
   const orderStatusConfig =
     ORDER_STATUS_CONFIG[order.status] || ORDER_STATUS_CONFIG.PENDING;
@@ -220,9 +255,11 @@ export default function OrderDetail() {
     ? PAYMENT_STATUS_CONFIG[latestPayment.status] ||
       PAYMENT_STATUS_CONFIG.PENDING
     : null;
-  const canRetryPayment =
-    order.status === "PENDING" || order.status === "FAILED";
- 
+  const canRetryPayment = order.status === "PENDING" && remainingSeconds > 0;
+  const isExpired =
+    order.status === "EXPIRED" ||
+    (order.status === "PENDING" && remainingSeconds === 0);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-lg px-4 py-10 sm:px-6">
@@ -234,7 +271,7 @@ export default function OrderDetail() {
           <ArrowLeft className="size-4" aria-hidden="true" />
           Back to orders
         </Link>
- 
+
         {/* Order meta */}
         <div className="mb-6 flex flex-wrap items-start justify-between gap-2 animate-fade-in-up">
           <div>
@@ -254,7 +291,7 @@ export default function OrderDetail() {
             </p>
           </div>
         </div>
- 
+
         {/* Order summary */}
         <div className="rounded-2xl border border-border bg-muted/30 overflow-hidden mb-4 animate-fade-in-up">
           <div className="flex items-center justify-between border-b border-border bg-muted/50 px-5 py-3">
@@ -263,7 +300,7 @@ export default function OrderDetail() {
             </span>
             <StatusBadge config={orderStatusConfig} />
           </div>
- 
+
           <ul role="list" className="divide-y divide-border">
             {items.map((item) => (
               <li
@@ -284,7 +321,7 @@ export default function OrderDetail() {
               </li>
             ))}
           </ul>
- 
+
           <div className="flex items-center justify-between border-t border-border bg-muted/50 px-5 py-4">
             <span className="text-sm font-medium text-muted-foreground">
               Total
@@ -294,7 +331,7 @@ export default function OrderDetail() {
             </span>
           </div>
         </div>
- 
+
         {/* Payment info */}
         {latestPayment && (
           <div className="rounded-2xl border border-border bg-card p-5 mb-4 animate-fade-in-up">
@@ -307,7 +344,7 @@ export default function OrderDetail() {
                 Payment information
               </p>
             </div>
- 
+
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Method</span>
@@ -316,19 +353,19 @@ export default function OrderDetail() {
                     latestPayment.provider}
                 </span>
               </div>
- 
+
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Status</span>
                 <StatusBadge config={paymentStatusConfig} />
               </div>
- 
+
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Amount</span>
                 <span className="text-sm font-medium text-foreground tabular-nums">
                   {formatPrice(latestPayment.amount)}
                 </span>
               </div>
- 
+
               {latestPayment.providerTransactionId && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
@@ -339,7 +376,7 @@ export default function OrderDetail() {
                   </span>
                 </div>
               )}
- 
+
               {latestPayment.completedAt && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
@@ -353,24 +390,29 @@ export default function OrderDetail() {
             </div>
           </div>
         )}
- 
+
         {/* Payment method selection + action */}
         {canRetryPayment && (
           <div className="rounded-2xl border border-border bg-card p-5 animate-fade-in-up">
             <div className="mb-4 flex items-center gap-2">
-              <CreditCard
-                className="size-4 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <p className="text-sm font-semibold text-foreground">
-                Complete your payment
-              </p>
+              <div className="flex items-center gap-2">
+                <CreditCard
+                  className="size-4 text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <p className="text-sm font-semibold text-foreground">
+                  Complete your payment
+                </p>
+              </div>
+              <span className="text-xs font-mono text-destructive tabular-nums">
+                {formatCountdown(remainingSeconds)}
+              </span>
             </div>
- 
+
             <p className="mb-3 text-xs text-muted-foreground">
               Choose a payment method to finish this order.
             </p>
- 
+
             {/* Method picker */}
             <div className="space-y-2 mb-4">
               {PAYMENT_METHODS.map((method) => {
@@ -393,7 +435,7 @@ export default function OrderDetail() {
                     <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-border bg-background">
                       {method.icon}
                     </span>
- 
+
                     {/* Labels */}
                     <span className="flex-1 min-w-0">
                       <span className="block text-sm font-medium text-foreground">
@@ -403,7 +445,7 @@ export default function OrderDetail() {
                         {method.description}
                       </span>
                     </span>
- 
+
                     {/* Radio indicator */}
                     <span
                       className={`size-4 shrink-0 rounded-full border-2 transition-colors ${
@@ -421,14 +463,34 @@ export default function OrderDetail() {
                 );
               })}
             </div>
- 
+
             {/* Error */}
             {payError && (
               <p className="mb-3 rounded-lg bg-destructive/10 border border-border px-3 py-2 text-xs text-destructive">
                 {payError}
               </p>
             )}
- 
+
+            {/* Expired */}
+            {isExpired && (
+              <div className="rounded-2xl border border-border bg-muted/30 p-5 text-center animate-fade-in-up">
+                <XCircle
+                  className="mx-auto mb-2 size-6 text-destructive"
+                  aria-hidden="true"
+                />
+                <p className="text-sm text-muted-foreground">
+                  This order has expired. Please add the items to your cart
+                  again to reorder.
+                </p>
+                <Link
+                  to="/cart"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                >
+                  Go to cart
+                </Link>
+              </div>
+            )}
+
             {/* Submit */}
             <button
               type="button"

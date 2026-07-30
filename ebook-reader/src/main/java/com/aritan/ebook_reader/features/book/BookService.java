@@ -1,27 +1,24 @@
 package com.aritan.ebook_reader.features.book;
 
-import com.aritan.ebook_reader.common.constants.messages.book.AuthorMessage;
 import com.aritan.ebook_reader.common.constants.messages.book.BookMessage;
-import com.aritan.ebook_reader.common.constants.messages.book.CategoryMessage;
-import com.aritan.ebook_reader.common.constants.messages.book.PublisherMessage;
 import com.aritan.ebook_reader.common.enums.book.BookBadge;
 import com.aritan.ebook_reader.common.enums.book.BookStatus;
+import com.aritan.ebook_reader.common.enums.order.OrderStatus;
 import com.aritan.ebook_reader.common.enums.outbox.FileSourceType;
 import com.aritan.ebook_reader.common.exception.ResourceNotFoundException;
 import com.aritan.ebook_reader.common.models.book.*;
 import com.aritan.ebook_reader.common.models.outbox.FileDeletionOutbox;
 import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
-import com.aritan.ebook_reader.features.author.IAuthorRepository;
 import com.aritan.ebook_reader.features.book.dtos.*;
 import com.aritan.ebook_reader.features.book.factory.BookFactory;
+import com.aritan.ebook_reader.features.book.repositories.IBookRepository;
 import com.aritan.ebook_reader.features.book.resolver.BookReferenceResolver;
 import com.aritan.ebook_reader.features.book.utilities.BookSpecification;
 import com.aritan.ebook_reader.features.book.utilities.BookMapper;
-import com.aritan.ebook_reader.features.category.ICategoryRepository;
 import com.aritan.ebook_reader.features.file.IFileDeletionOutboxRepository;
 import com.aritan.ebook_reader.features.file.IFileService;
 import com.aritan.ebook_reader.features.library.IUserLibraryRepository;
-import com.aritan.ebook_reader.features.publisher.IPublisherRepository;
+import com.aritan.ebook_reader.features.order.repositories.IOrderRepository;
 import com.aritan.ebook_reader.features.review.IReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -43,6 +40,7 @@ public class BookService implements IBookService{
     private final IBookRepository bookRepository;
     private final IUserLibraryRepository userLibraryRepository;
     private final IReviewRepository reviewRepository;
+    private final IOrderRepository orderRepository;
     private final IFileDeletionOutboxRepository fileDeletionOutboxRepository;
     private final BookReferenceResolver referenceResolver;
     private final BookFactory bookFactory;
@@ -56,14 +54,16 @@ public class BookService implements IBookService{
             BookFilterRequest request,
             Pageable pageable,
             BookBadge badge) {
+        Set<BookStatus> statuses = new HashSet<>();
+        statuses.add(BookStatus.ACTIVE);
         Specification<Book> spec = Specification
-                .where(BookSpecification.hasAuthor(request.getAuthorIds()))
-                .and(BookSpecification.hasCategory(request.getCategoryIds()))
-                .and(BookSpecification.hasStatus(BookStatus.ACTIVE))
+                .where(BookSpecification.hasAuthors(request.getAuthorIds()))
+                .and(BookSpecification.hasCategories(request.getCategoryIds()))
+                .and(BookSpecification.hasStatuses(statuses))
                 .and(BookSpecification.hasPublisher(request.getPublisherId()))
                 .and(BookSpecification.hasKeyword(request.getKeyword()))
                 .and(BookSpecification.hasBadge(badge))
-                .and(BookSpecification.hasTag(request.getTagIds()));
+                .and(BookSpecification.hasTags(request.getTagIds()));
 
         Page<Book> books = bookRepository.findAll(spec, pageable);
 
@@ -78,13 +78,16 @@ public class BookService implements IBookService{
     public Page<BookResponse> getPagedBooks(
             BookFilterRequest request,
             Pageable pageable) {
+        Set<BookStatus> statuses = new HashSet<>();
+        statuses.add(BookStatus.ACTIVE);
+
         Specification<Book> spec = Specification
-                .where(BookSpecification.hasAuthor(request.getAuthorIds()))
-                .and(BookSpecification.hasCategory(request.getCategoryIds()))
-                .and(BookSpecification.hasStatus(BookStatus.ACTIVE))
+                .where(BookSpecification.hasAuthors(request.getAuthorIds()))
+                .and(BookSpecification.hasCategories(request.getCategoryIds()))
+                .and(BookSpecification.hasStatuses(statuses))
                 .and(BookSpecification.hasPublisher(request.getPublisherId()))
                 .and(BookSpecification.hasKeyword(request.getKeyword()))
-                .and(BookSpecification.hasTag(request.getTagIds()));
+                .and(BookSpecification.hasTags(request.getTagIds()));
 
         Page<Book> books = bookRepository.findAll(spec, pageable);
 
@@ -96,16 +99,17 @@ public class BookService implements IBookService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<BookAdminResponse> searchBooks(BookFilterRequest request, Pageable pageable, BookBadge badge) {
         Specification<Book> spec = Specification
-                .where(BookSpecification.hasAuthor(request.getAuthorIds()))
-                .and(BookSpecification.hasCategory(request.getCategoryIds()))
-                .and(BookSpecification.hasStatus(request.getStatus()))
+                .where(BookSpecification.hasAuthors(request.getAuthorIds()))
+                .and(BookSpecification.hasCategories(request.getCategoryIds()))
+                .and(BookSpecification.hasStatuses(request.getStatuses()))
                 .and(BookSpecification.hasPublisher(request.getPublisherId()))
                 .and(BookSpecification.hasKeyword(request.getKeyword()))
                 .and(BookSpecification.hasBadge(badge));
 
-        Page<Book> books = bookRepository.findAll(spec, pageable);
+        Page<Book> books = bookRepository.findAllBooksForAdmin(spec, pageable);
 
         return books.map(book -> {
             BookAdminResponse response = bookMapper.toAdminResponse(book);
@@ -123,11 +127,16 @@ public class BookService implements IBookService{
 
         boolean existedInLibrary = userLibraryRepository.existsByUser_UserIdAndBook_BookId(userId, bookId);
         boolean existedUserReview = reviewRepository.existsByUser_UserIdAndBook_BookId(userId, bookId);
+        boolean isPendingOrder = orderRepository.existsByItems_Book_BookIdAndUser_UserIdAndStatus(
+                bookId,
+                userId,
+                OrderStatus.PENDING);
 
         BookDetailsResponse response = bookMapper.toDetailsResponse(book);
         response.setCoverImageUrl(storageUrlExtension.getPublicUrl(book.getCoverImageUrl()));
         response.setExistedInLibrary(existedInLibrary);
         response.setExistedUserReview(existedUserReview);
+        response.setPendingOrder(isPendingOrder);
         return response;
     }
 

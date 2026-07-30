@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronUp,
   BookOpen,
+  RotateCcw,
   Tag,
 } from "lucide-react";
 import RatingSummary from "../components/review/RatingSummary";
@@ -275,6 +276,11 @@ export default function BookDetails() {
                     return;
                   }
 
+                  if (book.pendingOrder) {
+                    navigate(`/orders`);
+                    return;
+                  }
+
                   handleAddToCart();
                 }}
                 disabled={
@@ -292,6 +298,11 @@ export default function BookDetails() {
                   <>
                     <BookOpen className="h-5 w-5" />
                     Read in Library
+                  </>
+                ) : book.pendingOrder ? (
+                  <>
+                    <RotateCcw className="h-5 w-5" />
+                    Continue Payment
                   </>
                 ) : isInCart ? (
                   <>

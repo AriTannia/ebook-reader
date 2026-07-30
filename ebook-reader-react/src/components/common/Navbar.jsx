@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, User, LogOut, Search, ShoppingCart, LayoutDashboard } from "lucide-react";
+import { BookOpen, User, LogOut, Search, ShoppingBag, ShoppingCart, LayoutDashboard } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../reducers/auth";
 
@@ -52,6 +52,14 @@ export default function Navbar() {
     }
   };
 
+  const handleMyOrdersClick = () => {
+    if (isLoggedIn) {
+      navigate("/orders");
+    } else {
+      navigate("/login");
+    }
+  };
+
   // Derive initials for the avatar placeholder
   const initials = currentUser?.fullName
     ? currentUser.fullName
@@ -62,15 +70,6 @@ export default function Navbar() {
         .join("")
         .toUpperCase()
     : "";
-
-  useEffect(() => {
-    console.log(
-      "Trạng thái đăng nhập thay đổi! isLoggedIn =",
-      isLoggedIn,
-      "User =",
-      currentUser,
-    );
-  }, [isLoggedIn, currentUser]);
 
   const hasUser =
     isLoggedIn && currentUser && Object.keys(currentUser).length > 0;
@@ -176,6 +175,16 @@ export default function Navbar() {
                     <LayoutDashboard className="h-4 w-4 shrink-0 text-muted-foreground" />
                     Dashboard
                   </button>
+
+                  <Link
+                    to="/orders"
+                    role="menuitem"
+                    onClick={handleMyOrdersClick}
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <ShoppingBag className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    My Orders
+                  </Link>
 
                   <button
                     role="menuitem"

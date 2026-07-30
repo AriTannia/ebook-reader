@@ -63,11 +63,10 @@ export const fetchBookDetails = createAsyncThunk(
 
 export const fetchBooksForAdmin = createAsyncThunk(
   "book/fetchBooksForAdmin",
-  async ({ filters = {}, badge = null }, thunkAPI) => {
+  async (filters = {}, thunkAPI) => {
     try {
       const response = await BookService.getAllBooksForAdmin(
-        { ...filters },
-        badge,
+        filters
       );
 
       return {

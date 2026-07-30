@@ -44,6 +44,9 @@ public class Order {
     @Column(name = OrderTableConstant.TOTAL_AMOUNT, nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
+    @Column(name = OrderTableConstant.PAYMENT_EXPIRES_AT)
+    private LocalDateTime paymentExpiresAt;
+
     @CreatedDate
     @Column(name = OrderTableConstant.CREATED_AT, updatable = false, nullable = false)
     private LocalDateTime createdAt;

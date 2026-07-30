@@ -16,4 +16,8 @@ public class PaymentMessage {
     public static final String PAYMENT_GATEWAY_NOT_FOUND = "Payment gateway not found for provider: %s";
     public static final String PAYMENT_NOT_FOUND_WITH_ID = "Payment not found with ID: %d";
     public static final String UNSUPPORTED_PAYMENT_PROVIDER = "Unsupported payment provider: %s";
+    public static final String PAYMENT_MOMO_INITIATED_FAILED = "Failed to initiate Momo payment";
+    public static final String ERROR_CALL_PAYMENT_GATEWAY = "Error occurred while calling payment gateway";
+    public static final String ORDER_NOT_PENDING = "Order with ID %d is not in PENDING status, current status: %s";
+    public static final String ORDER_PAYMENT_EXPIRED = "Order with ID %d has expired payment";
 }
