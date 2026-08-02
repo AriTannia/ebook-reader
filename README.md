@@ -12,7 +12,6 @@
   <a href="#-what-can-it-do"><strong>Features</strong></a> ·
   <a href="#-how-it-works"><strong>How it Works</strong></a> ·
   <a href="#-architecture"><strong>Architecture</strong></a> ·
-  <a href="#-getting-started"><strong>Getting Started</strong></a> ·
   <a href="#-api-reference"><strong>API Docs</strong></a>
 </p>
 
@@ -133,24 +132,27 @@ A user's typical journey through the platform:
 The backend follows a **layered architecture** with clear separation of concerns. Each feature is organized as a **vertical slice** — grouping its controller, service, repository, DTOs, and utilities together.
 
 ```mermaid
-flowchart TD
-    Client(["🖥️ Client Applications\nWeb App · Mobile · Admin Panel"])
+flowchart LR
+    Client(["🖥️ Client Applications"])
 
     Client -- "HTTPS / REST API" --> Security
 
     subgraph app ["🍃 Spring Boot Application"]
+        direction TB
         Security["🔒 Security\nJWT Filter"]
-        Controllers["📡 Controllers\nREST API"]
-        OpenAPI["📘 Swagger / OpenAPI"]
+        Controllers["📡 Controllers"]
         Services["⚙️ Services\nBusiness Logic"]
-        Repos["🗃️ Repositories\nJPA / SQL"]
-        S3["☁️ S3 Storage"]
-        Payment["💳 Payment Gateway\nVNPay · MoMo (mock)"]
-        Scheduler["⏰ Background Jobs\nEmail · File Cleanup · Order Expiration"]
-        DB[("🐘 PostgreSQL\nSupabase")]
+
+        subgraph infra ["Infrastructure"]
+            direction TB
+            Repos["🗃️ Repositories\nJPA / SQL"]
+            S3["☁️ S3 Storage"]
+            Payment["💳 Payment Gateway\nVNPay · MoMo"]
+            Scheduler["⏰ Background Jobs"]
+            DB[("🐘 PostgreSQL")]
+        end
 
         Security --> Controllers
-        Controllers --> OpenAPI
         Controllers --> Services
         Services --> Repos
         Services --> S3
