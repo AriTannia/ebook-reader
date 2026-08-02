@@ -1,4 +1,4 @@
-<![CDATA[<p align="center">
+<p align="center">
   <img src="https://img.icons8.com/3d-fluency/94/open-book--v1.png" alt="Ebook Reader Logo" width="80"/>
 </p>
 
@@ -835,4 +835,3 @@ Project Link: [github.com/AriTannia/ebook-reader](https://github.com/AriTannia/e
 <p align="center">
   <sub>If you found this project useful, consider giving it a ⭐</sub>
 </p>
-]]>
