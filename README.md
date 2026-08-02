@@ -73,7 +73,6 @@ A familiar e-commerce experience — add books to a cart, proceed to checkout, a
 |---|---|---|
 | **VNPay** | 🧪 Mock | Vietnam's leading payment gateway |
 | **MoMo** | 🧪 Mock | Popular Vietnamese e-wallet |
-| **Stripe** | 🔧 Planned | International card payments |
 
 - Secure webhook handling (IPN) for asynchronous payment confirmation
 - **Idempotent processing** — duplicate payment notifications are safely ignored
@@ -118,26 +117,12 @@ Transactional email system for critical user communications.
 
 ## 🔄 How It Works
 
-Here's the typical user journey through the platform:
+A user's typical journey through the platform:
 
-```mermaid
-flowchart LR
-    A(["🔍 Discover"]) --> B(["🛒 Shop"])
-    B --> C(["💳 Pay"])
-    C --> D(["📖 Read"])
-
-    A -. "Filter by category,\nauthor, tag" .-> A
-    B -. "Price locked\nat checkout" .-> B
-    C -. "VNPay / MoMo\n(mock flow)" .-> C
-    D -. "Progress synced\nacross devices" .-> D
-
-    subgraph behind ["⚙️ Behind the Scenes"]
-        E["JWT auth cookies\n(secure & stateless)"]
-        F["Outbox Pattern\n(emails & file cleanup)"]
-        G["Idempotent webhooks\n(no duplicate payments)"]
-        H["Background jobs\n(auto-expire orders @ 15 min)"]
-    end
-```
+1. **Discover** — Browse the book catalog, filter by category, author, publisher, or tag.
+2. **Shop** — Add books to the cart. The price is locked in at the time of checkout.
+3. **Pay** — Initiate a payment via VNPay or MoMo. The system handles redirects and webhook confirmation idempotently.
+4. **Read** — After payment is confirmed, the book appears in the user's personal library, ready to open. Reading progress is saved and synced across devices.
 
 ---
 
@@ -156,12 +141,13 @@ flowchart TD
     subgraph app ["🍃 Spring Boot Application"]
         Security["🔒 Security\nJWT Filter"]
         Controllers["📡 Controllers\nREST API"]
-        OpenAPI["📘 Swagger / OpenAPI\nDocumentation"]
+        OpenAPI["📘 Swagger / OpenAPI"]
         Services["⚙️ Services\nBusiness Logic"]
         Repos["🗃️ Repositories\nJPA / SQL"]
-        S3["☁️ S3 Storage\nSupabase"]
+        S3["☁️ S3 Storage"]
         Payment["💳 Payment Gateway\nVNPay · MoMo (mock)"]
-        Scheduler["⏰ Background Jobs\n📧 Email · 🗑️ File Cleanup\n⏰ Order Expiration · 🧹 Outbox"]
+        Scheduler["⏰ Background Jobs\nEmail · File Cleanup · Order Expiration"]
+        DB[("🐘 PostgreSQL\nSupabase")]
 
         Security --> Controllers
         Controllers --> OpenAPI
@@ -170,9 +156,8 @@ flowchart TD
         Services --> S3
         Services --> Payment
         Repos --> Scheduler
+        Repos --> DB
     end
-
-    Repos --> DB[("🐘 PostgreSQL\nSupabase")]
 ```
 
 ### Feature Modules
@@ -223,7 +208,6 @@ Each feature is self-contained with its own controller, service, repository, DTO
 <tr><td align="center" width="120"><img src="https://img.icons8.com/color/48/java-coffee-cup-logo--v1.png" width="36"/><br/><b>Java 25</b></td>
 <td align="center" width="120"><img src="https://img.icons8.com/color/48/spring-logo.png" width="36"/><br/><b>Spring Boot 4.1</b></td>
 <td align="center" width="120"><img src="https://img.icons8.com/color/48/postgreesql.png" width="36"/><br/><b>PostgreSQL</b></td>
-<td align="center" width="120"><img src="https://img.icons8.com/color/48/docker.png" width="36"/><br/><b>Docker</b></td>
 <td align="center" width="120"><img src="https://img.icons8.com/color/48/amazon-s3.png" width="36"/><br/><b>AWS S3</b></td></tr>
 </table>
 
@@ -240,52 +224,6 @@ Each feature is self-contained with its own controller, service, repository, DTO
 | **Email** | Spring Mail + Thymeleaf | Transactional email templates |
 | **API Docs** | SpringDoc OpenAPI 2.8.9 | Auto-generated Swagger documentation |
 | **Build** | Maven 3.9 (wrapper included) | Dependency management & build |
-| **Deploy** | Docker (multi-stage build) | Containerized deployment |
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-| Tool | Version | Why |
-|---|---|---|
-| Java JDK | 25+ | The application runtime |
-| Maven | 3.9+ | Build tool (or use the included `./mvnw` wrapper) |
-| PostgreSQL | 16+ | The database |
-| Docker | 24+ | *(Optional)* For containerized deployment |
-
-### Quick Start
-
-**1. Clone the repository**
-
-```bash
-git clone https://github.com/AriTannia/ebook-reader.git
-cd ebook-reader
-```
-
-**2. Set up environment variables**
-
-Create a `.env` file in the project root with the required configuration (database URL, JWT secret, S3 credentials, mail settings, etc.).
-
-**3. Run the application**
-
-```bash
-# Using Maven Wrapper (no Maven installation needed)
-./mvnw spring-boot:run
-
-# Or using Docker
-docker build -t ebook-reader .
-docker run -p 8080:8080 --env-file .env ebook-reader
-```
-
-**4. Explore the API**
-
-| What | URL |
-|---|---|
-| 🌐 API Base | `http://localhost:8080/api/v1` |
-| 📘 Swagger UI | `http://localhost:8080/swagger-ui.html` |
-| 📋 OpenAPI Spec | `http://localhost:8080/v3/api-docs` |
 
 ---
 
@@ -568,12 +506,6 @@ ebook-reader/
 ├── pom.xml                       # Maven dependencies
 └── .env                          # Environment variables (git-ignored)
 ```
-
-
-
----
-
-
 
 ---
 
