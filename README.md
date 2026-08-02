@@ -20,7 +20,6 @@
   <img src="https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white" alt="Java 25"/>
   <img src="https://img.shields.io/badge/Spring%20Boot-4.1-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot 4.1"/>
   <img src="https://img.shields.io/badge/PostgreSQL-336791?logo=postgresql&logoColor=white" alt="PostgreSQL"/>
-  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white" alt="Docker"/>
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License MIT"/>
 </p>
 
@@ -68,12 +67,12 @@ A familiar e-commerce experience — add books to a cart, proceed to checkout, a
 
 ### 💳 Payment Processing
 
-Integrated with **real Vietnamese payment gateways** so users can pay with the methods they already use.
+> ⚠️ **Note:** Payment integration is currently **simulated (mock)**. VNPay and MoMo flows implement the correct API contracts and webhook handling, but are **not connected to real payment systems**. This is intended for learning and demonstration purposes only.
 
 | Provider | Status | Description |
 |---|---|---|
-| **VNPay** | ✅ Integrated | Vietnam's leading payment gateway |
-| **MoMo** | ✅ Integrated | Popular Vietnamese e-wallet |
+| **VNPay** | 🧪 Mock | Vietnam's leading payment gateway |
+| **MoMo** | 🧪 Mock | Popular Vietnamese e-wallet |
 | **Stripe** | 🔧 Planned | International card payments |
 
 - Secure webhook handling (IPN) for asynchronous payment confirmation
@@ -121,32 +120,23 @@ Transactional email system for critical user communications.
 
 Here's the typical user journey through the platform:
 
-```
-  ┌─────────────────────────────────────────────────────────────────────┐
-  │                        USER JOURNEY                                 │
-  ├─────────────────────────────────────────────────────────────────────┤
-  │                                                                     │
-  │  1. DISCOVER        2. SHOP            3. PAY           4. READ    │
-  │  ┌──────────┐      ┌──────────┐      ┌──────────┐    ┌──────────┐ │
-  │  │ Browse   │ ───▶ │ Add to   │ ───▶ │ Checkout │──▶ │ Open in  │ │
-  │  │ Catalog  │      │ Cart     │      │ & Pay    │    │ Reader   │ │
-  │  └──────────┘      └──────────┘      └──────────┘    └──────────┘ │
-  │       │                                    │               │       │
-  │       ▼                                    ▼               ▼       │
-  │  Filter by          Price locked      VNPay / MoMo     Progress   │
-  │  category,          at checkout       payment flow     synced     │
-  │  author, tag                                           across     │
-  │                                                        devices    │
-  │                                                                    │
-  │  ┌──────────────────────────────────────────────────────────────┐  │
-  │  │                    BEHIND THE SCENES                         │  │
-  │  ├──────────────────────────────────────────────────────────────┤  │
-  │  │  • JWT auth cookies keep sessions secure & stateless        │  │
-  │  │  • Outbox pattern ensures emails & file cleanup never fail  │  │
-  │  │  • Idempotent webhooks prevent duplicate payments           │  │
-  │  │  • Background jobs auto-expire unpaid orders (15 min)       │  │
-  │  └──────────────────────────────────────────────────────────────┘  │
-  └─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    A(["🔍 Discover"]) --> B(["🛒 Shop"])
+    B --> C(["💳 Pay"])
+    C --> D(["📖 Read"])
+
+    A -. "Filter by category,\nauthor, tag" .-> A
+    B -. "Price locked\nat checkout" .-> B
+    C -. "VNPay / MoMo\n(mock flow)" .-> C
+    D -. "Progress synced\nacross devices" .-> D
+
+    subgraph behind ["⚙️ Behind the Scenes"]
+        E["JWT auth cookies\n(secure & stateless)"]
+        F["Outbox Pattern\n(emails & file cleanup)"]
+        G["Idempotent webhooks\n(no duplicate payments)"]
+        H["Background jobs\n(auto-expire orders @ 15 min)"]
+    end
 ```
 
 ---
@@ -157,44 +147,32 @@ Here's the typical user journey through the platform:
 
 The backend follows a **layered architecture** with clear separation of concerns. Each feature is organized as a **vertical slice** — grouping its controller, service, repository, DTOs, and utilities together.
 
-```
-┌───────────────────────────────────────────────────────────────────┐
-│                        CLIENT APPLICATIONS                        │
-│                  (Web App, Mobile App, Admin Panel)                │
-└──────────────────────────────┬────────────────────────────────────┘
-                               │ HTTPS / REST API
-                               ▼
-┌───────────────────────────────────────────────────────────────────┐
-│                     SPRING BOOT APPLICATION                       │
-│                                                                   │
-│  ┌─────────────┐   ┌──────────────┐   ┌───────────────────────┐  │
-│  │  Security   │   │  Controllers │   │   Swagger / OpenAPI   │  │
-│  │  JWT Filter │──▶│  (REST API)  │──▶│   Documentation       │  │
-│  └─────────────┘   └──────┬───────┘   └───────────────────────┘  │
-│                           │                                       │
-│                    ┌──────▼───────┐                               │
-│                    │   Services   │  ◄── Business Logic           │
-│                    └──────┬───────┘                               │
-│                           │                                       │
-│          ┌────────────────┼────────────────┐                     │
-│          ▼                ▼                ▼                      │
-│  ┌──────────────┐ ┌─────────────┐ ┌────────────────┐            │
-│  │ Repositories │ │  S3 Storage │ │ Payment Gateway│            │
-│  │ (JPA / SQL)  │ │  (Supabase) │ │ (VNPay, MoMo) │            │
-│  └──────┬───────┘ └─────────────┘ └────────────────┘            │
-│         │                                                        │
-│  ┌──────▼───────────────────────────────────────────────┐        │
-│  │              Background Job Scheduler                 │        │
-│  │  📧 Email dispatch  · 🗑️ File cleanup                 │        │
-│  │  ⏰ Order expiration · 🧹 Outbox cleanup              │        │
-│  └──────────────────────────────────────────────────────┘        │
-└──────────────────────────────┬────────────────────────────────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │    PostgreSQL        │
-                    │    (Supabase)        │
-                    └─────────────────────┘
+```mermaid
+flowchart TD
+    Client(["🖥️ Client Applications\nWeb App · Mobile · Admin Panel"])
+
+    Client -- "HTTPS / REST API" --> Security
+
+    subgraph app ["🍃 Spring Boot Application"]
+        Security["🔒 Security\nJWT Filter"]
+        Controllers["📡 Controllers\nREST API"]
+        OpenAPI["📘 Swagger / OpenAPI\nDocumentation"]
+        Services["⚙️ Services\nBusiness Logic"]
+        Repos["🗃️ Repositories\nJPA / SQL"]
+        S3["☁️ S3 Storage\nSupabase"]
+        Payment["💳 Payment Gateway\nVNPay · MoMo (mock)"]
+        Scheduler["⏰ Background Jobs\n📧 Email · 🗑️ File Cleanup\n⏰ Order Expiration · 🧹 Outbox"]
+
+        Security --> Controllers
+        Controllers --> OpenAPI
+        Controllers --> Services
+        Services --> Repos
+        Services --> S3
+        Services --> Payment
+        Repos --> Scheduler
+    end
+
+    Repos --> DB[("🐘 PostgreSQL\nSupabase")]
 ```
 
 ### Feature Modules
@@ -235,129 +213,7 @@ Each feature is self-contained with its own controller, service, repository, DTO
 
 ## 🗄 Database Design
 
-The database consists of **19 versioned migrations** managed by Flyway, creating a relational schema designed around the core business domains:
-
-```mermaid
-erDiagram
-    USERS ||--o{ ORDERS : "places"
-    USERS ||--o| CARTS : "has"
-    USERS ||--o{ USER_LIBRARIES : "owns"
-    USERS ||--o{ REVIEWS : "writes"
-    USERS ||--o{ READING_PROGRESSES : "tracks"
-
-    BOOKS ||--o{ BOOK_AUTHORS : "written by"
-    BOOKS ||--o{ BOOK_CATEGORIES : "categorized in"
-    BOOKS ||--o{ BOOK_TAGS : "labeled with"
-    BOOKS ||--o{ BOOK_FORMATS : "available as"
-    BOOKS ||--o{ REVIEWS : "has"
-    BOOKS }o--|| PUBLISHERS : "published by"
-
-    AUTHORS ||--o{ BOOK_AUTHORS : "writes"
-    CATEGORIES ||--o{ BOOK_CATEGORIES : "contains"
-    TAGS ||--o{ BOOK_TAGS : "labels"
-
-    CARTS ||--o{ CART_ITEMS : "contains"
-    CART_ITEMS }o--|| BOOKS : "references"
-
-    ORDERS ||--o{ ORDER_ITEMS : "contains"
-    ORDERS ||--o{ PAYMENTS : "paid via"
-    ORDER_ITEMS }o--|| BOOKS : "for"
-    ORDER_ITEMS ||--o| USER_LIBRARIES : "grants"
-
-    USER_LIBRARIES }o--|| BOOKS : "accesses"
-    READING_PROGRESSES }o--|| BOOKS : "reads"
-```
-
-### Domain Breakdown
-
-<details>
-<summary><strong>👤 User & Authentication Domain</strong></summary>
-
-Manages user accounts, roles, and session security.
-
-| Table | Purpose |
-|---|---|
-| `users` | User profiles (email, name, avatar, password hash) |
-| `roles` | Role definitions (`USER`, `ADMIN`) |
-| `user_roles` | Many-to-many: which users have which roles |
-| `refresh_tokens` | JWT refresh tokens for session continuity |
-| `password_reset_tokens` | Time-limited tokens for password recovery |
-
-**Key Constraint:** Each user has a unique email. Password reset tokens auto-expire.
-
-</details>
-
-<details>
-<summary><strong>📚 Book Catalog Domain</strong></summary>
-
-The core content domain — books and their metadata.
-
-| Table | Purpose |
-|---|---|
-| `books` | Book info: title, price, cover, status, badge, ratings |
-| `authors` | Author profiles with avatars and biographies |
-| `publishers` | Publisher registry with logos |
-| `categories` | Hierarchical categories with URL-friendly slugs |
-| `tags` | Flexible labels (UUID-based) |
-| `book_authors` | Many-to-many: books ↔ authors |
-| `book_categories` | Many-to-many: books ↔ categories |
-| `book_tags` | Many-to-many: books ↔ tags |
-| `book_formats` | Available formats per book (EPUB, PDF, MOBI) with file URLs |
-| `reviews` | User reviews: 1–5 rating, comment, helpful count |
-
-**Key Constraints:** Reviews enforce one-per-user-per-book. Book formats have unique type per book. Categories have unique slugs.
-
-</details>
-
-<details>
-<summary><strong>🛒 Commerce Domain</strong></summary>
-
-Handles the purchase flow from cart to completed order.
-
-| Table | Purpose |
-|---|---|
-| `carts` | One cart per user |
-| `cart_items` | Books in the cart (unique per cart-book pair) |
-| `orders` | Order records with status lifecycle |
-| `order_items` | Ordered books with **price snapshots** (locked at purchase time) |
-| `payments` | Payment transactions (provider, status, amounts) |
-| `processed_payment_events` | Idempotency guard for webhook processing |
-
-**Order Status Flow:** `PENDING` → `PAID` / `CANCELLED` / `EXPIRED` → `REFUNDED`
-
-**Payment Status Flow:** `PENDING` → `SUCCESS` / `FAILED`
-
-</details>
-
-<details>
-<summary><strong>📖 Library & Reading Domain</strong></summary>
-
-Manages what users own and their reading progress.
-
-| Table | Purpose |
-|---|---|
-| `user_libraries` | Books owned by a user (with access status) |
-| `reading_progresses` | Reading position, percentage, and status per book |
-
-**Access Statuses:** `ACTIVE` (can read) · `REVOKED` (admin removed) · `REFUNDED` (payment reversed)
-
-**Reading Statuses:** `NOT_STARTED` → `IN_PROGRESS` → `FINISHED`
-
-</details>
-
-<details>
-<summary><strong>⚙️ System Domain (Background Processing)</strong></summary>
-
-Infrastructure tables that ensure reliability.
-
-| Table | Purpose |
-|---|---|
-| `email_outbox` | Queue for outgoing emails (retry-safe) |
-| `file_deletion_outbox` | Queue for orphaned file cleanup (retry-safe) |
-
-Both outbox tables follow the **Transactional Outbox Pattern** — operations are first saved to the database (guaranteed), then processed asynchronously by background jobs. If processing fails, they're retried automatically.
-
-</details>
+> 🚧 **Work in progress** — ER diagram and schema documentation are being finalized.
 
 ---
 
@@ -410,7 +266,7 @@ cd ebook-reader
 
 **2. Set up environment variables**
 
-Create a `.env` file in the project root. See [Environment Variables](#-environment-variables) for the full reference.
+Create a `.env` file in the project root with the required configuration (database URL, JWT secret, S3 credentials, mail settings, etc.).
 
 **3. Run the application**
 
@@ -713,108 +569,11 @@ ebook-reader/
 └── .env                          # Environment variables (git-ignored)
 ```
 
----
 
-## 🔧 Environment Variables
-
-<details>
-<summary><strong>Click to expand full .env reference</strong></summary>
-
-```properties
-# ── Server ──────────────────────────────────────────
-PORT=8080
-
-# ── Database (PostgreSQL) ──────────────────────────
-DB_URL=jdbc:postgresql://localhost:5432/ebook_reader
-DB_USERNAME=your_db_username
-DB_PASSWORD=your_db_password
-
-# ── JWT Authentication ─────────────────────────────
-JWT_SECRET=your_jwt_secret_key_min_256_bits
-JWT_EXPIRATION_MS=900000                    # 15 minutes
-JWT_COOKIE_NAME=ebook-reader-jwt
-JWT_REFRESH_COOKIE_NAME=ebook-reader-jwt-refresh
-JWT_REFRESH_EXPIRATION_MS=1209600000        # 14 days
-
-# ── Password Reset ─────────────────────────────────
-PASSWORD_RESET_TOKEN_EXPIRATION_MS=900000   # 15 minutes
-
-# ── S3 Object Storage ─────────────────────────────
-S3_ENDPOINT_URL=https://your-s3-endpoint
-S3_REGION=your-region
-S3_ACCESS_KEY=your_access_key
-S3_SECRET_KEY=your_secret_key
-S3_PUBLIC_BUCKET_NAME=ebook-storage
-S3_PRIVATE_BUCKET_NAME=ebook-storage-private
-S3_PUBLIC_BASE_URL=https://your-public-base-url
-S3_PRESIGNED_URL_EXPIRY_MINUTES=90
-
-# ── VNPay (optional) ──────────────────────────────
-VNPAY_TMN_CODE=YOUR_TMN_CODE
-VNPAY_HASH_SECRET=YOUR_HASH_SECRET
-VNPAY_PAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-VNPAY_RETURN_URL=http://localhost:8080/api/payment/vnpay/callback
-
-# ── MoMo (optional) ───────────────────────────────
-MOMO_PARTNER_CODE=MOMO
-MOMO_ACCESS_KEY=YOUR_ACCESS_KEY
-MOMO_SECRET_KEY=YOUR_SECRET_KEY
-MOMO_PAY_URL=https://test-payment.momo.vn/v2/gateway/api/create
-MOMO_REDIRECT_URL=http://localhost:8080/api/payment/momo/callback
-MOMO_IPN_URL=http://localhost:8080/api/payment/momo/ipn
-MOMO_REQUEST_TYPE=captureWallet
-
-# ── Email (Gmail SMTP) ────────────────────────────
-MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
-MAIL_FROM=your_email@gmail.com
-
-# ── Frontend ──────────────────────────────────────
-FRONTEND_URL=http://localhost:5173
-```
-
-</details>
 
 ---
 
-## 🐳 Deployment
 
-### Docker (Recommended)
-
-The project uses a **multi-stage Docker build** — compiles with JDK 25, then runs on a lightweight JRE image to minimize memory usage (~512MB RAM).
-
-```bash
-docker build -t ebook-reader .
-docker run -d -p 8080:8080 --env-file .env --name ebook-reader ebook-reader
-```
-
-### Cloud Platforms
-
-The Docker image is optimized for deployment on:
-
-- **Render** — Free tier with 512MB RAM
-- **Railway** — Easy PostgreSQL + app deployment
-- **Fly.io** — Global edge deployment
-
----
-
-## 🧪 Testing
-
-```bash
-./mvnw test
-```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add some amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
 
 ---
 
@@ -827,8 +586,6 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
 ## 📬 Contact
 
 **Ari Tan** — [hnminh.tan.2004@gmail.com](mailto:hnminh.tan.2004@gmail.com)
-
-Project Link: [github.com/AriTannia/ebook-reader](https://github.com/AriTannia/ebook-reader)
 
 ---
 
