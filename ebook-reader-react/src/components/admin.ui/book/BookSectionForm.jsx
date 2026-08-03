@@ -132,7 +132,7 @@ export default function BookSectionForm({
                 <option value="">Select status</option>
                 {BOOK_STATUS_OPTIONS.map((opt) => (
                   <option key={opt.id} value={opt.id}>
-                    {opt.name}
+                    {opt.label}
                   </option>
                 ))}
               </select>
