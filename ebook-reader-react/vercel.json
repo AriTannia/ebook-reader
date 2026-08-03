@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://ebook-reader-be-1.onrender.com/api/:path*"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }
