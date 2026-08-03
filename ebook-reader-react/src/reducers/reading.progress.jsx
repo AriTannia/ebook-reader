@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as ReadingProgressService from "../services/reading.progress.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const saveReadingProgress = createAsyncThunk(
   "readingProgress/saveReadingProgress",
@@ -9,12 +10,7 @@ export const saveReadingProgress = createAsyncThunk(
       const response = await ReadingProgressService.saveProgress(progressData);
       return response.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error);
       dispatch(setMessage(message));
       return rejectWithValue(message);
     }
@@ -28,12 +24,7 @@ export const refreshReadingUrl = createAsyncThunk(
       const response = await ReadingProgressService.refreshReadingUrl(bookId);
       return response.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error);
       dispatch(setMessage(message));
       return rejectWithValue(message);
     }
@@ -47,12 +38,7 @@ export const getRecentReading = createAsyncThunk(
       const response = await ReadingProgressService.getRecentReading(limit);
       return response.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error);
       dispatch(setMessage(message));
       return rejectWithValue(message);
     }
@@ -66,12 +52,7 @@ export const markAsFinished = createAsyncThunk(
       const response = await ReadingProgressService.markAsFinished(bookId);
       return response.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error);
       dispatch(setMessage(message));
       return rejectWithValue(message);
     }

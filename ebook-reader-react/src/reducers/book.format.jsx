@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as BookFormatService from "../services/book.format.service";
 import { setMessage } from "./message";
-import { act } from "react";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const fetchAllBookFormats = createAsyncThunk(
   "bookFormats/fetchAllBookFormats",
@@ -10,10 +10,7 @@ export const fetchAllBookFormats = createAsyncThunk(
       const response = await BookFormatService.getAllBookFormats(bookId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching book formats.";
+      const message = getErrorMessage(error, { 404: 'No formats found for this book.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -27,10 +24,7 @@ export const addBookFormat = createAsyncThunk(
       const response = await BookFormatService.addNewBookFormat(bookId, formatData);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while adding a new book format.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -44,10 +38,7 @@ export const setPrimaryBookFormat = createAsyncThunk(
       const response = await BookFormatService.updatePrimaryFormat(bookId, formatId, isPrimary);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating the primary book format.";
+      const message = getErrorMessage(error, { 404: 'Book format not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -61,10 +52,7 @@ export const deleteBookFormat = createAsyncThunk(
       await BookFormatService.deleteBookFormat(bookId, formatId);
       return formatId;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while deleting the book format.";
+      const message = getErrorMessage(error, { 404: 'Book format not found. It may have already been deleted.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

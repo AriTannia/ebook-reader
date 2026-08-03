@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as OrderService from "../services/order.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const createOrder = createAsyncThunk(
     "order/createOrder",
@@ -9,12 +10,9 @@ export const createOrder = createAsyncThunk(
             const response = await OrderService.createOrder();
             return response.data.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error, {
+                409: 'You already have an active order. Please complete or cancel it first.',
+            });
             thunkAPI.dispatch(setMessage(message));
             return thunkAPI.rejectWithValue(message);
         }
@@ -28,12 +26,9 @@ export const getMyOrders = createAsyncThunk(
             const response = await OrderService.getMyOrders(filters);
             return response.data.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error, {
+                404: 'No orders were found.',
+            });
             thunkAPI.dispatch(setMessage(message));
             return thunkAPI.rejectWithValue(message);
         }
@@ -47,12 +42,9 @@ export const getMyOrderById = createAsyncThunk(
             const response = await OrderService.getMyOrderById(orderId);
             return response.data.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error, {
+                404: 'Order not found.',
+            });
             thunkAPI.dispatch(setMessage(message));
             return thunkAPI.rejectWithValue(message);
         }
@@ -66,12 +58,10 @@ export const cancelMyOrder = createAsyncThunk(
             const response = await OrderService.cancelMyOrder(orderId);
             return response.data.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error, {
+                404: 'Order not found.',
+                409: 'This order cannot be cancelled.',
+            });
             thunkAPI.dispatch(setMessage(message));
             return thunkAPI.rejectWithValue(message);
         }
@@ -85,12 +75,9 @@ export const fetchAllOrdersForAdmin = createAsyncThunk(
             const response = await OrderService.getAllOrdersForAdmin(filters);
             return response.data.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error, {
+                404: 'No orders were found.',
+            });
             thunkAPI.dispatch(setMessage(message));
             return thunkAPI.rejectWithValue(message);
         }
@@ -104,14 +91,11 @@ export const getOrderByIdForAdmin = createAsyncThunk(
             const response = await OrderService.getOrderByIdForAdmin(orderId);
             return response.data.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error, {
+                404: 'Order not found.',
+            });
             thunkAPI.dispatch(setMessage(message));
-            thunkAPI.rejectWithValue(message);
+            return thunkAPI.rejectWithValue(message);
         }
     }
 );
@@ -123,14 +107,12 @@ export const cancelOrderByAdmin = createAsyncThunk(
             const response = await OrderService.cancelOrderByAdmin(orderId);
             return response.data.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error, {
+                404: 'Order not found.',
+                409: 'This order cannot be cancelled.',
+            });
             thunkAPI.dispatch(setMessage(message));
-            thunkAPI.rejectWithValue(message);
+            return thunkAPI.rejectWithValue(message);
         }
     }
 );
@@ -142,14 +124,12 @@ export const refundOrder = createAsyncThunk(
             const response = await OrderService.refundOrder(orderId);
             return response.data.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error, {
+                404: 'Order not found.',
+                409: 'This order is not eligible for a refund.',
+            });
             thunkAPI.dispatch(setMessage(message));
-            thunkAPI.rejectWithValue(message);
+            return thunkAPI.rejectWithValue(message);
         }
     }
 );

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as PublisherService from "../services/publisher.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const fetchPublishers = createAsyncThunk(
   "publishers/fetchPublishers",
@@ -9,10 +10,7 @@ export const fetchPublishers = createAsyncThunk(
       const response = await PublisherService.getAllPublishers();
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching publishers.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -26,10 +24,7 @@ export const fetchPublisherById = createAsyncThunk(
       const response = await PublisherService.getPublisherById(publisherId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching the publisher.";
+      const message = getErrorMessage(error, { 404: 'Publisher not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -43,10 +38,7 @@ export const fetchPublishersForAdmin = createAsyncThunk(
       const response = await PublisherService.getAllPublishersForAdmin(filters);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching publishers for admin.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -60,10 +52,7 @@ export const addPublisher = createAsyncThunk(
       const response = await PublisherService.addNewPublisher(publisherData);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while adding the publisher.";
+      const message = getErrorMessage(error, { 409: 'A publisher with this name already exists.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -80,10 +69,7 @@ export const updatePublisher = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating the publisher.";
+      const message = getErrorMessage(error, { 404: 'Publisher not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -97,10 +83,7 @@ export const deletePublisher = createAsyncThunk(
       const response = await PublisherService.deletePublisher(publisherId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while deleting the publisher.";
+      const message = getErrorMessage(error, { 404: 'Publisher not found. It may have already been deleted.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as BookContentService from "../services/book.content.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const streamPdf = createAsyncThunk(
   "bookContent/streamPdf",
@@ -16,10 +17,7 @@ export const fetchContentUrl = createAsyncThunk(
       const response = await BookContentService.getContentUrl(bookId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching the content URL.";
+      const message = getErrorMessage(error, { 403: 'You do not have access to this content.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -33,10 +31,7 @@ export const fetchBookFormatForReading = createAsyncThunk(
       const response = await BookContentService.getBookFormatForReading(bookId);
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching the book format.";
+      const message = getErrorMessage(error, { 403: 'You do not have access to this book.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

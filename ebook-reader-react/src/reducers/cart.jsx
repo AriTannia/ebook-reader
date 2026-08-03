@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as CartService from "../services/cart.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
@@ -9,10 +10,7 @@ export const fetchCart = createAsyncThunk(
       const response = await CartService.getCart();
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching the cart.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -26,10 +24,9 @@ export const addToCart = createAsyncThunk(
       const response = await CartService.addCartItem(cartData);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while adding the book to the cart.";
+      const message = getErrorMessage(error, {
+        409: 'This item is already in your cart.',
+      });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -43,10 +40,9 @@ export const removeFromCart = createAsyncThunk(
       const response = await CartService.removeCartItem(cartItemId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while removing the book from the cart.";
+      const message = getErrorMessage(error, {
+        404: 'Cart item not found.',
+      });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -60,10 +56,7 @@ export const clearCart = createAsyncThunk(
       await CartService.clearCart();
       return;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while clearing the cart.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

@@ -1,19 +1,10 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import * as AuthService from '../services/auth.service';
 import { setMessage } from './message';
+import { getErrorMessage } from '../utils/errorHandler';
 
-const getAuthErrorMessage = (error) => {
-  const response = error.response?.data;
-
-  if (response?.codeNumber === 401 || response?.codeStatus === 'Unauthorized') {
-    return 'Incorrect email or password. Please try again.';
-  }
-
-  return (
-    response?.message ||
-    error.message ||
-    'An error occurred. Please try again.'
-  );
+const AUTH_ERROR_OVERRIDES = {
+  401: 'Incorrect email or password. Please try again.',
 };
 
 export const register = createAsyncThunk(
@@ -23,7 +14,7 @@ export const register = createAsyncThunk(
       const response = await AuthService.register(fullName, email, password);
       return response.data;
     } catch (error) {
-      const message = getAuthErrorMessage(error);
+      const message = getErrorMessage(error, AUTH_ERROR_OVERRIDES);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -38,7 +29,7 @@ export const login = createAsyncThunk(
       console.log("Login response:", response);
       return response.data;
     } catch (error) {
-      const message = getAuthErrorMessage(error);
+      const message = getErrorMessage(error, AUTH_ERROR_OVERRIDES);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -64,7 +55,7 @@ export const changePassword = createAsyncThunk(
       const response = await AuthService.changePassword(oldPassword, newPassword);
       return response.data;
     } catch (error) {
-      const message = getAuthErrorMessage(error);
+      const message = getErrorMessage(error, AUTH_ERROR_OVERRIDES);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -78,7 +69,7 @@ export const forgotPassword = createAsyncThunk(
       const response = await AuthService.forgotPassword(email);
       return response.data;
     } catch (error) {
-      const message = getAuthErrorMessage(error);
+      const message = getErrorMessage(error, AUTH_ERROR_OVERRIDES);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -92,7 +83,7 @@ export const resetPassword = createAsyncThunk(
       const response = await AuthService.resetPassword(token, newPassword);
       return response;
     } catch (error) {
-      const message = getAuthErrorMessage(error);
+      const message = getErrorMessage(error, AUTH_ERROR_OVERRIDES);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

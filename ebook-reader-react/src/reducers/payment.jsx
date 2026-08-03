@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as PayementService from "../services/payment.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const createPaymentIntent = createAsyncThunk(
     "payment/createPaymentIntent",
@@ -9,14 +10,9 @@ export const createPaymentIntent = createAsyncThunk(
             const response = await PayementService.createPaymentIntent(orderId, provider);
             return response.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error);
             thunkAPI.dispatch(setMessage(message));
-            throw error;
+            return thunkAPI.rejectWithValue(message);
         }
     }
 );
@@ -28,14 +24,9 @@ export const getPaymentsByOrderId = createAsyncThunk(
             const response = await PayementService.getPaymentsByOrderId(orderId);
             return response.data;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
+            const message = getErrorMessage(error);
             thunkAPI.dispatch(setMessage(message));
-            throw error;
+            return thunkAPI.rejectWithValue(message);
         }
     }
 );
@@ -63,7 +54,7 @@ const paymentSlice = createSlice({
             })
             .addCase(createPaymentIntent.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
             })
             .addCase(getPaymentsByOrderId.pending, (state) => {
                 state.loading = true;
@@ -75,7 +66,7 @@ const paymentSlice = createSlice({
             })
             .addCase(getPaymentsByOrderId.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
             });
     }
 });

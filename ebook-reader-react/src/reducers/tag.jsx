@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as TagService from "../services/tag.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const fetchTags = createAsyncThunk(
   "tags/fetchTags",
@@ -9,10 +10,7 @@ export const fetchTags = createAsyncThunk(
       const response = await TagService.getAllTags();
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching tags.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -26,10 +24,7 @@ export const fetchTagById = createAsyncThunk(
       const response = await TagService.getTagById(tagId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching the tag.";
+      const message = getErrorMessage(error, { 404: 'Tag not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -43,10 +38,7 @@ export const fetchTagsForAdmin = createAsyncThunk(
       const response = await TagService.getAllTagsForAdmin(filters);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching tags for admin.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -60,10 +52,7 @@ export const addTag = createAsyncThunk(
       const response = await TagService.addNewTag(tagData);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while adding the tag.";
+      const message = getErrorMessage(error, { 409: 'A tag with this name already exists.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -77,10 +66,7 @@ export const updateTag = createAsyncThunk(
       const response = await TagService.updateTagDetails(tagId, tagData);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating the tag.";
+      const message = getErrorMessage(error, { 404: 'Tag not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -94,10 +80,7 @@ export const deleteTag = createAsyncThunk(
       const response = await TagService.deleteTag(tagId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while deleting the tag.";
+      const message = getErrorMessage(error, { 404: 'Tag not found. It may have already been deleted.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

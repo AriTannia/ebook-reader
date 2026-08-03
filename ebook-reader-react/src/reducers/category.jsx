@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as CategoryService from "../services/category.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const fetchAllCategories = createAsyncThunk(
   "category/getAllCategories",
@@ -9,12 +10,7 @@ export const fetchAllCategories = createAsyncThunk(
       const response = await CategoryService.getAllCategories();
       return response.data.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -28,12 +24,7 @@ export const fetchCategoryById = createAsyncThunk(
       const response = await CategoryService.getCategoryById(categoryId);
       return response.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error, { 404: 'Category not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -47,12 +38,7 @@ export const fetchAllCategoriesForAdmin = createAsyncThunk(
       const response = await CategoryService.getAllCategoriesForAdmin(filters);
       return response.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -66,12 +52,7 @@ export const createCategory = createAsyncThunk(
       const response = await CategoryService.addNewCategory(categoryData);
       return response.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error, { 409: 'A category with this name already exists.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -88,12 +69,7 @@ export const updateCategory = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error, { 404: 'Category not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -107,12 +83,7 @@ export const deleteCategory = createAsyncThunk(
       const response = await CategoryService.deleteCategory(categoryId);
       return response.data;
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = getErrorMessage(error, { 404: 'Category not found. It may have already been deleted.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

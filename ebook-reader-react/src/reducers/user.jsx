@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as UserService from "../services/user.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const fetchUserById = createAsyncThunk(
   "user/fetchUserById",
@@ -9,10 +10,7 @@ export const fetchUserById = createAsyncThunk(
       const response = await UserService.getUserById(userId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching user profile.";
+      const message = getErrorMessage(error, { 404: 'User not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -27,10 +25,7 @@ export const updateUserProfile = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating user profile.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -45,10 +40,7 @@ export const updateUserAvatar = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating user avatar.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -62,10 +54,7 @@ export const fetchAllUsers = createAsyncThunk(
       const response = await UserService.getAllUsers(filters);
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching users.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -79,10 +68,7 @@ export const createUser = createAsyncThunk(
       const response = await UserService.createUser(userData);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while creating the user.";
+      const message = getErrorMessage(error, { 409: 'A user with this email already exists.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -96,10 +82,7 @@ export const updateUserRole = createAsyncThunk(
       const response = await UserService.updateUserRole(userId, roleData);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating the user role.";
+      const message = getErrorMessage(error, { 404: 'User not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -113,10 +96,7 @@ export const deleteUser = createAsyncThunk(
       await UserService.deleteUser(userId);
       return userId;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while deleting the user.";
+      const message = getErrorMessage(error, { 404: 'User not found. They may have already been deleted.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as FileService from "../services/file.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 import axios from "axios";
 
 export const FILE_UPLOAD_TYPE = {
@@ -45,10 +46,7 @@ export const uploadFile = createAsyncThunk(
 
     } catch (error) {
 
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while uploading the file.";
+      const message = getErrorMessage(error);
 
       return thunkAPI.rejectWithValue(message);
     }

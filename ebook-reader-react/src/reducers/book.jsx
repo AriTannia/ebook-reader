@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as BookService from "../services/book.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const fetchBooks = createAsyncThunk(
   "book/fetchBooks",
@@ -16,10 +17,9 @@ export const fetchBooks = createAsyncThunk(
         books: response.data.data.content,
       };
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching books.";
+      const message = getErrorMessage(error, {
+        404: 'No books were found.',
+      });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -34,10 +34,9 @@ export const searchBooks = createAsyncThunk(
       const response = await BookService.searchBooks({...filters});
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while searching for books.";
+      const message = getErrorMessage(error, {
+        404: 'No books matched your search.',
+      });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -51,10 +50,9 @@ export const fetchBookDetails = createAsyncThunk(
       const response = await BookService.getBookDetails(bookId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching book details.";
+      const message = getErrorMessage(error, {
+        404: 'Book not found.',
+      });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -73,10 +71,7 @@ export const fetchBooksForAdmin = createAsyncThunk(
         books: response.data,
       };
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching books for admin.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -90,10 +85,9 @@ export const addBook = createAsyncThunk(
       const response = await BookService.addNewBook(bookDataList);
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while adding the book.";
+      const message = getErrorMessage(error, {
+        409: 'A book with this title already exists.',
+      });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -107,10 +101,9 @@ export const updateBookDetails = createAsyncThunk(
       const response = await BookService.updateBookDetails(bookId, updatedData);
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating book details.";
+      const message = getErrorMessage(error, {
+        404: 'Book not found. It may have been deleted.',
+      });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -124,10 +117,9 @@ export const deleteBook = createAsyncThunk(
       await BookService.deleteBook(bookId);
       return bookId;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while deleting the book.";
+      const message = getErrorMessage(error, {
+        404: 'Book not found. It may have already been deleted.',
+      });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

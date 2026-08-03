@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as ReviewService from "../services/review.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const fetchReviewsByBookId = createAsyncThunk(
   "review/fetchReviewsByBookId",
@@ -9,10 +10,7 @@ export const fetchReviewsByBookId = createAsyncThunk(
       const response = await ReviewService.getReviewsByBookId(bookId, filters);
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching reviews.";
+      const message = getErrorMessage(error, { 404: 'No reviews found for this book.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -26,10 +24,7 @@ export const fetchReviewStatsByBookId = createAsyncThunk(
       const response = await ReviewService.getReviewStatsByBookId(bookId);
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching review statistics.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -43,10 +38,9 @@ export const addReview = createAsyncThunk(
       const response = await ReviewService.addReview(bookId, reviewData);
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while adding the review.";
+      const message = getErrorMessage(error, {
+        409: 'You have already reviewed this book.',
+      });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -64,10 +58,7 @@ export const updateReview = createAsyncThunk(
       );
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating the review.";
+      const message = getErrorMessage(error, { 404: 'Review not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -84,10 +75,7 @@ export const updateReviewHelpfulCount = createAsyncThunk(
       );
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating the helpful count.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -101,10 +89,7 @@ export const deleteReview = createAsyncThunk(
       await ReviewService.deleteReview(bookId, reviewId);
       return { bookId, reviewId };
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while deleting the review.";
+      const message = getErrorMessage(error, { 404: 'Review not found. It may have already been deleted.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }

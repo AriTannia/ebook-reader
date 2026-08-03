@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as AuthorService from "../services/author.service";
 import { setMessage } from "./message";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export const fetchAuthors = createAsyncThunk(
   "authors/fetchAuthors",
@@ -9,10 +10,7 @@ export const fetchAuthors = createAsyncThunk(
       const response = await AuthorService.getAllAuthors();
       return response.data.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching authors.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -26,10 +24,7 @@ export const fetchAuthorById = createAsyncThunk(
       const response = await AuthorService.getAuthorById(authorId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching the author.";
+      const message = getErrorMessage(error, { 404: 'Author not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -43,10 +38,7 @@ export const fetchAuthorsForAdmin = createAsyncThunk(
       const response = await AuthorService.getAllAuthorsForAdmin(filters);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while fetching authors for admin.";
+      const message = getErrorMessage(error);
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -60,10 +52,7 @@ export const addAuthor = createAsyncThunk(
       const response = await AuthorService.addNewAuthor(authorData);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while adding the author.";
+      const message = getErrorMessage(error, { 409: 'An author with this name already exists.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -77,10 +66,7 @@ export const updateAuthor = createAsyncThunk(
       const response = await AuthorService.updateAuthorDetails(authorId, updatedData);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while updating the author.";
+      const message = getErrorMessage(error, { 404: 'Author not found.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
@@ -94,10 +80,7 @@ export const deleteAuthor = createAsyncThunk(
       const response = await AuthorService.deleteAuthor(authorId);
       return response.data;
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "An error occurred while deleting the author.";
+      const message = getErrorMessage(error, { 404: 'Author not found. It may have already been deleted.' });
       thunkAPI.dispatch(setMessage(message));
       return thunkAPI.rejectWithValue(message);
     }
