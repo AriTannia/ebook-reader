@@ -162,18 +162,6 @@ flowchart LR
     end
 ```
 
-### Design Patterns
-
-| Pattern | Where It's Used |
-|---|---|
-| **Outbox Pattern** | Email dispatch, File cleanup |
-| **Factory Pattern** | Payment gateways, Book creation |
-| **Specification Pattern** | Book, Author, Category search |
-| **Rate Limiting** | Book content access |
-| **Idempotency** | Payment webhooks |
-| **DTO Pattern** | All API endpoints |
-| **MapStruct** | Entity ↔ DTO conversion |
-
 ---
 
 ## 🗄 Database Design
