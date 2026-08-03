@@ -162,39 +162,17 @@ flowchart LR
     end
 ```
 
-### Feature Modules
+### Design Patterns
 
-Each feature is self-contained with its own controller, service, repository, DTOs, and utilities:
-
-| Module | What It Does | Key Technique |
-|---|---|---|
-| **Auth** | User registration, login, password reset | JWT + HTTP-only cookies, BCrypt hashing |
-| **Book** | Book catalog CRUD, search, filtering | JPA Specifications, MapStruct mapping |
-| **Book Format** | Multi-format file management (EPUB, PDF) | S3 pre-signed URLs |
-| **Author** | Author profiles & book associations | Many-to-Many relationships |
-| **Publisher** | Publisher registry | One-to-Many with books |
-| **Category** | Book categorization with slugs | Hierarchical categories, unique slugs |
-| **Tag** | Flexible book labeling | UUID-based, Many-to-Many |
-| **Review** | User reviews with ratings | Aggregate stats, helpful votes |
-| **Cart** | Shopping cart management | Unique constraint per user-book |
-| **Order** | Checkout & order lifecycle | Price snapshots, auto-expiration |
-| **Payment** | Multi-provider payment processing | Factory pattern, idempotent webhooks |
-| **Library** | Digital book ownership | Access status tracking (Active/Revoked/Refunded) |
-| **Reading Progress** | Position & progress tracking | Locator-based, percentage tracking |
-| **File** | Cloud file upload/delete | Pre-signed S3 URLs, deletion outbox |
-| **User** | Profile management, admin CRUD | Role-based access (USER, ADMIN) |
-
-### Engineering Patterns Used
-
-| Pattern | Where It's Used | Why |
-|---|---|---|
-| **Outbox Pattern** | Email dispatch, File cleanup | Guarantees reliability — operations are never lost even if external services fail |
-| **Factory Pattern** | Payment gateways, Book creation | Easy to add new payment providers without changing existing code |
-| **Specification Pattern** | Book, Author, Category search | Composable, dynamic query filters without writing custom SQL |
-| **Rate Limiting** | Book content access | Prevents abuse of ebook download endpoints (Bucket4j + Caffeine) |
-| **Idempotency** | Payment webhooks | Safely handles duplicate notifications from payment providers |
-| **DTO Pattern** | All API endpoints | Separates API contracts from database entities |
-| **MapStruct** | Entity ↔ DTO conversion | Compile-time type-safe mapping, zero reflection overhead |
+| Pattern | Where It's Used |
+|---|---|
+| **Outbox Pattern** | Email dispatch, File cleanup |
+| **Factory Pattern** | Payment gateways, Book creation |
+| **Specification Pattern** | Book, Author, Category search |
+| **Rate Limiting** | Book content access |
+| **Idempotency** | Payment webhooks |
+| **DTO Pattern** | All API endpoints |
+| **MapStruct** | Entity ↔ DTO conversion |
 
 ---
 
