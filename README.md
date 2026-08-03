@@ -123,6 +123,13 @@ A user's typical journey through the platform:
 3. **Pay** — Initiate a payment via VNPay or MoMo. The system handles redirects and webhook confirmation idempotently.
 4. **Read** — After payment is confirmed, the book appears in the user's personal library, ready to open. Reading progress is saved and synced across devices.
 
+### 🔑 Demo Accounts
+
+| Role | Email | Password | Access |
+|---|---|---|---|
+| **Admin** | `taka@gmail.com` | `12345678` | Full access to the management dashboard — manage books, orders, categories, publishers, authors, users, and more |
+| **User** | *(just register)* | — | Browse, purchase, and read books |
+
 ---
 
 ## 🏗 Architecture
