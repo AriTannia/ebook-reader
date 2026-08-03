@@ -61,7 +61,8 @@ public class WebSecurityConfig {
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/swagger-ui.html",
-                                        "/error"
+                                        "/error",
+                                        "/api/v1/health"
                                 ).permitAll()
                                 .anyRequest().authenticated());
 
