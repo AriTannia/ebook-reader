@@ -9,6 +9,7 @@ import com.aritan.ebook_reader.common.models.book.UserLibrary;
 import com.aritan.ebook_reader.common.models.order.Order;
 import com.aritan.ebook_reader.common.models.order.OrderItem;
 import com.aritan.ebook_reader.common.models.user.User;
+import com.aritan.ebook_reader.config.s3.utilities.StorageUrlExtension;
 import com.aritan.ebook_reader.features.library.dtos.LibraryFilterRequest;
 import com.aritan.ebook_reader.features.library.dtos.UserLibraryResponse;
 import com.aritan.ebook_reader.features.library.readinghistory.IReadingProgressRepository;
@@ -31,6 +32,7 @@ public class UserLibraryService implements IUserLibraryService {
     private final IUserLibraryRepository userLibraryRepository;
     private final IReadingProgressRepository readingProgressRepository;
     private final LibraryMapper libraryMapper;
+    private final StorageUrlExtension storageUrlExtension;
 
     @Override
     @Transactional
@@ -84,7 +86,13 @@ public class UserLibraryService implements IUserLibraryService {
                         rp -> rp.getBook().getBookId(), rp -> rp));
 
         return result.map(userLibrary ->
-                libraryMapper.toResponse(userLibrary, progressMap.get(userLibrary.getBook().getBookId())));
+        {
+            UserLibraryResponse response = libraryMapper.toResponse(
+                    userLibrary, progressMap.get(userLibrary.getBook().getBookId()));
+            response.getBook().setCoverImageUrl(
+                    storageUrlExtension.getPublicUrl(userLibrary.getBook().getCoverImageUrl()));
+            return response;
+        });
     }
 
     @Override

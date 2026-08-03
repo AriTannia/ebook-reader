@@ -2,10 +2,13 @@ import { Link } from "react-router-dom";
 import { Heart, BookOpen } from "lucide-react";
 
 export default function LibraryBookCard({ item, onToggleFavorite }) {
+  if (!item?.book) return null;
+
   const { bookId, title, coverImageUrl } = item.book;
   const { readingProgress, isFavorite } = item;
   const progressPercent = readingProgress?.progressPercent ?? 0;
   const roundedPercent = Math.round(progressPercent);
+
 
   return (
     <div className="group relative flex flex-col gap-2">

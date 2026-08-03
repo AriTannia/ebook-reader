@@ -84,10 +84,6 @@ const LibrarySlice = createSlice({
       })
       .addCase(getAllLibraryItems.fulfilled, (state, action) => {
         state.loading = false;
-        console.log(
-          "action.payload.data.content: ",
-          action.payload.data.content,
-        );
         state.items = action.payload.data.content;
       })
       .addCase(getAllLibraryItems.rejected, (state, action) => {
